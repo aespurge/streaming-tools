@@ -1,0 +1,91 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:notification_app.ViewModels"
+        xmlns:local="clr-namespace:notification_app"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="550" d:DesignHeight="350"
+        Width="550" Height="350"
+        x:Class="notification_app.Views.MainWindow"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="notification_app">
+
+    <Window.Resources>
+        <local:RoundingValueConverter x:Key="RoundingValueConverter" />
+        <local:BoundedIntConverter x:Key="BoundedIntConverter" />
+    </Window.Resources>
+
+    <Design.DataContext>
+        <vm:MainWindowViewModel />
+    </Design.DataContext>
+
+    <DockPanel Margin="10">
+        <StackPanel>
+            <CheckBox IsChecked="{Binding TTSOn}">TTS On</CheckBox>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition />
+                    <RowDefinition Height="50" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Label Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,5,0">Twitch Channel:</Label>
+                <TextBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="4" HorizontalAlignment="Stretch"
+                         Text="{Binding TwitchChannel}" />
+                <Label Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,5,0">Twitch Username:</Label>
+                <TextBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="4" HorizontalAlignment="Stretch"
+                         Text="{Binding TwitchUsername}" />
+                <Label Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,5,0">Twitch OAuth Token:</Label>
+                <TextBox PasswordChar="*" Grid.Row="3" Grid.ColumnSpan="4" Grid.Column="1"
+                         HorizontalAlignment="Stretch" Text="{Binding TwitchOauth}" />
+                <Label Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right"
+                       Margin="0,0,5,0">
+                    TTS Voice:
+                </Label>
+                <ComboBox x:Name="ttsVoiceComboBox" SelectedItem="{Binding TtsVoice}" Grid.Row="4" Grid.Column="1"
+                          VerticalAlignment="Center" Margin="0,0,5,0" />
+                <Label Grid.Row="4" Grid.Column="2" VerticalAlignment="Center" Margin="0,0,5,0">Volume:</Label>
+                <Slider x:Name="volumeSlider" Grid.Row="4" Grid.Column="3" VerticalAlignment="Center" Minimum="0"
+                        Maximum="100" Value="{Binding TtsVolume}" />
+                <TextBlock Width="40" Grid.Row="4" Grid.Column="4" VerticalAlignment="Center" Margin="5,0,5,0"
+                           Text="{Binding Value, ElementName=volumeSlider, Converter={StaticResource RoundingValueConverter}}" />
+            </Grid>
+            <CheckBox IsChecked="{Binding PauseDuringSpeech}">Pause During Speech</CheckBox>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Label VerticalAlignment="Center">Microphone Source:</Label>
+                <ComboBox Grid.Column="1" x:Name="micSources" SelectedItem="{Binding MicSource}"
+                          VerticalAlignment="Center"
+                          Margin="0,0,5,0"
+                          SelectedIndex="{Binding SelectedInputDevice}" />
+            </Grid>
+
+            <Grid Margin="0,5,0,5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Label VerticalAlignment="Center">Threshold: </Label>
+                <NumericUpDown AllowSpin="false" ShowButtonSpinner="false" Grid.Column="1" Value="{Binding PauseThreshold, Mode=TwoWay}" Minimum="0" Maximum="100" Width="20" />
+                <Grid Grid.Column="2" Margin="5, 0">
+                    <Rectangle HorizontalAlignment="Left" Width="100" Height="10" Fill="black" />
+                    <Rectangle HorizontalAlignment="Left" Width="{Binding VoiceVolume}" Height="10" Fill="red" />
+                    <Rectangle HorizontalAlignment="Left" Margin="{Binding ThresholdVisualizationMargin}" Fill="green" Width="1" Height="20"/>
+                </Grid>
+            </Grid>
+        </StackPanel>
+    </DockPanel>
+</Window>
