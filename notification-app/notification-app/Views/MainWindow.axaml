@@ -12,7 +12,6 @@
 
     <Window.Resources>
         <local:RoundingValueConverter x:Key="RoundingValueConverter" />
-        <local:BoundedIntConverter x:Key="BoundedIntConverter" />
     </Window.Resources>
 
     <Design.DataContext>
@@ -79,11 +78,13 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <Label VerticalAlignment="Center">Threshold: </Label>
-                <NumericUpDown AllowSpin="false" ShowButtonSpinner="false" Grid.Column="1" Value="{Binding PauseThreshold, Mode=TwoWay}" Minimum="0" Maximum="100" Width="20" />
+                <NumericUpDown AllowSpin="false" ShowButtonSpinner="false" Grid.Column="1"
+                               Value="{Binding PauseThreshold, Mode=TwoWay}" Minimum="0" Maximum="100" Width="20" />
                 <Grid Grid.Column="2" Margin="5, 0">
                     <Rectangle HorizontalAlignment="Left" Width="100" Height="10" Fill="black" />
                     <Rectangle HorizontalAlignment="Left" Width="{Binding VoiceVolume}" Height="10" Fill="red" />
-                    <Rectangle HorizontalAlignment="Left" Margin="{Binding ThresholdVisualizationMargin}" Fill="green" Width="1" Height="20"/>
+                    <Rectangle HorizontalAlignment="Left" Margin="{Binding ThresholdVisualizationMargin}" Fill="green"
+                               Width="1" Height="20" />
                 </Grid>
             </Grid>
         </StackPanel>
