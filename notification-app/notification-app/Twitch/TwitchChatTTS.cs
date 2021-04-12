@@ -1,57 +1,49 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Speech.Synthesis;
 using System.Text;
-using System.Threading.Tasks;
 using TwitchLib.Client;
-using TwitchLib.Client.Enums;
 using TwitchLib.Client.Events;
-using TwitchLib.Client.Extensions;
 using TwitchLib.Client.Models;
 using TwitchLib.Communication.Clients;
 using TwitchLib.Communication.Models;
-using System.Speech;
-using System.Speech.Synthesis;
 
-namespace notification_app
-{
-    class TwitchChatTTS : IDisposable
-    {
+namespace notification_app {
+    internal class TwitchChatTTS : IDisposable {
         private TwitchClient client;
-        private SpeechSynthesizer synth = new SpeechSynthesizer();
-        private Configuration config;
+        private readonly Configuration config;
+        private SpeechSynthesizer synth = new();
 
-        public TwitchChatTTS()
-        {
+        public TwitchChatTTS() {
             config = Configuration.Instance();
 
             // Configure the audio output.   
             synth.SetOutputToDefaultAudioDevice();
             synth.Volume = (int) config.TtsVolume;
 
-            try
-            {
+            try {
                 // Pick the voice
                 if (null != config.TtsVoice)
                     synth.SelectVoice(config.TtsVoice);
-            }
-            catch (Exception e)
-            {
-            }
+            } catch (Exception e) { }
         }
 
-        public void Connect()
-        {
+        public void Dispose() {
+            client.Disconnect();
+            client = null;
+            synth.Dispose();
+            synth = null;
+        }
+
+        public void Connect() {
             byte[] data = Convert.FromBase64String(config.TwitchOauth);
             string password = Encoding.UTF8.GetString(data);
-            ConnectionCredentials credentials = new ConnectionCredentials(config.TwitchUsername, password);
-            var clientOptions = new ClientOptions
-            {
+            ConnectionCredentials credentials = new(config.TwitchUsername, password);
+            var clientOptions = new ClientOptions {
                 MessagesAllowedInPeriod = 750,
                 ThrottlingPeriod = TimeSpan.FromSeconds(30)
             };
 
-            WebSocketClient customClient = new WebSocketClient(clientOptions);
+            WebSocketClient customClient = new(clientOptions);
             client = new TwitchClient(customClient);
             client.Initialize(credentials, config.TwitchChannel);
 
@@ -59,28 +51,17 @@ namespace notification_app
             client.Connect();
         }
 
-        public void Pause()
-        {
+        public void Pause() {
             if (null != synth)
                 synth.Pause();
         }
 
-        public void Unpause()
-        {
+        public void Unpause() {
             synth.Resume();
         }
 
-        private void Client_OnMessageReceived(object sender, OnMessageReceivedArgs e)
-        {
+        private void Client_OnMessageReceived(object sender, OnMessageReceivedArgs e) {
             synth.SpeakAsync($"{e.ChatMessage.DisplayName} says {e.ChatMessage.Message}");
-        }
-
-        public void Dispose()
-        {
-            client.Disconnect();
-            client = null;
-            synth.Dispose();
-            synth = null;
         }
     }
 }
