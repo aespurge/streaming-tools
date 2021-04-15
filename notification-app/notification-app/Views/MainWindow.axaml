@@ -68,7 +68,7 @@
                 <ComboBox Grid.Column="1" x:Name="micSources" SelectedItem="{Binding MicSource}"
                           VerticalAlignment="Center"
                           Margin="0,0,5,0"
-                          SelectedIndex="{Binding SelectedInputDevice}" />
+                          SelectedIndex="{Binding SelectedMicrophone}" />
             </Grid>
 
             <Grid Margin="0,5,0,5">
@@ -82,8 +82,8 @@
                                Value="{Binding PauseThreshold, Mode=TwoWay}" Minimum="0" Maximum="100" Width="20" />
                 <Grid Grid.Column="2" Margin="5, 0">
                     <Rectangle HorizontalAlignment="Left" Width="100" Height="10" Fill="black" />
-                    <Rectangle HorizontalAlignment="Left" Width="{Binding VoiceVolume}" Height="10" Fill="red" />
-                    <Rectangle HorizontalAlignment="Left" Margin="{Binding ThresholdVisualizationMargin}" Fill="green"
+                    <Rectangle HorizontalAlignment="Left" Width="{Binding MicrophoneVoiceVolume}" Height="10" Fill="red" />
+                    <Rectangle HorizontalAlignment="Left" Margin="{Binding MicrophoneThresholdVisualizationMargin}" Fill="green"
                                Width="1" Height="20" />
                 </Grid>
             </Grid>

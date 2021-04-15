@@ -6,6 +6,9 @@ using Avalonia.Markup.Xaml;
 
 namespace notification_app.Views {
     public class MainWindow : Window {
+        /// <summary>
+        /// Initializes a new instance of the class.
+        /// </summary>
         public MainWindow() {
             InitializeComponent();
 #if DEBUG
@@ -13,6 +16,9 @@ namespace notification_app.Views {
 #endif
         }
 
+        /// <summary>
+        /// Initializes the controls values.
+        /// </summary>
         private void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
 
@@ -26,7 +32,7 @@ namespace notification_app.Views {
             var inputSources = this.Find<ComboBox>("micSources");
 
             var devices = NAudioUtilities.GetNumberOfDevices();
-            var list = Enumerable.Range(-1, devices + 1).Select(n => NAudioUtilities.GetCapabilities(n).ProductName).ToArray();
+            var list = Enumerable.Range(-1, devices + 1).Select(n => NAudioUtilities.GetWaveInDevice(n).ProductName).ToArray();
             inputSources.Items = list;
         }
     }

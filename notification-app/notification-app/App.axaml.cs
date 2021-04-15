@@ -6,7 +6,7 @@ using notification_app.Views;
 
 namespace notification_app {
     public class App : Application {
-        private TwitchChatTTS twitchChatTts;
+        private TwitchChatTts twitchChatTts;
 
         public override void Initialize() {
             AvaloniaXamlLoader.Load(this);
