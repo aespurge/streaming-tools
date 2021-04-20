@@ -4,11 +4,11 @@ using Avalonia.Data.Converters;
 
 namespace notification_app {
     /// <summary>
-    /// Converts back and forth from percentages.
+    ///     Converts back and forth from percentages.
     /// </summary>
     internal class RoundingValueConverter : IValueConverter {
         /// <summary>
-        /// Converts from an integer to a string representation of a percentage.
+        ///     Converts from an integer to a string representation of a percentage.
         /// </summary>
         /// <param name="value">The value to convert.</param>
         /// <param name="targetType">Not used.</param>
@@ -20,7 +20,7 @@ namespace notification_app {
         }
 
         /// <summary>
-        /// Convert from a string representation of a percentage back to a integer.
+        ///     Convert from a string representation of a percentage back to a integer.
         /// </summary>
         /// <param name="value">The value to convert.</param>
         /// <param name="targetType">Not used.</param>

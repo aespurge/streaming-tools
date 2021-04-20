@@ -1,18 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TwitchLib.Client.Events;
+﻿using TwitchLib.Client.Events;
 
-namespace notification_app.Twitch.Filter
-{
+namespace notification_app.Twitch.Filter {
     /// <summary>
-    /// A contract for filtering something from TTS.
+    ///     A contract for filtering something from TTS.
     /// </summary>
-    interface ITtsFilter {
+    internal interface ITtsFilter {
         /// <summary>
-        /// Filters a message from TTS.
+        ///     Filters a message from TTS.
         /// </summary>
         /// <param name="twitchInfo">The information on the original chat message.</param>
         /// <param name="currentMessage">The message from twitch chat.</param>

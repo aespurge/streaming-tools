@@ -10,19 +10,72 @@ using ReactiveUI;
 
 namespace notification_app.ViewModels {
     /// <summary>
-    /// The business logic behind the main UI.
+    ///     The business logic behind the main UI.
     /// </summary>
     public class MainWindowViewModel : ViewModelBase {
         /*********************
          * The main objects **
          *********************/
         /// <summary>
-        /// The persisted configuration.
+        ///     The persisted configuration.
         /// </summary>
         private readonly Configuration config;
 
         /// <summary>
-        /// The TTS object responsible for managing and listening to text to speech.
+        ///     The timer used to unpause TTS at some point after microphone data is detected.
+        /// </summary>
+        private readonly Timer unpauseTimer;
+
+        /// <summary>
+        ///     The object that buffers tha data from the microphone.
+        /// </summary>
+        private BufferedWaveProvider microphoneBufferedData;
+
+        /****************************************
+         * The Microphone Pausing TTS Settings **
+         ****************************************/
+        /// <summary>
+        ///     The main event that listens for microphone data.
+        /// </summary>
+        private WaveInEvent microphoneDataEvent;
+
+        /// <summary>
+        ///     The margin to use on the visual indicator for the pause threshold.
+        /// </summary>
+        private Thickness microphoneMicrophoneThresholdVisualizationMargin;
+
+        /// <summary>
+        ///     The current volume of the voice read from the microphone.
+        /// </summary>
+        private int microphoneMicrophoneVoiceVolume;
+
+        /// <summary>
+        ///     The object that converts the microphone data into a wave so we can read the volume.
+        /// </summary>
+        private MeteringSampleProvider microphoneVoiceData;
+
+        /// <summary>
+        ///     The string representation of the output device in windows.
+        /// </summary>
+        private string outputDevice;
+
+        /// <summary>
+        ///     True if we should pause TTS when the microphone is picking up sound, false otherwise.
+        /// </summary>
+        private bool pauseDuringSpeech;
+
+        /// <summary>
+        ///     The percentage of volume at which we should pause TTS when we detect microphone data.
+        /// </summary>
+        private int pauseThreshold;
+
+        /// <summary>
+        ///     The string representation of the microphone device name from NAudio.
+        /// </summary>
+        private int selectedMicrophone;
+
+        /// <summary>
+        ///     The TTS object responsible for managing and listening to text to speech.
         /// </summary>
         private TwitchChatTts tts;
 
@@ -30,85 +83,37 @@ namespace notification_app.ViewModels {
          * TTS Main Configuration Settings **
          ************************************/
         /// <summary>
-        /// True if TTS is on, false otherwise.
+        ///     True if TTS is on, false otherwise.
         /// </summary>
         private bool ttsOn;
 
         /// <summary>
-        /// The string representation of the TTS voice from the Microsoft TTS library.
+        ///     The string representation of the TTS voice from the Microsoft TTS library.
         /// </summary>
         private string ttsVoice;
 
         /// <summary>
-        /// The volume to play TTS at.
+        ///     The volume to play TTS at.
         /// </summary>
         private uint ttsVolume;
 
         /// <summary>
-        /// The twitch channel to listen to.
+        ///     The twitch channel to listen to.
         /// </summary>
         private string twitchChannel;
 
         /// <summary>
-        /// The username of the user to join twitch chat as.
+        ///     The OAuth token of the account to listen to twitch chat on.
+        /// </summary>
+        private string twitchOauth;
+
+        /// <summary>
+        ///     The username of the user to join twitch chat as.
         /// </summary>
         private string twitchUsername;
 
         /// <summary>
-        /// The OAuth token of the account to listen to twitch chat on.
-        /// </summary>
-        private string twitchOauth;
-
-        /****************************************
-         * The Microphone Pausing TTS Settings **
-         ****************************************/
-        /// <summary>
-        /// The main event that listens for microphone data.
-        /// </summary>
-        private WaveInEvent microphoneDataEvent;
-
-        /// <summary>
-        /// The object that buffers tha data from the microphone.
-        /// </summary>
-        private BufferedWaveProvider microphoneBufferedData;
-
-        /// <summary>
-        /// The object that converts the microphone data into a wave so we can read the volume.
-        /// </summary>
-        private MeteringSampleProvider microphoneVoiceData;
-
-        /// <summary>
-        /// True if we should pause TTS when the microphone is picking up sound, false otherwise.
-        /// </summary>
-        private bool pauseDuringSpeech;
-
-        /// <summary>
-        /// The string representation of the microphone device name from NAudio.
-        /// </summary>
-        private int selectedMicrophone;
-
-        /// <summary>
-        /// The percentage of volume at which we should pause TTS when we detect microphone data.
-        /// </summary>
-        private int pauseThreshold;
-
-        /// <summary>
-        /// The current volume of the voice read from the microphone.
-        /// </summary>
-        private int microphoneMicrophoneVoiceVolume;
-
-        /// <summary>
-        /// The timer used to unpause TTS at some point after microphone data is detected.
-        /// </summary>
-        private readonly Timer unpauseTimer;
-
-        /// <summary>
-        /// The margin to use on the visual indicator for the pause threshold.
-        /// </summary>
-        private Thickness microphoneMicrophoneThresholdVisualizationMargin;
-
-        /// <summary>
-        /// Initializes a new instance of the class.
+        ///     Initializes a new instance of the class.
         /// </summary>
         public MainWindowViewModel() {
             // Default to unpausing TTS 1 second after the microphone threshold has paused it.
@@ -122,6 +127,7 @@ namespace notification_app.ViewModels {
             TwitchChannel = config.TwitchChannel;
             TwitchOauth = Encoding.UTF8.GetString(Convert.FromBase64String(config.TwitchOauth));
             TtsVoice = config.TtsVoice;
+            OutputDevice = config.OutputDevice;
             TtsVolume = config.TtsVolume;
             SelectedMicrophone = GetSelectMicrophoneDeviceIndex(config.MicrophoneGuid);
             PauseDuringSpeech = config.PauseDuringSpeech;
@@ -134,14 +140,7 @@ namespace notification_app.ViewModels {
         }
 
         /// <summary>
-        /// Destructor
-        /// </summary>
-        ~MainWindowViewModel() {
-            PropertyChanged -= MainWindowViewModel_PropertyChanged;
-        }
-
-        /// <summary>
-        /// True if TTS is on, false otherwise.
+        ///     True if TTS is on, false otherwise.
         /// </summary>
         public bool TTSOn {
             get => ttsOn;
@@ -151,31 +150,17 @@ namespace notification_app.ViewModels {
                 this.RaiseAndSetIfChanged(ref ttsOn, value);
 
                 if (value) {
-                    config.TwitchUsername = TwitchUsername;
-                    config.TwitchChannel = TwitchChannel;
-                    config.TwitchOauth = Convert.ToBase64String(Encoding.UTF8.GetBytes(TwitchOauth));
-                    config.TtsVoice = TtsVoice;
-                    config.TtsVolume = TtsVolume;
-                    config.MicrophoneGuid = GetSelectMicrophoneDeviceGuid();
-                    config.PauseDuringSpeech = PauseDuringSpeech;
-                    config.PauseThreshold = PauseThreshold;
-                    config.TTSOn = value;
-                    Configuration.Instance().WriteConfiguration();
-
                     tts = new TwitchChatTts();
                     tts.Connect();
                 } else {
                     if (null != tts)
                         tts.Dispose();
-
-                    config.TTSOn = false;
-                    Configuration.Instance().WriteConfiguration();
                 }
             }
         }
 
         /// <summary>
-        /// The username of the user to join twitch chat as.
+        ///     The username of the user to join twitch chat as.
         /// </summary>
         public string TwitchUsername {
             get => twitchUsername;
@@ -183,7 +168,7 @@ namespace notification_app.ViewModels {
         }
 
         /// <summary>
-        /// The OAuth token of the account to listen to twitch chat on.
+        ///     The OAuth token of the account to listen to twitch chat on.
         /// </summary>
         public string TwitchOauth {
             get => twitchOauth;
@@ -191,7 +176,7 @@ namespace notification_app.ViewModels {
         }
 
         /// <summary>
-        /// The twitch channel to listen to.
+        ///     The twitch channel to listen to.
         /// </summary>
         public string TwitchChannel {
             get => twitchChannel;
@@ -199,7 +184,7 @@ namespace notification_app.ViewModels {
         }
 
         /// <summary>
-        /// The string representation of the TTS voice from the Microsoft TTS library.
+        ///     The string representation of the TTS voice from the Microsoft TTS library.
         /// </summary>
         public string TtsVoice {
             get => ttsVoice;
@@ -207,7 +192,15 @@ namespace notification_app.ViewModels {
         }
 
         /// <summary>
-        /// The volume to play TTS at.
+        ///     The string representation of the output device in windows.
+        /// </summary>
+        public string OutputDevice {
+            get => outputDevice;
+            set => this.RaiseAndSetIfChanged(ref outputDevice, value);
+        }
+
+        /// <summary>
+        ///     The volume to play TTS at.
         /// </summary>
         public uint TtsVolume {
             get => ttsVolume;
@@ -215,7 +208,7 @@ namespace notification_app.ViewModels {
         }
 
         /// <summary>
-        /// True if we should pause TTS when the microphone is picking up sound, false otherwise.
+        ///     True if we should pause TTS when the microphone is picking up sound, false otherwise.
         /// </summary>
         public bool PauseDuringSpeech {
             get => pauseDuringSpeech;
@@ -248,7 +241,7 @@ namespace notification_app.ViewModels {
         }
 
         /// <summary>
-        /// The string representation of the microphone device name from NAudio.
+        ///     The string representation of the microphone device name from NAudio.
         /// </summary>
         public int SelectedMicrophone {
             get => selectedMicrophone;
@@ -256,7 +249,7 @@ namespace notification_app.ViewModels {
         }
 
         /// <summary>
-        /// The current volume of the voice read from the microphone.
+        ///     The current volume of the voice read from the microphone.
         /// </summary>
         public int MicrophoneVoiceVolume {
             get => microphoneMicrophoneVoiceVolume;
@@ -264,7 +257,7 @@ namespace notification_app.ViewModels {
         }
 
         /// <summary>
-        /// The percentage of volume at which we should pause TTS when we detect microphone data.
+        ///     The percentage of volume at which we should pause TTS when we detect microphone data.
         /// </summary>
         public int PauseThreshold {
             get => pauseThreshold;
@@ -280,7 +273,6 @@ namespace notification_app.ViewModels {
         }
 
         /// <summary>
-        /// 
         /// </summary>
         public Thickness MicrophoneThresholdVisualizationMargin {
             get => microphoneMicrophoneThresholdVisualizationMargin;
@@ -288,8 +280,15 @@ namespace notification_app.ViewModels {
         }
 
         /// <summary>
-        /// Event fired after TTS has been paused to unpause it. This occurs after the TTS
-        /// has been paused by the voice detected in the microphone has exceeded the threshold.
+        ///     Destructor
+        /// </summary>
+        ~MainWindowViewModel() {
+            PropertyChanged -= MainWindowViewModel_PropertyChanged;
+        }
+
+        /// <summary>
+        ///     Event fired after TTS has been paused to unpause it. This occurs after the TTS
+        ///     has been paused by the voice detected in the microphone has exceeded the threshold.
         /// </summary>
         /// <param name="sender">The timer.</param>
         /// <param name="e">The event arguments.</param>
@@ -299,28 +298,28 @@ namespace notification_app.ViewModels {
         }
 
         /// <summary>
-        /// Gets the selected microphone unique GUID.
+        ///     Gets the selected microphone unique GUID.
         /// </summary>
         /// <returns></returns>
         private string GetSelectMicrophoneDeviceGuid() {
             if (SelectedMicrophone < 0) return null;
 
-            var totalDevices = NAudioUtilities.GetNumberOfDevices();
+            var totalDevices = NAudioUtilities.GetTotalInputDevices();
             var guids = Enumerable.Range(-1, totalDevices + 1)
-                                  .Select(n => NAudioUtilities.GetWaveInDevice(n).ProductGuid).ToArray();
+                                  .Select(n => NAudioUtilities.GetInputDevice(n).ProductGuid).ToArray();
             return guids[SelectedMicrophone].ToString();
         }
 
         /// <summary>
-        /// Gets the NAudio index associated with the selected microphone.
+        ///     Gets the NAudio index associated with the selected microphone.
         /// </summary>
         /// <param name="guid">The unique GUID of the microphone.</param>
         /// <returns>The index of the microphone according to NAudio.</returns>
         private int GetSelectMicrophoneDeviceIndex(string guid) {
-            var totalDevices = NAudioUtilities.GetNumberOfDevices();
+            var totalDevices = NAudioUtilities.GetTotalInputDevices();
             var index = -1;
             for (var i = -1; i < totalDevices - 1; i++)
-                if (NAudioUtilities.GetWaveInDevice(i).ProductGuid.ToString() == guid) {
+                if (NAudioUtilities.GetInputDevice(i).ProductGuid.ToString() == guid) {
                     index = i + 1;
                     break;
                 }
@@ -329,9 +328,9 @@ namespace notification_app.ViewModels {
         }
 
         /// <summary>
-        /// Called when microphone voice data is recognized.
+        ///     Called when microphone voice data is recognized.
         /// </summary>
-        /// <param name="sender">A <seealso cref="SampleChannel"/> receiving microphone data.</param>
+        /// <param name="sender">A <seealso cref="SampleChannel" /> receiving microphone data.</param>
         /// <param name="e">The data on how loud the voice is.</param>
         private void MicrophoneAudioChannel_PreVolumeMeter(object? sender, StreamVolumeEventArgs e) {
             MicrophoneVoiceVolume = Convert.ToInt32(e.MaxSampleValues[0] * 100);
@@ -348,26 +347,40 @@ namespace notification_app.ViewModels {
         }
 
         /// <summary>
-        /// Captures all property values that change on the class.
+        ///     Captures all property values that change on the class.
         /// </summary>
         /// <param name="sender">The window.</param>
         /// <param name="e">Information on the property that changed.</param>
         private void MainWindowViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e) {
-            if (!nameof(TTSOn).Equals(e.PropertyName, StringComparison.InvariantCultureIgnoreCase) &&
-                !nameof(MicrophoneVoiceVolume).Equals(e.PropertyName, StringComparison.InvariantCultureIgnoreCase))
-                TTSOn = false;
+            writeConfiguration();
         }
 
         /// <summary>
-        /// Called when the microphone creates voice data.
+        ///     Write the configuration to file.
         /// </summary>
-        /// <param name="sender">The <seealso cref="WaveInEvent"/> that captured the data from the microphone.</param>
+        private void writeConfiguration() {
+            config.TwitchUsername = TwitchUsername;
+            config.TwitchChannel = TwitchChannel;
+            config.TwitchOauth = Convert.ToBase64String(Encoding.UTF8.GetBytes(TwitchOauth));
+            config.TtsVoice = TtsVoice;
+            config.OutputDevice = OutputDevice;
+            config.TtsVolume = TtsVolume;
+            config.MicrophoneGuid = GetSelectMicrophoneDeviceGuid();
+            config.PauseDuringSpeech = PauseDuringSpeech;
+            config.PauseThreshold = PauseThreshold;
+            config.TTSOn = TTSOn;
+            Configuration.Instance().WriteConfiguration();
+        }
+
+        /// <summary>
+        ///     Called when the microphone creates voice data.
+        /// </summary>
+        /// <param name="sender">The <seealso cref="WaveInEvent" /> that captured the data from the microphone.</param>
         /// <param name="e">Data received.</param>
         private void Microphone_DataReceived(object? sender, WaveInEventArgs e) {
             microphoneBufferedData.AddSamples(e.Buffer, 0, e.BytesRecorded);
             float[] test = new float[e.Buffer.Length];
             microphoneVoiceData.Read(test, 0, e.BytesRecorded);
         }
-
     }
 }

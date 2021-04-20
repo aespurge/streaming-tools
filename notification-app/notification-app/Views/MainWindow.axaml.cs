@@ -1,13 +1,12 @@
 using System.Linq;
 using System.Speech.Synthesis;
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
 namespace notification_app.Views {
     public class MainWindow : Window {
         /// <summary>
-        /// Initializes a new instance of the class.
+        ///     Initializes a new instance of the class.
         /// </summary>
         public MainWindow() {
             InitializeComponent();
@@ -17,7 +16,7 @@ namespace notification_app.Views {
         }
 
         /// <summary>
-        /// Initializes the controls values.
+        ///     Initializes the controls values.
         /// </summary>
         private void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);
@@ -30,10 +29,15 @@ namespace notification_app.Views {
 
             // Setup the list of microphone sources
             var inputSources = this.Find<ComboBox>("micSources");
-
-            var devices = NAudioUtilities.GetNumberOfDevices();
-            var list = Enumerable.Range(-1, devices + 1).Select(n => NAudioUtilities.GetWaveInDevice(n).ProductName).ToArray();
+            var devices = NAudioUtilities.GetTotalInputDevices();
+            var list = Enumerable.Range(-1, devices + 1).Select(n => NAudioUtilities.GetInputDevice(n).ProductName).ToArray();
             inputSources.Items = list;
+
+            // Setup the list of output devices
+            var outputSources = this.Find<ComboBox>("outputDeviceComboBox");
+            var outputDevices = NAudioUtilities.GetTotalOutputDevices();
+            var outputItems = Enumerable.Range(-1, devices + 2).Select(n => NAudioUtilities.GetOutputDevice(n).ProductName).ToArray();
+            outputSources.Items = outputItems;
         }
     }
 }
