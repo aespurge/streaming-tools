@@ -181,7 +181,7 @@ namespace notification_app {
                         ttsSoundOutput.Volume = config.TtsVolume / 100.0f;
 
                         ttsSoundOutput.Init(reader);
-                        
+
                         // Play is async so we will make it synchronous here so we don't have to deal with
                         // queueing. We can improve this to remove the hack in the future.
                         ttsSoundOutput.PlaybackStopped += delegate {

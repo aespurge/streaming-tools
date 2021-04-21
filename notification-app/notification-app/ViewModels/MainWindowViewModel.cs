@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Timers;
 using Avalonia;
+using Avalonia.Controls;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
 using ReactiveUI;
@@ -148,6 +149,9 @@ namespace notification_app.ViewModels {
                 if (value == ttsOn) return;
 
                 this.RaiseAndSetIfChanged(ref ttsOn, value);
+
+                if (Design.IsDesignMode)
+                    return;
 
                 if (value) {
                     tts = new TwitchChatTts();
