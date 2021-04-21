@@ -7,6 +7,8 @@ using Avalonia;
 using Avalonia.Controls;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
+using notification_app.NAudio;
+using notification_app.Twitch;
 using ReactiveUI;
 
 namespace notification_app.ViewModels {

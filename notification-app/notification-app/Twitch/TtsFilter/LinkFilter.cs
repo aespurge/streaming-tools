@@ -1,7 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 using TwitchLib.Client.Events;
 
-namespace notification_app.Twitch.Filter {
+namespace notification_app.Twitch.TtsFilter {
     /// <summary>
     ///     Filters out links from twitch chat.
     /// </summary>

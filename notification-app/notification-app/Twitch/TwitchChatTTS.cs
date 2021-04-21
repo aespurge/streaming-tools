@@ -4,16 +4,16 @@ using System.Speech.Synthesis;
 using System.Text;
 using System.Threading;
 using NAudio.Wave;
-using notification_app.AdministrationFilter;
+using notification_app.NAudio;
 using notification_app.Twitch.AdministrationFilter;
-using notification_app.Twitch.Filter;
+using notification_app.Twitch.TtsFilter;
 using TwitchLib.Client;
 using TwitchLib.Client.Events;
 using TwitchLib.Client.Models;
 using TwitchLib.Communication.Clients;
 using TwitchLib.Communication.Models;
 
-namespace notification_app {
+namespace notification_app.Twitch {
     /// <summary>
     ///     A twitch chat Text-to-speech client.
     /// </summary>

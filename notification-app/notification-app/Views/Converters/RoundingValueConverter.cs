@@ -2,7 +2,7 @@
 using System.Globalization;
 using Avalonia.Data.Converters;
 
-namespace notification_app {
+namespace notification_app.Views.Converters {
     /// <summary>
     ///     Converts back and forth from percentages.
     /// </summary>

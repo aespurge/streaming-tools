@@ -1,6 +1,6 @@
 ﻿using TwitchLib.Client.Events;
 
-namespace notification_app.Twitch.Filter {
+namespace notification_app.Twitch.TtsFilter {
     /// <summary>
     ///     A contract for filtering something from TTS.
     /// </summary>

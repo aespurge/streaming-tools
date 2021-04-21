@@ -1,7 +1,7 @@
 ﻿using System;
 using TwitchLib.Client.Events;
 
-namespace notification_app.Twitch.Filter {
+namespace notification_app.Twitch.TtsFilter {
     /// <summary>
     ///     Filters chat messages based on the users that sent them.
     /// </summary>

@@ -1,7 +1,7 @@
 ﻿using TwitchLib.Client;
 using TwitchLib.Client.Events;
 
-namespace notification_app.AdministrationFilter {
+namespace notification_app.Twitch.AdministrationFilter {
     /// <summary>
     ///     Handles administration of the stream.
     /// </summary>

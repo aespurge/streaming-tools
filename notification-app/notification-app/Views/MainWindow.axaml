@@ -4,6 +4,7 @@
         xmlns:local="clr-namespace:notification_app"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:converters="clr-namespace:notification_app.Views.Converters"
         mc:Ignorable="d" d:DesignWidth="550" d:DesignHeight="350"
         Width="550" Height="350"
         x:Class="notification_app.Views.MainWindow"
@@ -11,7 +12,7 @@
         Title="notification_app">
 
     <Window.Resources>
-        <local:RoundingValueConverter x:Key="RoundingValueConverter" />
+        <converters:RoundingValueConverter x:Key="RoundingValueConverter" />
     </Window.Resources>
 
     <Design.DataContext>

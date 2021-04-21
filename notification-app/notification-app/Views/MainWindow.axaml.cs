@@ -3,6 +3,7 @@ using System.Speech.Synthesis;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
+using notification_app.NAudio;
 
 namespace notification_app.Views {
     public class MainWindow : Window {

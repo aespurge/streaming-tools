@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 using NAudio;
 using NAudio.Wave;
 
-namespace notification_app {
+namespace notification_app.NAudio {
     /// <summary>
     ///     Utilities for simplifying interactions with the NAudio library.
     /// </summary>

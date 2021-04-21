@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using notification_app.Twitch;
 using notification_app.ViewModels;
 using notification_app.Views;
 

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Text.RegularExpressions;
-using notification_app.AdministrationFilter;
 using TwitchLib.Client;
 using TwitchLib.Client.Events;
 using TwitchLib.Client.Extensions;
