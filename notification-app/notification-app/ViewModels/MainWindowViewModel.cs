@@ -115,6 +115,11 @@ namespace notification_app.ViewModels {
         /// </summary>
         private string twitchUsername;
 
+        /*********************************
+         * The inner control view models *
+         *********************************/
+        private LayoutsViewModel layoutViewModel => new();
+
         /// <summary>
         ///     Initializes a new instance of the class.
         /// </summary>

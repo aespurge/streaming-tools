@@ -1,9 +1,18 @@
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Speech.Synthesis;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
+using Avalonia.Platform;
+using Avalonia.Win32;
 using notification_app.NAudio;
+using notification_app.Utilities;
+using PInvoke;
 
 namespace notification_app.Views {
     public class MainWindow : Window {
@@ -38,7 +47,7 @@ namespace notification_app.Views {
             // Setup the list of output devices
             var outputSources = this.Find<ComboBox>("outputDeviceComboBox");
             var outputDevices = NAudioUtilities.GetTotalOutputDevices();
-            var outputItems = Enumerable.Range(-1, devices + 2).Select(n => NAudioUtilities.GetOutputDevice(n).ProductName).ToArray();
+            var outputItems = Enumerable.Range(-1, outputDevices + 1).Select(n => NAudioUtilities.GetOutputDevice(n).ProductName).ToArray();
             outputSources.Items = outputItems;
         }
     }
