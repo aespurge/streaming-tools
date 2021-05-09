@@ -1,20 +1,14 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Speech.Synthesis;
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using Avalonia.Platform;
-using Avalonia.Win32;
-using notification_app.NAudio;
-using notification_app.Utilities;
-using PInvoke;
+using streaming_tools.Utilities;
 
-namespace notification_app.Views {
+namespace streaming_tools.Views {
+    /// <summary>
+    ///     The main UI.
+    /// </summary>
     public class MainWindow : Window {
         /// <summary>
         ///     Initializes a new instance of the class.

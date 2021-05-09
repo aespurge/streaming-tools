@@ -1,11 +1,11 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
-using notification_app.Twitch;
-using notification_app.ViewModels;
-using notification_app.Views;
+using streaming_tools.Twitch;
+using streaming_tools.ViewModels;
+using streaming_tools.Views;
 
-namespace notification_app {
+namespace streaming_tools {
     public class App : Application {
         private TwitchChatTts twitchChatTts;
 

@@ -5,6 +5,7 @@
     <Nullable>enable</Nullable>
     <RootNamespace>streaming_tools</RootNamespace>
     <Platforms>AnyCPU;x64</Platforms>
+    <ApplicationIcon>icon.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -26,6 +27,9 @@
     <Compile Remove="Models\**" />
     <EmbeddedResource Remove="Models\**" />
     <None Remove="Models\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Assets\icon.ico" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\.editorconfig" Link=".editorconfig" />

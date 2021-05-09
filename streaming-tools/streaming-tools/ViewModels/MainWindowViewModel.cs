@@ -7,11 +7,12 @@ using Avalonia;
 using Avalonia.Controls;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
-using notification_app.NAudio;
-using notification_app.Twitch;
 using ReactiveUI;
+using streaming_tools.GameIntegrations;
+using streaming_tools.Twitch;
+using streaming_tools.Utilities;
 
-namespace notification_app.ViewModels {
+namespace streaming_tools.ViewModels {
     /// <summary>
     ///     The business logic behind the main UI.
     /// </summary>
@@ -62,6 +63,14 @@ namespace notification_app.ViewModels {
         /// </summary>
         private string outputDevice;
 
+        /*************************
+         * The game integrations *
+         *************************/
+        /// <summary>
+        ///     A flag indicating whether the path of exile integration is turned on.
+        /// </summary>
+        private bool pathOfExileEnabled;
+
         /// <summary>
         ///     True if we should pause TTS when the microphone is picking up sound, false otherwise.
         /// </summary>
@@ -71,6 +80,11 @@ namespace notification_app.ViewModels {
         ///     The percentage of volume at which we should pause TTS when we detect microphone data.
         /// </summary>
         private int pauseThreshold;
+
+        /// <summary>
+        ///     The path of exile game integration.
+        /// </summary>
+        private PathOfExileIntegration poe;
 
         /// <summary>
         ///     The string representation of the microphone device name from NAudio.
@@ -115,11 +129,6 @@ namespace notification_app.ViewModels {
         /// </summary>
         private string twitchUsername;
 
-        /*********************************
-         * The inner control view models *
-         *********************************/
-        private LayoutsViewModel layoutViewModel => new();
-
         /// <summary>
         ///     Initializes a new instance of the class.
         /// </summary>
@@ -133,7 +142,8 @@ namespace notification_app.ViewModels {
             config = Configuration.Instance();
             TwitchUsername = config.TwitchUsername;
             TwitchChannel = config.TwitchChannel;
-            TwitchOauth = Encoding.UTF8.GetString(Convert.FromBase64String(config.TwitchOauth));
+            if (null != config.TwitchOauth)
+                TwitchOauth = Encoding.UTF8.GetString(Convert.FromBase64String(config.TwitchOauth));
             TtsVoice = config.TtsVoice;
             OutputDevice = config.OutputDevice;
             TtsVolume = config.TtsVolume;
@@ -144,13 +154,21 @@ namespace notification_app.ViewModels {
             // We listen to our own property changed event to know when we need to push
             // information to the TTS object.
             PropertyChanged += MainWindowViewModel_PropertyChanged;
-            TTSOn = config.TTSOn;
+            TtsOn = config.TtsOn;
         }
+
+        /*********************************
+         * The inner control view models *
+         *********************************/
+        /// <summary>
+        ///     The view responsible for laying out windows on the OS.
+        /// </summary>
+        private LayoutsViewModel LayoutViewModel => new();
 
         /// <summary>
         ///     True if TTS is on, false otherwise.
         /// </summary>
-        public bool TTSOn {
+        public bool TtsOn {
             get => ttsOn;
             set {
                 if (value == ttsOn) return;
@@ -166,6 +184,23 @@ namespace notification_app.ViewModels {
                 } else {
                     if (null != tts)
                         tts.Dispose();
+                }
+            }
+        }
+
+        /// <summary>
+        ///     True if path of exile integration is enable, false otherwise.
+        /// </summary>
+        public bool PathOfExileEnabled {
+            get => pathOfExileEnabled;
+            set {
+                pathOfExileEnabled = value;
+
+                if (value) {
+                    poe = new PathOfExileIntegration();
+                } else {
+                    poe?.Dispose();
+                    poe = null;
                 }
             }
         }
@@ -228,26 +263,10 @@ namespace notification_app.ViewModels {
 
                 this.RaiseAndSetIfChanged(ref pauseDuringSpeech, value);
 
-                if (value) {
-                    microphoneDataEvent = new WaveInEvent {DeviceNumber = selectedMicrophone - 1};
-                    microphoneDataEvent.DataAvailable += Microphone_DataReceived;
-                    microphoneBufferedData = new BufferedWaveProvider(new WaveFormat(8000, 1));
-
-                    var sampleChannel = new SampleChannel(microphoneBufferedData, true);
-                    sampleChannel.PreVolumeMeter += MicrophoneAudioChannel_PreVolumeMeter;
-                    sampleChannel.Volume = 100;
-                    microphoneVoiceData = new MeteringSampleProvider(sampleChannel);
-                    // microphoneVoiceData.StreamVolume += PostVolumeMeter_StreamVolume;
-
-                    microphoneDataEvent.StartRecording();
-                } else {
-                    microphoneDataEvent.Dispose();
-                    microphoneDataEvent = null;
-
-                    microphoneBufferedData.ClearBuffer();
-                    microphoneBufferedData = null;
-                    microphoneVoiceData = null;
-                }
+                if (value)
+                    StartListenToMicrophone();
+                else
+                    StopListenToMicrophone();
             }
         }
 
@@ -284,6 +303,7 @@ namespace notification_app.ViewModels {
         }
 
         /// <summary>
+        ///     The margin used to push the visual representation of the threshold marker on the UI.
         /// </summary>
         public Thickness MicrophoneThresholdVisualizationMargin {
             get => microphoneMicrophoneThresholdVisualizationMargin;
@@ -295,6 +315,38 @@ namespace notification_app.ViewModels {
         /// </summary>
         ~MainWindowViewModel() {
             PropertyChanged -= MainWindowViewModel_PropertyChanged;
+        }
+
+        /// <summary>
+        ///     Starts listening to the microphone so we know when to pause TTS for microphone speaking.
+        /// </summary>
+        private void StartListenToMicrophone() {
+            if (-1 == SelectedMicrophone)
+                return;
+
+            microphoneDataEvent = new WaveInEvent {DeviceNumber = SelectedMicrophone - 1};
+            microphoneDataEvent.DataAvailable += Microphone_DataReceived;
+            microphoneBufferedData = new BufferedWaveProvider(new WaveFormat(8000, 1));
+
+            var sampleChannel = new SampleChannel(microphoneBufferedData, true);
+            sampleChannel.PreVolumeMeter += MicrophoneAudioChannel_PreVolumeMeter;
+            sampleChannel.Volume = 100;
+            microphoneVoiceData = new MeteringSampleProvider(sampleChannel);
+            // microphoneVoiceData.StreamVolume += PostVolumeMeter_StreamVolume;
+
+            microphoneDataEvent.StartRecording();
+        }
+
+        /// <summary>
+        ///     Stops listening to the microphone.
+        /// </summary>
+        private void StopListenToMicrophone() {
+            microphoneDataEvent?.Dispose();
+            microphoneDataEvent = null;
+
+            microphoneBufferedData?.ClearBuffer();
+            microphoneBufferedData = null;
+            microphoneVoiceData = null;
         }
 
         /// <summary>
@@ -363,23 +415,29 @@ namespace notification_app.ViewModels {
         /// <param name="sender">The window.</param>
         /// <param name="e">Information on the property that changed.</param>
         private void MainWindowViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e) {
-            writeConfiguration();
+            if (nameof(SelectedMicrophone).Equals(e.PropertyName, StringComparison.InvariantCultureIgnoreCase)) {
+                StopListenToMicrophone();
+                StartListenToMicrophone();
+            }
+
+            WriteConfiguration();
         }
 
         /// <summary>
         ///     Write the configuration to file.
         /// </summary>
-        private void writeConfiguration() {
+        private void WriteConfiguration() {
             config.TwitchUsername = TwitchUsername;
             config.TwitchChannel = TwitchChannel;
-            config.TwitchOauth = Convert.ToBase64String(Encoding.UTF8.GetBytes(TwitchOauth));
+            if (null != TwitchOauth)
+                config.TwitchOauth = Convert.ToBase64String(Encoding.UTF8.GetBytes(TwitchOauth));
             config.TtsVoice = TtsVoice;
             config.OutputDevice = OutputDevice;
             config.TtsVolume = TtsVolume;
             config.MicrophoneGuid = GetSelectMicrophoneDeviceGuid();
             config.PauseDuringSpeech = PauseDuringSpeech;
             config.PauseThreshold = PauseThreshold;
-            config.TTSOn = TTSOn;
+            config.TtsOn = TtsOn;
             Configuration.Instance().WriteConfiguration();
         }
 

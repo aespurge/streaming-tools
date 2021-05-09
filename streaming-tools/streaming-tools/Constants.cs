@@ -1,4 +1,4 @@
-﻿namespace notification_app {
+﻿namespace streaming_tools {
     /// <summary>
     ///     Global constants for use in the application.
     /// </summary>

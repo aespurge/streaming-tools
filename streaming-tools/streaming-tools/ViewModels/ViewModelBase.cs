@@ -1,6 +1,6 @@
 using ReactiveUI;
 
-namespace notification_app.ViewModels {
+namespace streaming_tools.ViewModels {
     /// <summary>
     ///     The base view for common functionality.
     /// </summary>

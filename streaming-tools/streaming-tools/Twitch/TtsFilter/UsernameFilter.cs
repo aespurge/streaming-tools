@@ -1,7 +1,7 @@
 ﻿using System;
 using TwitchLib.Client.Events;
 
-namespace notification_app.Twitch.TtsFilter {
+namespace streaming_tools.Twitch.TtsFilter {
     /// <summary>
     ///     Filters chat messages based on the users that sent them.
     /// </summary>
@@ -10,7 +10,7 @@ namespace notification_app.Twitch.TtsFilter {
         ///     The users to never read chat messages for.
         /// </summary>
         private readonly string[] ignoreUsers = {
-            "streamlabs", "nightbot"
+            "streamlabs", "nightbot", "nullinside"
         };
 
         /// <summary>
@@ -19,7 +19,7 @@ namespace notification_app.Twitch.TtsFilter {
         /// <param name="twitchInfo">The information on the original chat message.</param>
         /// <param name="currentMessage">The message from twitch chat.</param>
         /// <returns>The new TTS message.</returns>
-        public string filter(OnMessageReceivedArgs twitchInfo, string currentMessage) {
+        public string Filter(OnMessageReceivedArgs twitchInfo, string currentMessage) {
             foreach (var username in ignoreUsers)
                 if (username.Equals(twitchInfo.ChatMessage.DisplayName, StringComparison.InvariantCultureIgnoreCase))
                     return null;

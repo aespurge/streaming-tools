@@ -4,16 +4,16 @@ using System.Speech.Synthesis;
 using System.Text;
 using System.Threading;
 using NAudio.Wave;
-using notification_app.NAudio;
-using notification_app.Twitch.AdministrationFilter;
-using notification_app.Twitch.TtsFilter;
+using streaming_tools.Twitch.AdministrationFilter;
+using streaming_tools.Twitch.TtsFilter;
+using streaming_tools.Utilities;
 using TwitchLib.Client;
 using TwitchLib.Client.Events;
 using TwitchLib.Client.Models;
 using TwitchLib.Communication.Clients;
 using TwitchLib.Communication.Models;
 
-namespace notification_app.Twitch {
+namespace streaming_tools.Twitch {
     /// <summary>
     ///     A twitch chat Text-to-speech client.
     /// </summary>
@@ -49,11 +49,6 @@ namespace notification_app.Twitch {
         private readonly object ttsSoundOutputSignalLock = new();
 
         /// <summary>
-        ///     The client capable of interacting with twitch chat.
-        /// </summary>
-        private TwitchClient? client;
-
-        /// <summary>
         ///     The text-to-speech sound output.
         /// </summary>
         private WaveOutEvent ttsSoundOutput;
@@ -71,6 +66,11 @@ namespace notification_app.Twitch {
         }
 
         /// <summary>
+        ///     The client capable of interacting with twitch chat.
+        /// </summary>
+        public TwitchClient? TwitchClient { get; set; }
+
+        /// <summary>
         ///     Releases unmanaged resources.
         /// </summary>
         public void Dispose() {
@@ -86,8 +86,8 @@ namespace notification_app.Twitch {
                 ttsSoundOutput = null;
             }
 
-            client?.Disconnect();
-            client = null;
+            TwitchClient?.Disconnect();
+            TwitchClient = null;
         }
 
         /// <summary>
@@ -103,11 +103,11 @@ namespace notification_app.Twitch {
             };
 
             WebSocketClient customClient = new(clientOptions);
-            client = new TwitchClient(customClient);
-            client.Initialize(credentials, config.TwitchChannel);
+            TwitchClient = new TwitchClient(customClient);
+            TwitchClient.Initialize(credentials, config.TwitchChannel);
 
-            client.OnMessageReceived += Client_OnMessageReceived;
-            client.Connect();
+            TwitchClient.OnMessageReceived += Client_OnMessageReceived;
+            TwitchClient.Connect();
         }
 
         /// <summary>
@@ -138,12 +138,12 @@ namespace notification_app.Twitch {
             // chat, etc. If the administration filter tells us that we shouldn't process
             // the message further because it handled it, then don't.
             foreach (var filter in adminFilters)
-                if (!filter.handle(client, e))
+                if (!filter.Handle(TwitchClient, e))
                     return;
 
             // Go through the TTS filters which modify the chat message and update it.
             string chatMessage = e.ChatMessage.Message;
-            foreach (var filter in ttsFilters) chatMessage = filter.filter(e, chatMessage);
+            foreach (var filter in ttsFilters) chatMessage = filter.Filter(e, chatMessage);
 
             // If we don't have a chat message then the message was completely filtered out and we have nothing
             // to do here.
@@ -177,7 +177,7 @@ namespace notification_app.Twitch {
                         ttsSoundOutput = new WaveOutEvent();
                         ttsSoundOutputSignal = new ManualResetEvent(false);
 
-                        ttsSoundOutput.DeviceNumber = getOutputDeviceIndex(config.OutputDevice);
+                        ttsSoundOutput.DeviceNumber = GetOutputDeviceIndex(config.OutputDevice);
                         ttsSoundOutput.Volume = config.TtsVolume / 100.0f;
 
                         ttsSoundOutput.Init(reader);
@@ -215,7 +215,7 @@ namespace notification_app.Twitch {
         /// </summary>
         /// <param name="name">The name of the device.</param>
         /// <returns>The index of the device if found, -1 otherwise.</returns>
-        private int getOutputDeviceIndex(string name) {
+        private int GetOutputDeviceIndex(string name) {
             if (string.IsNullOrWhiteSpace(name)) return -1;
 
             for (var i = 0; i < NAudioUtilities.GetTotalOutputDevices(); i++) {

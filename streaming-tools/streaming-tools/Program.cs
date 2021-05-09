@@ -1,7 +1,7 @@
 using Avalonia;
 using Avalonia.ReactiveUI;
 
-namespace notification_app {
+namespace streaming_tools {
     internal class Program {
         // Initialization code. Don't use any Avalonia, third-party APIs or any
         // SynchronizationContext-reliant code before AppMain is called: things aren't initialized

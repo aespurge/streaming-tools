@@ -1,9 +1,9 @@
 using System;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
-using notification_app.ViewModels;
+using streaming_tools.ViewModels;
 
-namespace notification_app {
+namespace streaming_tools {
     public class ViewLocator : IDataTemplate {
         public bool SupportsRecycling => false;
 

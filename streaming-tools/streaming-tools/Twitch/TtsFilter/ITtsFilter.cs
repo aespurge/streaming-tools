@@ -1,6 +1,6 @@
 ﻿using TwitchLib.Client.Events;
 
-namespace notification_app.Twitch.TtsFilter {
+namespace streaming_tools.Twitch.TtsFilter {
     /// <summary>
     ///     A contract for filtering something from TTS.
     /// </summary>
@@ -11,6 +11,6 @@ namespace notification_app.Twitch.TtsFilter {
         /// <param name="twitchInfo">The information on the original chat message.</param>
         /// <param name="currentMessage">The message from twitch chat.</param>
         /// <returns>The new TTS message.</returns>
-        string filter(OnMessageReceivedArgs twitchInfo, string currentMessage);
+        string Filter(OnMessageReceivedArgs twitchInfo, string currentMessage);
     }
 }

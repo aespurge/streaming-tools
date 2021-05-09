@@ -4,7 +4,7 @@ using TwitchLib.Client;
 using TwitchLib.Client.Events;
 using TwitchLib.Client.Extensions;
 
-namespace notification_app.Twitch.AdministrationFilter {
+namespace streaming_tools.Twitch.AdministrationFilter {
     /// <summary>
     ///     Handles banning the "Wanna become famous" bot.
     /// </summary>
@@ -26,7 +26,7 @@ namespace notification_app.Twitch.AdministrationFilter {
         /// </summary>
         /// <param name="client">The twitch client.</param>
         /// <param name="messageInfo">The information on the chat message.</param>
-        public bool handle(TwitchClient client, OnMessageReceivedArgs messageInfo) {
+        public bool Handle(TwitchClient client, OnMessageReceivedArgs messageInfo) {
             string chatMessage = messageInfo.ChatMessage.Message;
             if (chatMessage.Contains("Wanna become famous?", StringComparison.InvariantCultureIgnoreCase) &&
                 Regex.IsMatch(chatMessage, Constants.REGEX_URL)) {

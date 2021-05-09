@@ -2,7 +2,7 @@
 using System.IO;
 using Newtonsoft.Json;
 
-namespace notification_app {
+namespace streaming_tools {
     /// <summary>
     ///     The persisted user configuration.
     /// </summary>
@@ -12,7 +12,7 @@ namespace notification_app {
         /// </summary>
         private static readonly string CONFIG_FILENAME = Path.Combine(
             Environment.GetEnvironmentVariable("LocalAppData"),
-            "nullinside", "notification-app", "config.json");
+            "nullinside", "streaming-tools", "config.json");
 
         /// <summary>
         ///     The singleton instance of the class.
@@ -67,7 +67,7 @@ namespace notification_app {
         /// <summary>
         ///     True if text to speech is on, false otherwise.
         /// </summary>
-        public bool TTSOn { get; set; }
+        public bool TtsOn { get; set; }
 
         /// <summary>
         ///     The percentage of microphone audio at which point text to speech pauses.
@@ -79,7 +79,8 @@ namespace notification_app {
         /// </summary>
         /// <returns>The <see cref="Configuration" /> object.</returns>
         public static Configuration Instance() {
-            if (null == instance) instance = ReadConfiguration();
+            if (null == instance)
+                instance = ReadConfiguration();
 
             return instance;
         }
@@ -92,10 +93,12 @@ namespace notification_app {
             Configuration config = null;
 
             try {
-                JsonSerializer serializer = new();
-                using (StreamReader sr = new(CONFIG_FILENAME))
-                using (JsonReader jr = new JsonTextReader(sr)) {
-                    config = serializer.Deserialize<Configuration>(jr);
+                if (File.Exists(CONFIG_FILENAME)) {
+                    JsonSerializer serializer = new();
+                    using (StreamReader sr = new(CONFIG_FILENAME))
+                    using (JsonReader jr = new JsonTextReader(sr)) {
+                        config = serializer.Deserialize<Configuration>(jr);
+                    }
                 }
             } catch (Exception e) { }
 
@@ -111,7 +114,8 @@ namespace notification_app {
         /// <returns>True if successful, false otherwise</returns>
         public bool WriteConfiguration() {
             try {
-                Directory.CreateDirectory(Path.GetDirectoryName(CONFIG_FILENAME));
+                if (!Directory.Exists(Path.GetDirectoryName(CONFIG_FILENAME)))
+                    Directory.CreateDirectory(Path.GetDirectoryName(CONFIG_FILENAME));
 
                 JsonSerializer serializer = new();
                 using (StreamWriter sr = new(CONFIG_FILENAME))
