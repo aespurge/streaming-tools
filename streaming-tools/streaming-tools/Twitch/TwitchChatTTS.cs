@@ -35,7 +35,8 @@ namespace streaming_tools.Twitch {
         /// </summary>
         private readonly ITtsFilter[] ttsFilters = {
             new LinkFilter(),
-            new UsernameFilter()
+            new UsernameSkipFilter(),
+            new UsernamePhoneticFilter()
         };
 
         /// <summary>
@@ -142,20 +143,22 @@ namespace streaming_tools.Twitch {
                     return;
 
             // Go through the TTS filters which modify the chat message and update it.
-            string chatMessage = e.ChatMessage.Message;
-            foreach (var filter in ttsFilters) chatMessage = filter.Filter(e, chatMessage);
+            Tuple<string, string> chatMessageInfo = new(e.ChatMessage.DisplayName, e.ChatMessage.Message);
+            foreach (var filter in ttsFilters)
+                chatMessageInfo = filter.Filter(e, chatMessageInfo.Item1, chatMessageInfo.Item2);
 
             // If we don't have a chat message then the message was completely filtered out and we have nothing
             // to do here.
-            if (null == chatMessage || string.IsNullOrWhiteSpace(chatMessage.Trim()))
+            if (null == chatMessageInfo || string.IsNullOrWhiteSpace(chatMessageInfo.Item2.Trim()))
                 return;
 
             // If the chat message starts with the !tts command, then TTS is supposed to read the message as if
             // they're say it. So we will handle the message as such.
-            if (!chatMessage.Trim().StartsWith("!tts", StringComparison.InvariantCultureIgnoreCase))
-                chatMessage = $"{e.ChatMessage.DisplayName} says {chatMessage}";
+            string chatMessage;
+            if (!chatMessageInfo.Item2.Trim().StartsWith("!tts", StringComparison.InvariantCultureIgnoreCase))
+                chatMessage = $"{chatMessageInfo.Item1} says {chatMessageInfo.Item2}";
             else
-                chatMessage = chatMessage.Replace("!tts", "");
+                chatMessage = chatMessageInfo.Item2.Replace("!tts", "");
 
             // Create a microsoft TTS object and a stream for outputting its audio file to.
             using (var synth = new SpeechSynthesizer())
