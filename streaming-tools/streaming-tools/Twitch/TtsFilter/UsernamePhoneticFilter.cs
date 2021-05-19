@@ -16,7 +16,13 @@ namespace streaming_tools.Twitch.TtsFilter {
             {"sk4963", "OxMom"},
             {"gaggablagblag", "Gagga-Blag-Blag"},
             {"viennagaymerbear", "Gaymer-Bear"},
-            {"ekamy", "ek-uh-mee "}
+            {"ekamy", "eckahhmeee"},
+            {"vtleavs", "v t levs"},
+            {"impicusmaximus", "Impicus"},
+            {"lonkwore", "lonk"},
+            {"yahya11419", "yah yah"},
+            {"AresWyler", "aireese"},
+            {"byblyss", "ByeBliss"}
         };
 
         /// <summary>
@@ -30,7 +36,8 @@ namespace streaming_tools.Twitch.TtsFilter {
             string replacementName = usernamesToPronunciations.GetValueOrDefault(twitchInfo.ChatMessage.DisplayName.ToLowerInvariant(), username);
 
             string message = currentMessage;
-            foreach (var usernameToPhonetic in usernamesToPronunciations) message = message.Replace(usernameToPhonetic.Key, usernameToPhonetic.Value, StringComparison.InvariantCultureIgnoreCase);
+            foreach (var usernameToPhonetic in usernamesToPronunciations)
+                message = message.Replace(usernameToPhonetic.Key, usernameToPhonetic.Value, StringComparison.InvariantCultureIgnoreCase);
 
             return new Tuple<string, string>(replacementName, message);
         }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Timers;
 using TwitchLib.Client;
@@ -49,10 +50,17 @@ namespace streaming_tools.GameIntegrations {
             // Grab the configuration
             config = Configuration.Instance();
 
+            if (string.IsNullOrWhiteSpace(config.SelectedTwitchAccount))
+                return;
+
+            var account = config.TwitchAccounts.FirstOrDefault(a => config.SelectedTwitchAccount.Equals(a.Username, StringComparison.InvariantCultureIgnoreCase));
+            if (null == account)
+                return;
+
             // Create the configuration for the twitch client.
-            byte[] data = Convert.FromBase64String(config.TwitchOauth);
+            byte[] data = Convert.FromBase64String(account.OAuth);
             string password = Encoding.UTF8.GetString(data);
-            ConnectionCredentials credentials = new(config.TwitchUsername, password);
+            ConnectionCredentials credentials = new(account.Username, password);
             var clientOptions = new ClientOptions {
                 MessagesAllowedInPeriod = 750,
                 ThrottlingPeriod = TimeSpan.FromSeconds(30)

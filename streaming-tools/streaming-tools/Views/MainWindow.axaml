@@ -6,9 +6,9 @@
         xmlns:viewModels="clr-namespace:streaming_tools.ViewModels"
         xmlns:views="clr-namespace:streaming_tools.Views"
         mc:Ignorable="d"
-        d:DesignWidth="800" d:DesignHeight="415"
-        Width="800" Height="415"
-        MinWidth="800" MinHeight="415"
+        d:DesignWidth="800" d:DesignHeight="510"
+        Width="800" Height="510"
+        MinWidth="800" MinHeight="510"
         x:Class="streaming_tools.Views.MainWindow"
         Icon="/Assets/icon.ico"
         Title="notification_app">
@@ -21,6 +21,7 @@
 
     <Window.Resources>
         <converters:RoundingValueConverter x:Key="RoundingValueConverter" />
+        <converters:TwitchAccountUsernameConverter x:Key="TwitchAccountUsernameConverter" />
     </Window.Resources>
 
     <Design.DataContext>
@@ -28,6 +29,7 @@
     </Design.DataContext>
 
     <StackPanel Margin="10">
+        <views:AccountsView DataContext="{Binding AccountsViewModel}" Margin="0,0,0,2" />
         <DockPanel>
             <Border BorderBrush="Black"
                     BorderThickness="1"
@@ -40,7 +42,6 @@
                     <CheckBox IsChecked="{Binding TtsOn}">TTS On</CheckBox>
                     <Grid>
                         <Grid.RowDefinitions>
-                            <RowDefinition />
                             <RowDefinition />
                             <RowDefinition />
                             <RowDefinition />
@@ -58,29 +59,27 @@
                         <TextBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="4" HorizontalAlignment="Stretch"
                                  Text="{Binding TwitchChannel}" />
                         <Label Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,5,0">Twitch Username:</Label>
-                        <TextBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="4" HorizontalAlignment="Stretch"
-                                 Text="{Binding TwitchUsername}" />
-                        <Label Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,5,0">Twitch OAuth Token:</Label>
-                        <TextBox PasswordChar="*" Grid.Row="3" Grid.ColumnSpan="4" Grid.Column="1"
-                                 HorizontalAlignment="Stretch" Text="{Binding TwitchOauth}" />
-                        <Label Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right"
+                        <ComboBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="4" HorizontalAlignment="Stretch"
+                                  Items="{Binding Config.TwitchAccounts, Converter={StaticResource TwitchAccountUsernameConverter}}"
+                                  SelectedItem="{Binding SelectedTwitchAccount}" />
+                        <Label Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right"
                                Margin="0,0,5,0">
                             TTS Voice:
                         </Label>
-                        <ComboBox x:Name="ttsVoiceComboBox" SelectedItem="{Binding TtsVoice}" Grid.Row="4"
+                        <ComboBox x:Name="ttsVoiceComboBox" SelectedItem="{Binding TtsVoice}" Grid.Row="3"
                                   Grid.Column="1"
                                   VerticalAlignment="Center" Margin="0,0,5,0" />
-                        <Label Grid.Row="4" Grid.Column="2" VerticalAlignment="Center" Margin="0,0,5,0">Volume:</Label>
-                        <Slider x:Name="volumeSlider" Grid.Row="4" Grid.Column="3" VerticalAlignment="Center"
+                        <Label Grid.Row="3" Grid.Column="2" VerticalAlignment="Center" Margin="0,0,5,0">Volume:</Label>
+                        <Slider x:Name="volumeSlider" Grid.Row="3" Grid.Column="3" VerticalAlignment="Center"
                                 Minimum="0"
                                 Maximum="100" Value="{Binding TtsVolume}" />
-                        <TextBlock Width="40" Grid.Row="4" Grid.Column="4" VerticalAlignment="Center" Margin="5,0,5,0"
+                        <TextBlock Width="40" Grid.Row="3" Grid.Column="4" VerticalAlignment="Center" Margin="5,0,5,0"
                                    Text="{Binding Value, ElementName=volumeSlider, Converter={StaticResource RoundingValueConverter}}" />
-                        <Label Grid.Row="5" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right"
+                        <Label Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right"
                                Margin="0,0,5,0">
                             Output Device:
                         </Label>
-                        <ComboBox x:Name="outputDeviceComboBox" SelectedItem="{Binding OutputDevice}" Grid.Row="5"
+                        <ComboBox x:Name="outputDeviceComboBox" SelectedItem="{Binding OutputDevice}" Grid.Row="4"
                                   Grid.Column="1" Grid.ColumnSpan="4"
                                   VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="0,0,5,0" />
                     </Grid>
@@ -123,7 +122,8 @@
                     BorderThickness="1"
                     CornerRadius="3"
                     Padding="4"
-                    HorizontalAlignment="Stretch">
+                    HorizontalAlignment="Stretch"
+                    Margin="2,0,0,0">
                 <views:Layouts DataContext="{Binding LayoutViewModel}" />
             </Border>
         </DockPanel>

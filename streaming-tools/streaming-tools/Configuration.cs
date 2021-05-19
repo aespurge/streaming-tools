@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using System.IO;
 using Newtonsoft.Json;
 
@@ -6,7 +7,7 @@ namespace streaming_tools {
     /// <summary>
     ///     The persisted user configuration.
     /// </summary>
-    internal class Configuration {
+    public class Configuration {
         /// <summary>
         ///     The location the file should be saved and read from.
         /// </summary>
@@ -25,14 +26,14 @@ namespace streaming_tools {
         protected Configuration() { }
 
         /// <summary>
-        ///     The twitch user that connects to chats.
+        ///     A collection of all twitch accounts.
         /// </summary>
-        public string TwitchUsername { get; set; }
+        public ObservableCollection<TwitchAccount> TwitchAccounts { get; set; }
 
         /// <summary>
-        ///     The OAuth token used to authenticate as the <see cref="TwitchUsername" />.
+        ///     The currently selected twitch account.
         /// </summary>
-        public string TwitchOauth { get; set; }
+        public string SelectedTwitchAccount { get; set; }
 
         /// <summary>
         ///     The twitch channel to read chat from.
@@ -105,6 +106,9 @@ namespace streaming_tools {
             if (null == config)
                 config = new Configuration();
 
+            if (null == config.TwitchAccounts)
+                config.TwitchAccounts = new ObservableCollection<TwitchAccount>();
+
             return config;
         }
 
@@ -128,5 +132,20 @@ namespace streaming_tools {
 
             return true;
         }
+    }
+
+    /// <summary>
+    ///     Represents a twitch account.
+    /// </summary>
+    public class TwitchAccount {
+        /// <summary>
+        ///     The twitch username.
+        /// </summary>
+        public string Username { get; set; }
+
+        /// <summary>
+        ///     The twitch OAuth token.
+        /// </summary>
+        public string OAuth { get; set; }
     }
 }

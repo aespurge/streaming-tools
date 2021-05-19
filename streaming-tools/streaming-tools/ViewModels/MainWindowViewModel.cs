@@ -1,7 +1,6 @@
 using System;
 using System.ComponentModel;
 using System.Linq;
-using System.Text;
 using System.Timers;
 using Avalonia;
 using Avalonia.Controls;
@@ -17,14 +16,6 @@ namespace streaming_tools.ViewModels {
     ///     The business logic behind the main UI.
     /// </summary>
     public class MainWindowViewModel : ViewModelBase {
-        /*********************
-         * The main objects **
-         *********************/
-        /// <summary>
-        ///     The persisted configuration.
-        /// </summary>
-        private readonly Configuration config;
-
         /// <summary>
         ///     The timer used to unpause TTS at some point after microphone data is detected.
         /// </summary>
@@ -92,6 +83,11 @@ namespace streaming_tools.ViewModels {
         private int selectedMicrophone;
 
         /// <summary>
+        ///     The selected twitch channel to use for the bot.
+        /// </summary>
+        private string selectedTwitchAccount;
+
+        /// <summary>
         ///     The TTS object responsible for managing and listening to text to speech.
         /// </summary>
         private TwitchChatTts tts;
@@ -120,41 +116,47 @@ namespace streaming_tools.ViewModels {
         private string twitchChannel;
 
         /// <summary>
-        ///     The OAuth token of the account to listen to twitch chat on.
-        /// </summary>
-        private string twitchOauth;
-
-        /// <summary>
-        ///     The username of the user to join twitch chat as.
-        /// </summary>
-        private string twitchUsername;
-
-        /// <summary>
         ///     Initializes a new instance of the class.
         /// </summary>
         public MainWindowViewModel() {
+            AccountsViewModel = new AccountsViewModel();
+
             // Default to unpausing TTS 1 second after the microphone threshold has paused it.
             unpauseTimer = new Timer(1000);
             unpauseTimer.Elapsed += UnpauseTimer_Elapsed;
             unpauseTimer.AutoReset = false;
 
             // Get the configuration and assign the values.
-            config = Configuration.Instance();
-            TwitchUsername = config.TwitchUsername;
-            TwitchChannel = config.TwitchChannel;
-            if (null != config.TwitchOauth)
-                TwitchOauth = Encoding.UTF8.GetString(Convert.FromBase64String(config.TwitchOauth));
-            TtsVoice = config.TtsVoice;
-            OutputDevice = config.OutputDevice;
-            TtsVolume = config.TtsVolume;
-            SelectedMicrophone = GetSelectMicrophoneDeviceIndex(config.MicrophoneGuid);
-            PauseDuringSpeech = config.PauseDuringSpeech;
-            PauseThreshold = config.PauseThreshold;
+            Config = Configuration.Instance();
+            SelectedTwitchAccount = Config.SelectedTwitchAccount;
+            TwitchChannel = Config.TwitchChannel;
+            TtsVoice = Config.TtsVoice;
+            OutputDevice = Config.OutputDevice;
+            TtsVolume = Config.TtsVolume;
+            SelectedMicrophone = GetSelectMicrophoneDeviceIndex(Config.MicrophoneGuid);
+            PauseDuringSpeech = Config.PauseDuringSpeech;
+            PauseThreshold = Config.PauseThreshold;
 
             // We listen to our own property changed event to know when we need to push
             // information to the TTS object.
             PropertyChanged += MainWindowViewModel_PropertyChanged;
-            TtsOn = config.TtsOn;
+            TtsOn = Config.TtsOn;
+        }
+
+        /*********************
+         * The main objects **
+         *********************/
+        /// <summary>
+        ///     The persisted configuration.
+        /// </summary>
+        public Configuration Config { get; }
+
+        /// <summary>
+        ///     The selected twitch channel to use for the bot.
+        /// </summary>
+        public string SelectedTwitchAccount {
+            get => selectedTwitchAccount;
+            set => this.RaiseAndSetIfChanged(ref selectedTwitchAccount, value);
         }
 
         /*********************************
@@ -164,6 +166,11 @@ namespace streaming_tools.ViewModels {
         ///     The view responsible for laying out windows on the OS.
         /// </summary>
         private LayoutsViewModel LayoutViewModel => new();
+
+        /// <summary>
+        ///     The view responsible for specifying twitch accounts.
+        /// </summary>
+        public AccountsViewModel AccountsViewModel { get; set; }
 
         /// <summary>
         ///     True if TTS is on, false otherwise.
@@ -203,22 +210,6 @@ namespace streaming_tools.ViewModels {
                     poe = null;
                 }
             }
-        }
-
-        /// <summary>
-        ///     The username of the user to join twitch chat as.
-        /// </summary>
-        public string TwitchUsername {
-            get => twitchUsername;
-            set => this.RaiseAndSetIfChanged(ref twitchUsername, value);
-        }
-
-        /// <summary>
-        ///     The OAuth token of the account to listen to twitch chat on.
-        /// </summary>
-        public string TwitchOauth {
-            get => twitchOauth;
-            set => this.RaiseAndSetIfChanged(ref twitchOauth, value);
         }
 
         /// <summary>
@@ -427,17 +418,15 @@ namespace streaming_tools.ViewModels {
         ///     Write the configuration to file.
         /// </summary>
         private void WriteConfiguration() {
-            config.TwitchUsername = TwitchUsername;
-            config.TwitchChannel = TwitchChannel;
-            if (null != TwitchOauth)
-                config.TwitchOauth = Convert.ToBase64String(Encoding.UTF8.GetBytes(TwitchOauth));
-            config.TtsVoice = TtsVoice;
-            config.OutputDevice = OutputDevice;
-            config.TtsVolume = TtsVolume;
-            config.MicrophoneGuid = GetSelectMicrophoneDeviceGuid();
-            config.PauseDuringSpeech = PauseDuringSpeech;
-            config.PauseThreshold = PauseThreshold;
-            config.TtsOn = TtsOn;
+            Config.SelectedTwitchAccount = SelectedTwitchAccount;
+            Config.TwitchChannel = TwitchChannel;
+            Config.TtsVoice = TtsVoice;
+            Config.OutputDevice = OutputDevice;
+            Config.TtsVolume = TtsVolume;
+            Config.MicrophoneGuid = GetSelectMicrophoneDeviceGuid();
+            Config.PauseDuringSpeech = PauseDuringSpeech;
+            Config.PauseThreshold = PauseThreshold;
+            Config.TtsOn = TtsOn;
             Configuration.Instance().WriteConfiguration();
         }
 

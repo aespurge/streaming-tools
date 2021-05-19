@@ -10,7 +10,7 @@ namespace streaming_tools.Twitch.TtsFilter {
         ///     The users to never read chat messages for.
         /// </summary>
         private readonly string[] ignoreUsers = {
-            "streamlabs", "nightbot", "nullinside"
+            "streamlabs", "nightbot", "nullinside", "robotbyblyss"
         };
 
         /// <summary>

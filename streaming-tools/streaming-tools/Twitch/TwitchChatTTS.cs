@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Speech.Synthesis;
 using System.Text;
 using System.Threading;
@@ -95,9 +96,16 @@ namespace streaming_tools.Twitch {
         ///     Connects to the chat to listen for messages to read in text to speech.
         /// </summary>
         public void Connect() {
-            byte[] data = Convert.FromBase64String(config.TwitchOauth);
+            if (string.IsNullOrWhiteSpace(config.SelectedTwitchAccount))
+                return;
+
+            var account = config.TwitchAccounts.FirstOrDefault(a => config.SelectedTwitchAccount.Equals(a.Username, StringComparison.InvariantCultureIgnoreCase));
+            if (null == account)
+                return;
+
+            byte[] data = Convert.FromBase64String(account.OAuth);
             string password = Encoding.UTF8.GetString(data);
-            ConnectionCredentials credentials = new(config.TwitchUsername, password);
+            ConnectionCredentials credentials = new(account.Username, password);
             var clientOptions = new ClientOptions {
                 MessagesAllowedInPeriod = 750,
                 ThrottlingPeriod = TimeSpan.FromSeconds(30)
@@ -144,8 +152,12 @@ namespace streaming_tools.Twitch {
 
             // Go through the TTS filters which modify the chat message and update it.
             Tuple<string, string> chatMessageInfo = new(e.ChatMessage.DisplayName, e.ChatMessage.Message);
-            foreach (var filter in ttsFilters)
+            foreach (var filter in ttsFilters) {
+                if (null == chatMessageInfo)
+                    break;
+
                 chatMessageInfo = filter.Filter(e, chatMessageInfo.Item1, chatMessageInfo.Item2);
+            }
 
             // If we don't have a chat message then the message was completely filtered out and we have nothing
             // to do here.

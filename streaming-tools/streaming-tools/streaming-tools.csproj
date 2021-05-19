@@ -29,6 +29,7 @@
     <None Remove="Models\**" />
   </ItemGroup>
   <ItemGroup>
+    <None Remove="Assets\delete.png" />
     <None Remove="Assets\icon.ico" />
   </ItemGroup>
   <ItemGroup>
@@ -45,5 +46,10 @@
     <PackageReference Include="PInvoke.User32" Version="0.7.104" />
     <PackageReference Include="System.Speech" Version="5.0.0" />
     <PackageReference Include="TwitchLib" Version="3.2.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Views\AccountsView.axaml.cs">
+      <DependentUpon>AccountsView.axaml</DependentUpon>
+    </Compile>
   </ItemGroup>
 </Project>
