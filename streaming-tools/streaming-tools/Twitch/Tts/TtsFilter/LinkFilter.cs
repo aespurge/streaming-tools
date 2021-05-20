@@ -1,10 +1,11 @@
-﻿using System;
-using System.Text.RegularExpressions;
-using TwitchLib.Client.Events;
+﻿namespace streaming_tools.Twitch.Tts.TtsFilter {
+    using System;
+    using System.Text.RegularExpressions;
 
-namespace streaming_tools.Twitch.TtsFilter {
+    using TwitchLib.Client.Events;
+
     /// <summary>
-    ///     Filters out links from twitch chat.
+    ///     Filters out links from being read.
     /// </summary>
     internal class LinkFilter : ITtsFilter {
         /// <summary>
@@ -15,7 +16,7 @@ namespace streaming_tools.Twitch.TtsFilter {
         /// <param name="currentMessage">The message from twitch chat.</param>
         /// <returns>The new TTS message and username.</returns>
         public Tuple<string, string> Filter(OnMessageReceivedArgs twitchInfo, string username, string currentMessage) {
-            return new(username, Regex.Replace(currentMessage, Constants.REGEX_URL, string.Empty));
+            return new Tuple<string, string>(username, Regex.Replace(currentMessage, Constants.REGEX_URL, string.Empty));
         }
     }
 }

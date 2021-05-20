@@ -1,24 +1,20 @@
 namespace streaming_tools.Views {
-    using Avalonia;
     using Avalonia.Controls;
     using Avalonia.Markup.Xaml;
 
     /// <summary>
-    ///     The main UI.
+    /// The view responsible for pausing twitch chat TTS when the microphone hears things.
     /// </summary>
-    public class MainWindow : Window {
+    public class TtsPauseConfigView : UserControl {
         /// <summary>
-        ///     Initializes a new instance of the <see cref="MainWindow"/> class.
+        /// Initializes a new instance of the <see cref="TtsPauseConfigView"/> class.
         /// </summary>
-        public MainWindow() {
+        public TtsPauseConfigView() {
             this.InitializeComponent();
-#if DEBUG
-            this.AttachDevTools();
-#endif
         }
 
         /// <summary>
-        ///     Initializes the controls values.
+        /// Creates the UI components.
         /// </summary>
         private void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);

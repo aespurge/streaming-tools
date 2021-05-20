@@ -1,89 +1,98 @@
-﻿using System;
-using System.Collections.ObjectModel;
-using System.IO;
-using Newtonsoft.Json;
+﻿namespace streaming_tools {
+    using System;
+    using System.Collections.ObjectModel;
+    using System.ComponentModel;
+    using System.IO;
+    using System.Linq;
+    using System.Runtime.CompilerServices;
 
-namespace streaming_tools {
+    using JetBrains.Annotations;
+
+    using Newtonsoft.Json;
+
     /// <summary>
     ///     The persisted user configuration.
     /// </summary>
-    public class Configuration {
+    public class Configuration : INotifyPropertyChanged {
         /// <summary>
         ///     The location the file should be saved and read from.
         /// </summary>
-        private static readonly string CONFIG_FILENAME = Path.Combine(
-            Environment.GetEnvironmentVariable("LocalAppData"),
-            "nullinside", "streaming-tools", "config.json");
+        private static readonly string CONFIG_FILENAME = Path.Combine(Environment.GetEnvironmentVariable("LocalAppData") ?? string.Empty, "nullinside", "streaming-tools", "config.json");
 
         /// <summary>
         ///     The singleton instance of the class.
         /// </summary>
-        private static Configuration instance;
+        private static Configuration? instance;
 
         /// <summary>
-        ///     Prevents classes from instantiated.
+        /// The <seealso cref="Guid"/> of the microphone used to pause TTS.
         /// </summary>
+        private string? microphoneGuid;
+
+        /// <summary>
+        /// The 0% - 100% microphone volume at which to pause TTS.
+        /// </summary>
+        private int pauseThreshold;
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="Configuration"/> class.
+        /// </summary>
+        /// <remarks>Prevents the class from being instantiated outside of our singleton.</remarks>
         protected Configuration() { }
 
         /// <summary>
-        ///     A collection of all twitch accounts.
+        /// Raised when a property is changed on this object.
         /// </summary>
-        public ObservableCollection<TwitchAccount> TwitchAccounts { get; set; }
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         /// <summary>
-        ///     The currently selected twitch account.
+        ///     Gets or sets the <seealso cref="Guid"/> of the microphone used to pause TTS.
         /// </summary>
-        public string SelectedTwitchAccount { get; set; }
+        public string? MicrophoneGuid {
+            get => this.microphoneGuid;
+            set {
+                if (value == this.microphoneGuid)
+                    return;
+
+                this.microphoneGuid = value;
+                this.OnPropertyChanged();
+            }
+        }
 
         /// <summary>
-        ///     The twitch channel to read chat from.
+        ///     Gets or sets the percentage of microphone audio at which point text to speech pauses.
         /// </summary>
-        public string TwitchChannel { get; set; }
+        public int PauseThreshold {
+            get => this.pauseThreshold;
+            set {
+                if (value == this.pauseThreshold)
+                    return;
+
+                this.pauseThreshold = value;
+                this.OnPropertyChanged();
+            }
+        }
 
         /// <summary>
-        ///     The selected Microsoft Text to Speech voice.
+        ///     Gets or sets the collection of all twitch accounts.
         /// </summary>
-        public string TtsVoice { get; set; }
+        public ObservableCollection<TwitchAccount>? TwitchAccounts { get; set; }
 
         /// <summary>
-        ///     The output device to send audio to.
+        /// Gets or sets the collection of twitch chat configurations.
         /// </summary>
-        public string OutputDevice { get; set; }
+        public ObservableCollection<TwitchChatConfiguration>? TwitchChatConfigs { get; set; }
 
         /// <summary>
-        ///     The volume of the text to speech voice.
+        ///     Gets the singleton instance of our class.
         /// </summary>
-        public uint TtsVolume { get; set; }
+        public static Configuration Instance {
+            get {
+                if (null == instance)
+                    instance = ReadConfiguration();
 
-        /// <summary>
-        ///     The GUID of the microphone to listen to.
-        /// </summary>
-        public string MicrophoneGuid { get; set; }
-
-        /// <summary>
-        ///     True if text to speech should pause when someone talks into the microphone, false otherwise.
-        /// </summary>
-        public bool PauseDuringSpeech { get; set; }
-
-        /// <summary>
-        ///     True if text to speech is on, false otherwise.
-        /// </summary>
-        public bool TtsOn { get; set; }
-
-        /// <summary>
-        ///     The percentage of microphone audio at which point text to speech pauses.
-        /// </summary>
-        public int PauseThreshold { get; set; }
-
-        /// <summary>
-        ///     The singleton instance of our class.
-        /// </summary>
-        /// <returns>The <see cref="Configuration" /> object.</returns>
-        public static Configuration Instance() {
-            if (null == instance)
-                instance = ReadConfiguration();
-
-            return instance;
+                return instance;
+            }
         }
 
         /// <summary>
@@ -91,7 +100,7 @@ namespace streaming_tools {
         /// </summary>
         /// <returns>The configuration object.</returns>
         public static Configuration ReadConfiguration() {
-            Configuration config = null;
+            Configuration? config = null;
 
             try {
                 if (File.Exists(CONFIG_FILENAME)) {
@@ -101,7 +110,7 @@ namespace streaming_tools {
                         config = serializer.Deserialize<Configuration>(jr);
                     }
                 }
-            } catch (Exception e) { }
+            } catch (Exception) { }
 
             if (null == config)
                 config = new Configuration();
@@ -109,7 +118,22 @@ namespace streaming_tools {
             if (null == config.TwitchAccounts)
                 config.TwitchAccounts = new ObservableCollection<TwitchAccount>();
 
+            if (null == config.TwitchChatConfigs)
+                config.TwitchChatConfigs = new ObservableCollection<TwitchChatConfiguration>();
+
             return config;
+        }
+
+        /// <summary>
+        /// Gets the twitch account object associated with the username.
+        /// </summary>
+        /// <param name="username">The username.</param>
+        /// <returns>The <see cref="TwitchAccount"/> object if found, null otherwise.</returns>
+        public TwitchAccount? GetTwitchAccount(string? username) {
+            if (null == this.TwitchAccounts || string.IsNullOrWhiteSpace(username))
+                return null;
+
+            return this.TwitchAccounts.FirstOrDefault(a => null != a.Username && a.Username.Equals(username, StringComparison.InvariantCultureIgnoreCase));
         }
 
         /// <summary>
@@ -118,19 +142,29 @@ namespace streaming_tools {
         /// <returns>True if successful, false otherwise</returns>
         public bool WriteConfiguration() {
             try {
-                if (!Directory.Exists(Path.GetDirectoryName(CONFIG_FILENAME)))
-                    Directory.CreateDirectory(Path.GetDirectoryName(CONFIG_FILENAME));
+                var dirName = Path.GetDirectoryName(CONFIG_FILENAME);
+                if (null != dirName && !Directory.Exists(dirName))
+                    Directory.CreateDirectory(dirName);
 
                 JsonSerializer serializer = new();
                 using (StreamWriter sr = new(CONFIG_FILENAME))
                 using (JsonWriter jr = new JsonTextWriter(sr)) {
                     serializer.Serialize(jr, this);
                 }
-            } catch (Exception e) {
+            } catch (Exception) {
                 return false;
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Raised when a property changes on this class.
+        /// </summary>
+        /// <param name="propertyName">The name of the property.</param>
+        [NotifyPropertyChangedInvocator]
+        protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null) {
+            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 
@@ -139,13 +173,58 @@ namespace streaming_tools {
     /// </summary>
     public class TwitchAccount {
         /// <summary>
-        ///     The twitch username.
+        ///     Gets or sets the twitch OAuth token.
         /// </summary>
-        public string Username { get; set; }
+        public string? OAuth { get; set; }
 
         /// <summary>
-        ///     The twitch OAuth token.
+        ///     Gets or sets the twitch username.
         /// </summary>
-        public string OAuth { get; set; }
+        public string? Username { get; set; }
+    }
+
+    /// <summary>
+    /// Represents a single connection to a twitch chat by a single user.
+    /// </summary>
+    public class TwitchChatConfiguration {
+        /// <summary>
+        /// Gets or sets the twitch username.
+        /// </summary>
+        public string? AccountUsername { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the bot should provide administration commands.
+        /// </summary>
+        public bool AdminOn { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the output device to send audio to.
+        /// </summary>
+        public string? OutputDevice { get; set; }
+
+        /// <summary>
+        ///     Gets or sets a value indicating whether text to speech should pause when someone talks into the microphone.
+        /// </summary>
+        public bool PauseDuringSpeech { get; set; }
+
+        /// <summary>
+        ///     Gets or sets a value indicating whether text to speech is on.
+        /// </summary>
+        public bool TtsOn { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the selected Microsoft Text to Speech voice.
+        /// </summary>
+        public string? TtsVoice { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the volume of the text to speech voice.
+        /// </summary>
+        public uint TtsVolume { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the twitch channel to read chat from.
+        /// </summary>
+        public string? TwitchChannel { get; set; }
     }
 }

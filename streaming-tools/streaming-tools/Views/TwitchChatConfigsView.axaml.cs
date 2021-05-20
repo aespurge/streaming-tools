@@ -1,24 +1,20 @@
 namespace streaming_tools.Views {
-    using Avalonia;
     using Avalonia.Controls;
     using Avalonia.Markup.Xaml;
 
     /// <summary>
-    ///     The main UI.
+    /// The view responsible for keeping track of the configuration to each twitch chat.
     /// </summary>
-    public class MainWindow : Window {
+    public class TwitchChatConfigsView : UserControl {
         /// <summary>
-        ///     Initializes a new instance of the <see cref="MainWindow"/> class.
+        /// Initializes a new instance of the <see cref="TwitchChatConfigsView"/> class.
         /// </summary>
-        public MainWindow() {
+        public TwitchChatConfigsView() {
             this.InitializeComponent();
-#if DEBUG
-            this.AttachDevTools();
-#endif
         }
 
         /// <summary>
-        ///     Initializes the controls values.
+        /// Creates the UI components.
         /// </summary>
         private void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);

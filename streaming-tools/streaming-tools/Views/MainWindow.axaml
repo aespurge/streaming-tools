@@ -2,13 +2,12 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:converters="clr-namespace:streaming_tools.Views.Converters"
         xmlns:viewModels="clr-namespace:streaming_tools.ViewModels"
         xmlns:views="clr-namespace:streaming_tools.Views"
         mc:Ignorable="d"
-        d:DesignWidth="800" d:DesignHeight="510"
-        Width="800" Height="510"
-        MinWidth="800" MinHeight="510"
+        d:DesignWidth="965" d:DesignHeight="570"
+        Width="965" Height="570"
+        MinWidth="965" MinHeight="570"
         x:Class="streaming_tools.Views.MainWindow"
         Icon="/Assets/icon.ico"
         Title="notification_app">
@@ -20,8 +19,6 @@
     </Window.Styles>-->
 
     <Window.Resources>
-        <converters:RoundingValueConverter x:Key="RoundingValueConverter" />
-        <converters:TwitchAccountUsernameConverter x:Key="TwitchAccountUsernameConverter" />
     </Window.Resources>
 
     <Design.DataContext>
@@ -36,87 +33,8 @@
                     CornerRadius="3"
                     Padding="4"
                     HorizontalAlignment="Stretch"
-                    MinWidth="550">
-                <StackPanel>
-                    <TextBlock HorizontalAlignment="Center" FontWeight="Bold">Text-to-Speech Settings</TextBlock>
-                    <CheckBox IsChecked="{Binding TtsOn}">TTS On</CheckBox>
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition />
-                            <RowDefinition />
-                            <RowDefinition />
-                            <RowDefinition />
-                            <RowDefinition Height="50" />
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <Label Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,5,0">Twitch Channel:</Label>
-                        <TextBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="4" HorizontalAlignment="Stretch"
-                                 Text="{Binding TwitchChannel}" />
-                        <Label Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,5,0">Twitch Username:</Label>
-                        <ComboBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="4" HorizontalAlignment="Stretch"
-                                  Items="{Binding Config.TwitchAccounts, Converter={StaticResource TwitchAccountUsernameConverter}}"
-                                  SelectedItem="{Binding SelectedTwitchAccount}" />
-                        <Label Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right"
-                               Margin="0,0,5,0">
-                            TTS Voice:
-                        </Label>
-                        <ComboBox x:Name="ttsVoiceComboBox" SelectedItem="{Binding TtsVoice}" Grid.Row="3"
-                                  Grid.Column="1"
-                                  VerticalAlignment="Center" Margin="0,0,5,0" />
-                        <Label Grid.Row="3" Grid.Column="2" VerticalAlignment="Center" Margin="0,0,5,0">Volume:</Label>
-                        <Slider x:Name="volumeSlider" Grid.Row="3" Grid.Column="3" VerticalAlignment="Center"
-                                Minimum="0"
-                                Maximum="100" Value="{Binding TtsVolume}" />
-                        <TextBlock Width="40" Grid.Row="3" Grid.Column="4" VerticalAlignment="Center" Margin="5,0,5,0"
-                                   Text="{Binding Value, ElementName=volumeSlider, Converter={StaticResource RoundingValueConverter}}" />
-                        <Label Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Right"
-                               Margin="0,0,5,0">
-                            Output Device:
-                        </Label>
-                        <ComboBox x:Name="outputDeviceComboBox" SelectedItem="{Binding OutputDevice}" Grid.Row="4"
-                                  Grid.Column="1" Grid.ColumnSpan="4"
-                                  VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="0,0,5,0" />
-                    </Grid>
-                    <CheckBox IsChecked="{Binding PauseDuringSpeech}">Pause During Speech</CheckBox>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition />
-                        </Grid.ColumnDefinitions>
-                        <Label VerticalAlignment="Center">Microphone Source:</Label>
-                        <ComboBox Grid.Column="1" x:Name="micSources"
-                                  VerticalAlignment="Center"
-                                  Margin="0,0,5,0"
-                                  SelectedIndex="{Binding SelectedMicrophone}" />
-                    </Grid>
-
-                    <Grid Margin="0,5,0,5">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <Label VerticalAlignment="Center">Threshold: </Label>
-                        <NumericUpDown AllowSpin="false" ShowButtonSpinner="false" Grid.Column="1"
-                                       Value="{Binding PauseThreshold, Mode=TwoWay}" Minimum="0" Maximum="100"
-                                       Width="20" />
-                        <Grid Grid.Column="2" Margin="5, 0">
-                            <Rectangle HorizontalAlignment="Left" Width="100" Height="10" Fill="black" />
-                            <Rectangle HorizontalAlignment="Left" Width="{Binding MicrophoneVoiceVolume}" Height="10"
-                                       Fill="red" />
-                            <Rectangle HorizontalAlignment="Left"
-                                       Margin="{Binding MicrophoneThresholdVisualizationMargin}"
-                                       Fill="green"
-                                       Width="1" Height="20" />
-                        </Grid>
-                    </Grid>
-                </StackPanel>
+                    MinWidth="400">
+                <views:TtsPauseConfigView DataContext="{Binding TtsPauseConfigViewModel}" />
             </Border>
             <Border BorderBrush="Black"
                     BorderThickness="1"
@@ -128,5 +46,6 @@
             </Border>
         </DockPanel>
         <CheckBox IsChecked="{Binding PathOfExileEnabled}">Path of Exile Integration</CheckBox>
+        <views:TwitchChatConfigsView DataContext="{Binding TwitchChatConfigs}" />
     </StackPanel>
 </Window>

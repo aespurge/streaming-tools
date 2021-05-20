@@ -1,7 +1,8 @@
-﻿using System;
-using TwitchLib.Client.Events;
+﻿namespace streaming_tools.Twitch.Tts.TtsFilter {
+    using System;
 
-namespace streaming_tools.Twitch.TtsFilter {
+    using TwitchLib.Client.Events;
+
     /// <summary>
     ///     Filters chat messages based on the users that sent them.
     /// </summary>
@@ -9,9 +10,7 @@ namespace streaming_tools.Twitch.TtsFilter {
         /// <summary>
         ///     The users to never read chat messages for.
         /// </summary>
-        private readonly string[] ignoreUsers = {
-            "streamlabs", "nightbot", "nullinside", "robotbyblyss"
-        };
+        private readonly string[] ignoreUsers = { "streamlabs", "nightbot", "nullinside", "robotbyblyss" };
 
         /// <summary>
         ///     Filters out chat messages for bot users.
@@ -21,9 +20,10 @@ namespace streaming_tools.Twitch.TtsFilter {
         /// <param name="currentMessage">The message from twitch chat.</param>
         /// <returns>The new TTS message and username.</returns>
         public Tuple<string, string> Filter(OnMessageReceivedArgs twitchInfo, string username, string currentMessage) {
-            foreach (var ignoredUser in ignoreUsers)
+            foreach (var ignoredUser in this.ignoreUsers) {
                 if (ignoredUser.Equals(twitchInfo.ChatMessage.DisplayName, StringComparison.InvariantCultureIgnoreCase))
-                    return null;
+                    return new Tuple<string, string>("", "");
+            }
 
             return new Tuple<string, string>(username, currentMessage);
         }

@@ -15,6 +15,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DocumentationFile>C:\dev\git\streaming-tools\streaming-tools\streaming-tools\streaming-tools.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -29,6 +30,7 @@
     <None Remove="Models\**" />
   </ItemGroup>
   <ItemGroup>
+    <None Remove="Assets\add.png" />
     <None Remove="Assets\delete.png" />
     <None Remove="Assets\icon.ico" />
   </ItemGroup>
@@ -44,6 +46,10 @@
     <PackageReference Include="NAudio.WinMM" Version="2.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="PInvoke.User32" Version="0.7.104" />
+    <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="System.Speech" Version="5.0.0" />
     <PackageReference Include="TwitchLib" Version="3.2.0" />
   </ItemGroup>

@@ -1,11 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using PInvoke;
-using streaming_tools.Utilities;
+﻿namespace streaming_tools.ViewModels {
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Linq;
 
-namespace streaming_tools.ViewModels {
+    using PInvoke;
+
+    using streaming_tools.Utilities;
+
     /// <summary>
     ///     The view model for handling laying out windows on the OS.
     /// </summary>
@@ -26,11 +28,11 @@ namespace streaming_tools.ViewModels {
         /// </summary>
         public LayoutsViewModel() {
             var primaryMonitor = MonitorUtilities.GetPrimaryMonitor();
-            SelectedMonitor = MonitorUtilities.MONITOR_NOT_FOUND_DEVICE_NAME != primaryMonitor.DeviceName ? primaryMonitor.DeviceName : MonitorUtilities.GetMonitors().FirstOrDefault().DeviceName;
+            this.SelectedMonitor = MonitorUtilities.MONITOR_NOT_FOUND_DEVICE_NAME != primaryMonitor.DeviceName ? primaryMonitor.DeviceName : MonitorUtilities.GetMonitors().FirstOrDefault().DeviceName;
         }
 
         /// <summary>
-        ///     The currently selected monitor to move the windows to.
+        ///     Gets or sets the currently selected monitor to move the windows to.
         /// </summary>
         public string SelectedMonitor { get; set; }
 
@@ -51,25 +53,24 @@ namespace streaming_tools.ViewModels {
 
             // Determine the size of the windows when tiled based on the total area of
             // the monitor
-            var monitor = null == SelectedMonitor ? MonitorUtilities.GetPrimaryMonitor() : monitors.FirstOrDefault(m => SelectedMonitor.Equals(m.DeviceName, StringComparison.InvariantCultureIgnoreCase));
+            var monitor = null == this.SelectedMonitor ? MonitorUtilities.GetPrimaryMonitor() : monitors.FirstOrDefault(m => this.SelectedMonitor.Equals(m.DeviceName, StringComparison.InvariantCultureIgnoreCase));
             var monitorWidth = monitor.WorkArea.Right - monitor.WorkArea.Left;
             var monitorHeight = monitor.WorkArea.Bottom - monitor.WorkArea.Top;
-            var width = 2 <= processes.Count ? (int) Math.Ceiling(monitorWidth / 2.0f) : monitorWidth;
-            width += (int) (PADDING / 2.0 * -1.0);
+            var width = 2 <= processes.Count ? (int)Math.Ceiling(monitorWidth / 2.0f) : monitorWidth;
+            width += (int)(PADDING / 2.0 * -1.0);
             var height = monitorHeight;
             var rows = Math.Ceiling(processes.Count / 2.0f);
-            height = (int) Math.Ceiling(height / rows);
+            height = (int)Math.Ceiling(height / rows);
 
             // Apply the layout
             for (var i = 0; i < processes.Count; i++) {
                 var process = processes[i];
-                var row = (int) Math.Floor(i / 2.0);
+                var row = (int)Math.Floor(i / 2.0);
                 var column = i % 2 == 0 ? 0 : 1;
                 var x = monitor.WorkArea.Left + column * width + (column == 1 ? PADDING : 0);
                 var y = monitor.WorkArea.Top + row * height;
 
-                if (!previousWindowSettings.ContainsKey(process.Id))
-                    previousWindowSettings[process.Id] = (User32.SetWindowLongFlags) User32.GetWindowLong(process.MainWindowHandle, User32.WindowLongIndexFlags.GWL_STYLE);
+                if (!this.previousWindowSettings.ContainsKey(process.Id)) this.previousWindowSettings[process.Id] = (User32.SetWindowLongFlags)User32.GetWindowLong(process.MainWindowHandle, User32.WindowLongIndexFlags.GWL_STYLE);
 
                 User32.SetWindowLong(process.MainWindowHandle, User32.WindowLongIndexFlags.GWL_STYLE, User32.SetWindowLongFlags.WS_VISIBLE);
                 User32.SetWindowPos(process.MainWindowHandle, User32.SpecialWindowHandles.HWND_TOP, x, y, width, height, User32.SetWindowPosFlags.SWP_SHOWWINDOW);
@@ -82,8 +83,7 @@ namespace streaming_tools.ViewModels {
         /// </summary>
         private void OnUndoClicked() {
             foreach (var process in Process.GetProcessesByName("vlc")) {
-                User32.SetWindowLongFlags oldValue;
-                if (!previousWindowSettings.TryGetValue(process.Id, out oldValue))
+                if (!this.previousWindowSettings.TryGetValue(process.Id, out var oldValue))
                     continue;
 
                 User32.SetWindowLong(process.MainWindowHandle, User32.WindowLongIndexFlags.GWL_STYLE, oldValue);

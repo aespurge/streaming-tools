@@ -1,9 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using PInvoke;
+﻿namespace streaming_tools.Utilities {
+    using System;
+    using System.Collections.Generic;
+    using System.Runtime.InteropServices;
 
-namespace streaming_tools.Utilities {
+    using PInvoke;
+
     /// <summary>
     ///     Helpers for dealing with low level calls to the OS' monitor interface.
     /// </summary>
@@ -16,7 +17,7 @@ namespace streaming_tools.Utilities {
         /// <summary>
         ///     The default struct to return when a monitor isn't found.
         /// </summary>
-        public static readonly PInvokeUtilities.MonitorInfoEx MONITOR_NOT_FOUND = new() {DeviceName = MONITOR_NOT_FOUND_DEVICE_NAME};
+        public static readonly PInvokeUtilities.MonitorInfoEx MONITOR_NOT_FOUND = new() { DeviceName = MONITOR_NOT_FOUND_DEVICE_NAME };
 
         /// <summary>
         ///     Gets a collection representing all monitors on the machine.
@@ -29,15 +30,19 @@ namespace streaming_tools.Utilities {
             // Use a low-level PInvoke to iterate though the monitors.
             // ReSharper disable once RedundantUnsafeContext
             unsafe {
-                User32.EnumDisplayMonitors(IntPtr.Zero, IntPtr.Zero, (monitor, _, _, _) => {
-                    var mi = new PInvokeUtilities.MonitorInfoEx();
-                    mi.Size = Marshal.SizeOf(mi);
-                    var success = PInvokeUtilities.GetMonitorInfo(monitor, ref mi);
-                    if (success)
-                        monitors.Add(mi);
+                User32.EnumDisplayMonitors(
+                    IntPtr.Zero,
+                    IntPtr.Zero,
+                    (monitor, _, _, _) => {
+                        var mi = new PInvokeUtilities.MonitorInfoEx();
+                        mi.Size = Marshal.SizeOf(mi);
+                        var success = PInvokeUtilities.GetMonitorInfo(monitor, ref mi);
+                        if (success)
+                            monitors.Add(mi);
 
-                    return true;
-                }, IntPtr.Zero);
+                        return true;
+                    },
+                    IntPtr.Zero);
             }
 
             // Return what we found.
@@ -51,7 +56,7 @@ namespace streaming_tools.Utilities {
         public static PInvokeUtilities.MonitorInfoEx GetPrimaryMonitor() {
             // Try to find the primary monitor using the primary monitor flag.
             foreach (var monitor in GetMonitors())
-                if (((User32.MONITORINFO_Flags) monitor.Flags).HasFlag(User32.MONITORINFO_Flags.MONITORINFOF_PRIMARY))
+                if (((User32.MONITORINFO_Flags)monitor.Flags).HasFlag(User32.MONITORINFO_Flags.MONITORINFOF_PRIMARY))
                     return monitor;
 
             return MONITOR_NOT_FOUND;

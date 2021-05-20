@@ -1,9 +1,10 @@
-﻿using System;
-using TwitchLib.Client.Events;
+﻿namespace streaming_tools.Twitch.Tts.TtsFilter {
+    using System;
 
-namespace streaming_tools.Twitch.TtsFilter {
+    using TwitchLib.Client.Events;
+
     /// <summary>
-    ///     A contract for filtering something from TTS.
+    ///     A contract for filtering messages in TTS either by modifying the message or removing it.
     /// </summary>
     internal interface ITtsFilter {
         /// <summary>

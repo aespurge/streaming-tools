@@ -1,0 +1,1412 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>streaming-tools</name>
+    </assembly>
+    <members>
+        <member name="T:streaming_tools.App">
+            <summary>
+            The main entry point of the application.
+            </summary>
+        </member>
+        <member name="M:streaming_tools.App.Initialize">
+            <summary>
+            Creates the UI components.
+            </summary>
+        </member>
+        <member name="M:streaming_tools.App.OnFrameworkInitializationCompleted">
+            <summary>
+            The initialization method for performing one time initialization for the application.
+            </summary>
+        </member>
+        <member name="T:streaming_tools.Configuration">
+            <summary>
+                The persisted user configuration.
+            </summary>
+        </member>
+        <member name="F:streaming_tools.Configuration.CONFIG_FILENAME">
+            <summary>
+                The location the file should be saved and read from.
+            </summary>
+        </member>
+        <member name="F:streaming_tools.Configuration.instance">
+            <summary>
+                The singleton instance of the class.
+            </summary>
+        </member>
+        <member name="F:streaming_tools.Configuration.microphoneGuid">
+            <summary>
+            The <seealso cref="T:System.Guid"/> of the microphone used to pause TTS.
+            </summary>
+        </member>
+        <member name="F:streaming_tools.Configuration.pauseThreshold">
+            <summary>
+            The 0% - 100% microphone volume at which to pause TTS.
+            </summary>
+        </member>
+        <member name="M:streaming_tools.Configuration.#ctor">
+            <summary>
+                Initializes a new instance of the <see cref="T:streaming_tools.Configuration"/> class.
+            </summary>
+            <remarks>Prevents the class from being instantiated outside of our singleton.</remarks>
+        </member>
+        <member name="E:streaming_tools.Configuration.PropertyChanged">
+            <summary>
+            Raised when a property is changed on this object.
+            </summary>
+        </member>
+        <member name="P:streaming_tools.Configuration.MicrophoneGuid">
+            <summary>
+                Gets or sets the <seealso cref="T:System.Guid"/> of the microphone used to pause TTS.
+            </summary>
+        </member>
+        <member name="P:streaming_tools.Configuration.PauseThreshold">
+            <summary>
+                Gets or sets the percentage of microphone audio at which point text to speech pauses.
+            </summary>
+        </member>
+        <member name="P:streaming_tools.Configuration.TwitchAccounts">
+            <summary>
+                Gets or sets the collection of all twitch accounts.
+            </summary>
+        </member>
+        <member name="P:streaming_tools.Configuration.TwitchChatConfigs">
+            <summary>
+            Gets or sets the collection of twitch chat configurations.
+            </summary>
+        </member>
+        <member name="P:streaming_tools.Configuration.Instance">
+            <summary>
+                Gets the singleton instance of our class.
+            </summary>
+        </member>
+        <member name="M:streaming_tools.Configuration.ReadConfiguration">
+            <summary>
+                Read the configuration from disk.
+            </summary>
+            <returns>The configuration object.</returns>
+        </member>
+        <member name="M:streaming_tools.Configuration.GetTwitchAccount(System.String)">
+            <summary>
+            Gets the twitch account object associated with the username.
+            </summary>
+            <param name="username">The username.</param>
+            <returns>The <see cref="T:streaming_tools.TwitchAccount"/> object if found, null otherwise.</returns>
+        </member>
+        <member name="M:streaming_tools.Configuration.WriteConfiguration">
+            <summary>
+                Write the configuration to disk.
+            </summary>
+            <returns>True if successful, false otherwise</returns>
+        </member>
+        <member name="M:streaming_tools.Configuration.OnPropertyChanged(System.String)">
+            <summary>
+            Raised when a property changes on this class.
+            </summary>
+            <param name="propertyName">The name of the property.</param>
+        </member>
+        <member name="T:streaming_tools.TwitchAccount">
+            <summary>
+                Represents a twitch account.
+            </summary>
+        </member>
+        <member name="P:streaming_tools.TwitchAccount.OAuth">
+            <summary>
+                Gets or sets the twitch OAuth token.
+            </summary>
+        </member>
+        <member name="P:streaming_tools.TwitchAccount.Username">
+            <summary>
+                Gets or sets the twitch username.
+            </summary>
+        </member>
+        <member name="T:streaming_tools.TwitchChatConfiguration">
+            <summary>
+            Represents a single connection to a twitch chat by a single user.
+            </summary>
+        </member>
+        <member name="P:streaming_tools.TwitchChatConfiguration.AccountUsername">
+            <summary>
+            Gets or sets the twitch username.
+            </summary>
+        </member>
+        <member name="P:streaming_tools.TwitchChatConfiguration.AdminOn">
+            <summary>
+            Gets or sets a value indicating whether the bot should provide administration commands.
+            </summary>
+        </member>
+        <member name="P:streaming_tools.TwitchChatConfiguration.OutputDevice">
+            <summary>
+                Gets or sets the output device to send audio to.
+            </summary>
+        </member>
+        <member name="P:streaming_tools.TwitchChatConfiguration.PauseDuringSpeech">
+            <summary>
+                Gets or sets a value indicating whether text to speech should pause when someone talks into the microphone.
+            </summary>
+        </member>
+        <member name="P:streaming_tools.TwitchChatConfiguration.TtsOn">
+            <summary>
+                Gets or sets a value indicating whether text to speech is on.
+            </summary>
+        </member>
+        <member name="P:streaming_tools.TwitchChatConfiguration.TtsVoice">
+            <summary>
+                Gets or sets the selected Microsoft Text to Speech voice.
+            </summary>
+        </member>
+        <member name="P:streaming_tools.TwitchChatConfiguration.TtsVolume">
+            <summary>
+                Gets or sets the volume of the text to speech voice.
+            </summary>
+        </member>
+        <member name="P:streaming_tools.TwitchChatConfiguration.TwitchChannel">
+            <summary>
+                Gets or sets the twitch channel to read chat from.
+            </summary>
+        </member>
+        <member name="T:streaming_tools.Constants">
+            <summary>
+                Global constants for use in the application.
+            </summary>
+        </member>
+        <member name="F:streaming_tools.Constants.REGEX_URL">
+            <summary>
+                A regular expression for identifying a link.
+            </summary>
+        </member>
+        <member name="F:streaming_tools.Constants.TWITCH_OAUTH_SITE">
+            <summary>
+                The address to retrieve an OAuth token from twitch.
+            </summary>
+        </member>
+        <member name="T:streaming_tools.GameIntegrations.PathOfExileIntegration">
+            <summary>
+                Integration for the Path of Exile game to increment the death counter when our character dies.
+            </summary>
+        </member>
+        <member name="M:streaming_tools.GameIntegrations.PathOfExileIntegration.Dispose">
+            <summary>
+                Releases unmanaged resources.
+            </summary>
+        </member>
+        <member name="M:streaming_tools.GameIntegrations.PathOfExileIntegration.CheckPoeLogTimerElapsed(System.Object,System.Timers.ElapsedEventArgs)">
+            <summary>
+                Checks the POE log file to see if the player died.
+            </summary>
+            <param name="sender">The timer.</param>
+            <param name="e">The event arguments.</param>
+        </member>
+        <member name="T:streaming_tools.Twitch.Admin.BotWannaBecomeFamous">
+            <summary>
+                Handles banning the "Wanna become famous" bot.
+            </summary>
+        </member>
+        <member name="M:streaming_tools.Twitch.Admin.BotWannaBecomeFamous.Handle(streaming_tools.TwitchChatConfiguration,TwitchLib.Client.TwitchClient,TwitchLib.Client.Events.OnMessageReceivedArgs)">
+            <summary>
+                Handles banning the "Wanna become famous" bot message.
+            </summary>
+            <param name="config">The configuration for the twitch chat.</param>
+            <param name="client">The twitch client.</param>
+            <param name="messageInfo">The information on the chat message.</param>
+            <returns>True if the message should be passed on, false if it should be discarded.</returns>
+        </member>
+        <member name="T:streaming_tools.Twitch.Admin.IAdminFilter">
+            <summary>
+                Handles administration of the stream.
+            </summary>
+        </member>
+        <member name="M:streaming_tools.Twitch.Admin.IAdminFilter.Handle(streaming_tools.TwitchChatConfiguration,TwitchLib.Client.TwitchClient,TwitchLib.Client.Events.OnMessageReceivedArgs)">
+            <summary>
+                Handles administration of the chat messages.
+            </summary>
+            <param name="config">The configuration for the twitch chat.</param>
+            <param name="client">The twitch client.</param>
+            <param name="messageInfo">The information on the chat message.</param>
+            <returns>True if the message should be passed on, false if it should be discarded.</returns>
+        </member>
+        <member name="T:streaming_tools.Twitch.Admin.TwitchChatAdmin">
+            <summary>
+                Handles the admin filters on a twitch chat.
+            </summary>
+        </member>
+        <member name="F:streaming_tools.Twitch.Admin.TwitchChatAdmin.adminFilters">
+            <summary>
+                The ordered filters to apply to administer the twitch chat.
+            </summary>
+        </member>
+        <member name="F:streaming_tools.Twitch.Admin.TwitchChatAdmin.chatConfig">
+            <summary>
+                The chat configuration.
+            </summary>
+        </member>
+        <member name="M:streaming_tools.Twitch.Admin.TwitchChatAdmin.#ctor(streaming_tools.TwitchChatConfiguration)">
+            <summary>
+                Initializes a new instance of the <see cref="T:streaming_tools.Twitch.Admin.TwitchChatAdmin" /> class.
+            </summary>
+            <param name="config">The chat configuration.</param>
+        </member>
+        <member name="M:streaming_tools.Twitch.Admin.TwitchChatAdmin.Connect">
+            <summary>
+                Connects to the chat to listen for messages to apply admin filters to.
+            </summary>
+        </member>
+        <member name="M:streaming_tools.Twitch.Admin.TwitchChatAdmin.Dispose">
+            <summary>
+                Releases unmanaged resources.
+            </summary>
+        </member>
+        <member name="M:streaming_tools.Twitch.Admin.TwitchChatAdmin.Client_OnMessageReceived(TwitchLib.Client.TwitchClient,TwitchLib.Client.Events.OnMessageReceivedArgs)">
+            <summary>
+                Applies admin filters to the messages from twitch chat.
+            </summary>
+            <param name="twitchClient">The twitch chat client.</param>
+            <param name="e">The message.</param>
+            <returns>True if the message should be passed on, false otherwise.</returns>
+        </member>
+        <member name="T:streaming_tools.Twitch.Tts.TtsFilter.ITtsFilter">
+            <summary>
+                A contract for filtering messages in TTS either by modifying the message or removing it.
+            </summary>
+        </member>
+        <member name="M:streaming_tools.Twitch.Tts.TtsFilter.ITtsFilter.Filter(TwitchLib.Client.Events.OnMessageReceivedArgs,System.String,System.String)">
+            <summary>
+                Filters a message from TTS.
+            </summary>
+            <param name="twitchInfo">The information on the original chat message.</param>
+            <param name="username">The username of the twitch chatter for TTS to say.</param>
+            <param name="currentMessage">The message from twitch chat.</param>
+            <returns>The new TTS message and username.</returns>
+        </member>
+        <member name="T:streaming_tools.Twitch.Tts.TtsFilter.LinkFilter">
+            <summary>
+                Filters out links from being read.
+            </summary>
+        </member>
+        <member name="M:streaming_tools.Twitch.Tts.TtsFilter.LinkFilter.Filter(TwitchLib.Client.Events.OnMessageReceivedArgs,System.String,System.String)">
+            <summary>
+                Filters out links from text to speech.
+            </summary>
+            <param name="twitchInfo">The information on the original chat message.</param>
+            <param name="username">The username of the twitch chatter for TTS to say.</param>
+            <param name="currentMessage">The message from twitch chat.</param>
+            <returns>The new TTS message and username.</returns>
+        </member>
+        <member name="T:streaming_tools.Twitch.Tts.TtsFilter.UsernamePhoneticFilter">
+            <summary>
+                Converts users names to their phonetic spellings.
+            </summary>
+        </member>
+        <member name="F:streaming_tools.Twitch.Tts.TtsFilter.UsernamePhoneticFilter.usernamesToPronunciations">
+            <summary>
+                The hard-coded list of usernames that I know need to be fixed.
+            </summary>
+        </member>
+        <member name="M:streaming_tools.Twitch.Tts.TtsFilter.UsernamePhoneticFilter.Filter(TwitchLib.Client.Events.OnMessageReceivedArgs,System.String,System.String)">
+            <summary>
+                Converts a username to it's phonetic spelling for TTS.
+            </summary>
+            <param name="twitchInfo">The information on the original chat message.</param>
+            <param name="username">The username of the twitch chatter for TTS to say.</param>
+            <param name="currentMessage">The message from twitch chat.</param>
+            <returns>The new TTS message and username.</returns>
+        </member>
+        <member name="T:streaming_tools.Twitch.Tts.TtsFilter.UsernameSkipFilter">
+            <summary>
+                Filters chat messages based on the users that sent them.
+            </summary>
+        </member>
+        <member name="F:streaming_tools.Twitch.Tts.TtsFilter.UsernameSkipFilter.ignoreUsers">
+            <summary>
+                The users to never read chat messages for.
+            </summary>
+        </member>
+        <member name="M:streaming_tools.Twitch.Tts.TtsFilter.UsernameSkipFilter.Filter(TwitchLib.Client.Events.OnMessageReceivedArgs,System.String,System.String)">
+            <summary>
+                Filters out chat messages for bot users.
+            </summary>
+            <param name="twitchInfo">The information on the original chat message.</param>
+            <param name="username">The username of the twitch chatter for TTS to say.</param>
+            <param name="currentMessage">The message from twitch chat.</param>
+            <returns>The new TTS message and username.</returns>
+        </member>
+        <member name="T:streaming_tools.Twitch.Tts.TwitchChatTts">
+            <summary>
+                A twitch chat Text-to-speech client.
+            </summary>
+        </member>
+        <member name="F:streaming_tools.Twitch.Tts.TwitchChatTts.chatConfig">
+            <summary>
+                The configuration for the twitch chat.
+            </summary>
+        </member>
+        <member name="F:streaming_tools.Twitch.Tts.TwitchChatTts.ttsFilters">
+            <summary>
+                Filters for modifying an incoming message for text to speech.
+            </summary>
+        </member>
+        <member name="F:streaming_tools.Twitch.Tts.TwitchChatTts.ttsSoundOutputLock">
+            <summary>
+                The lock for ensuring mutual exclusion on the <see cref="F:streaming_tools.Twitch.Tts.TwitchChatTts.ttsSoundOutput" /> object.
+            </summary>
+        </member>
+        <member name="F:streaming_tools.Twitch.Tts.TwitchChatTts.ttsSoundOutputSignalLock">
+            <summary>
+                The lock for ensuring mutual exclusion on the <see cref="F:streaming_tools.Twitch.Tts.TwitchChatTts.ttsSoundOutputSignal" /> object.
+            </summary>
+        </member>
+        <member name="F:streaming_tools.Twitch.Tts.TwitchChatTts.ttsSoundOutput">
+            <summary>
+                The text-to-speech sound output.
+            </summary>
+        </member>
+        <member name="F:streaming_tools.Twitch.Tts.TwitchChatTts.ttsSoundOutputSignal">
+            <summary>
+                The signal used to make sound output synchronous.
+            </summary>
+        </member>
+        <member name="M:streaming_tools.Twitch.Tts.TwitchChatTts.#ctor(streaming_tools.TwitchChatConfiguration)">
+            <summary>
+                Initializes a new instance of the <see cref="T:streaming_tools.Twitch.Tts.TwitchChatTts" /> class.
+            </summary>
+            <param name="config">The configuration for the twitch chat.</param>
+        </member>
+        <member name="M:streaming_tools.Twitch.Tts.TwitchChatTts.Connect">
+            <summary>
+                Connects to the chat to listen for messages to read in text to speech.
+            </summary>
+        </member>
+        <member name="M:streaming_tools.Twitch.Tts.TwitchChatTts.Dispose">
+            <summary>
+                Releases unmanaged resources.
+            </summary>
+        </member>
+        <member name="M:streaming_tools.Twitch.Tts.TwitchChatTts.Pause">
+            <summary>
+                Pauses the text to speech.
+            </summary>
+        </member>
+        <member name="M:streaming_tools.Twitch.Tts.TwitchChatTts.Unpause">
+            <summary>
+                Continues the text to speech.
+            </summary>
+        </member>
+        <member name="M:streaming_tools.Twitch.Tts.TwitchChatTts.Client_OnMessageReceived(TwitchLib.Client.TwitchClient,TwitchLib.Client.Events.OnMessageReceivedArgs)">
+            <summary>
+                Event called when a message in received in twitch chat.
+            </summary>
+            <param name="twitchClient">The twitch chat client.</param>
+            <param name="e">The chat message information.</param>
+        </member>
+        <member name="T:streaming_tools.Twitch.Tts.TwitchChatTtsPauser">
+            <summary>
+                Handles pausing twitch chat TTS when the microphone hears.
+            </summary>
+        </member>
+        <member name="F:streaming_tools.Twitch.Tts.TwitchChatTtsPauser.unpauseTimer">
+            <summary>
+                The timer used to continue TTS at some point after microphone data is detected.
+            </summary>
+        </member>
+        <member name="F:streaming_tools.Twitch.Tts.TwitchChatTtsPauser.microphoneBufferedData">
+            <summary>
+                The object that buffers that data from the microphone.
+            </summary>
+        </member>
+        <member name="F:streaming_tools.Twitch.Tts.TwitchChatTtsPauser.microphoneDataEvent">
+            <summary>
+                The main event that listens for microphone data.
+            </summary>
+        </member>
+        <member name="F:streaming_tools.Twitch.Tts.TwitchChatTtsPauser.microphoneMicrophoneVoiceVolume">
+            <summary>
+                The current volume of the voice read from the microphone.
+            </summary>
+        </member>
+        <member name="F:streaming_tools.Twitch.Tts.TwitchChatTtsPauser.microphoneVoiceData">
+            <summary>
+                The object that converts the microphone data into a wave so we can read the volume.
+            </summary>
+        </member>
+        <member name="F:streaming_tools.Twitch.Tts.TwitchChatTtsPauser.pauseThreshold">
+            <summary>
+                The percentage of volume at which we should pause TTS when we detect microphone data.
+            </summary>
+        </member>
+        <member name="F:streaming_tools.Twitch.Tts.TwitchChatTtsPauser.selectedMicrophone">
+            <summary>
+                The string representation of the microphone device name from NAudio.
+            </summary>
+        </member>
+        <member name="M:streaming_tools.Twitch.Tts.TwitchChatTtsPauser.#ctor">
+            <summary>
+                Initializes a new instance of the <see cref="T:streaming_tools.Twitch.Tts.TwitchChatTtsPauser" /> class.
+            </summary>
+        </member>
+        <member name="E:streaming_tools.Twitch.Tts.TwitchChatTtsPauser.PropertyChanged">
+            <summary>
+            Invoked when properties on the class change.
+            </summary>
+        </member>
+        <member name="P:streaming_tools.Twitch.Tts.TwitchChatTtsPauser.MicrophoneVoiceVolume">
+            <summary>
+                Gets or sets the current volume of the voice read from the microphone.
+            </summary>
+        </member>
+        <member name="P:streaming_tools.Twitch.Tts.TwitchChatTtsPauser.PauseThreshold">
+            <summary>
+                Gets or sets the percentage of volume at which we should pause TTS when we detect microphone data.
+            </summary>
+        </member>
+        <member name="P:streaming_tools.Twitch.Tts.TwitchChatTtsPauser.SelectedMicrophone">
+            <summary>
+                Gets or sets the string representation of the microphone device name from NAudio.
+            </summary>
+        </member>
+        <member name="P:streaming_tools.Twitch.Tts.TwitchChatTtsPauser.Tts">
+            <summary>
+            Gets or sets the reference to the TTS class the reads twitch chat.
+            </summary>
+        </member>
+        <member name="M:streaming_tools.Twitch.Tts.TwitchChatTtsPauser.GetSelectMicrophoneDeviceIndex(System.String)">
+            <summary>
+                Gets the NAudio index associated with the selected microphone.
+            </summary>
+            <param name="guid">The unique GUID of the microphone.</param>
+            <returns>The index of the microphone according to NAudio.</returns>
+        </member>
+        <member name="M:streaming_tools.Twitch.Tts.TwitchChatTtsPauser.StartListenToMicrophone">
+            <summary>
+                Starts listening to the microphone so we know when to pause TTS for microphone speaking.
+            </summary>
+        </member>
+        <member name="M:streaming_tools.Twitch.Tts.TwitchChatTtsPauser.StopListenToMicrophone">
+            <summary>
+                Stops listening to the microphone.
+            </summary>
+        </member>
+        <member name="M:streaming_tools.Twitch.Tts.TwitchChatTtsPauser.OnPropertyChanged(System.String)">
+            <summary>
+            Raised when a property is changed on the class.
+            </summary>
+            <param name="propertyName">The name of the property.</param>
+        </member>
+        <member name="M:streaming_tools.Twitch.Tts.TwitchChatTtsPauser.Microphone_DataReceived(System.Object,NAudio.Wave.WaveInEventArgs)">
+            <summary>
+                Called when the microphone creates voice data.
+            </summary>
+            <param name="sender">The <seealso cref="T:NAudio.Wave.WaveInEvent" /> that captured the data from the microphone.</param>
+            <param name="e">Data received.</param>
+        </member>
+        <member name="M:streaming_tools.Twitch.Tts.TwitchChatTtsPauser.MicrophoneAudioChannel_PreVolumeMeter(System.Object,NAudio.Wave.SampleProviders.StreamVolumeEventArgs)">
+            <summary>
+                Called when microphone voice data is recognized.
+            </summary>
+            <param name="sender">A <seealso cref="T:NAudio.Wave.SampleProviders.SampleChannel" /> receiving microphone data.</param>
+            <param name="e">The data on how loud the voice is.</param>
+        </member>
+        <member name="M:streaming_tools.Twitch.Tts.TwitchChatTtsPauser.UnpauseTimer_Elapsed(System.Object,System.Timers.ElapsedEventArgs)">
+            <summary>
+                Event fired after TTS has been paused to continue it. This occurs after the TTS
+                has been paused by the voice detected in the microphone has exceeded the threshold.
+            </summary>
+            <param name="sender">The timer.</param>
+            <param name="e">The event arguments.</param>
+        </member>
+        <member name="T:streaming_tools.Twitch.TwitchChatManager">
+            <summary>
+                Organizes and aggregates the clients connected to zero or more twitch chats. Invokes callbacks for messages
+                received
+                in chats.
+            </summary>
+        </member>
+        <member name="F:streaming_tools.Twitch.TwitchChatManager.instance">
+            <summary>
+                The singleton instance of the class.
+            </summary>
+        </member>
+        <member name="F:streaming_tools.Twitch.TwitchChatManager.twitchClients">
+            <summary>
+                The mapping of twitch clients to their requested configurations.
+            </summary>
+        </member>
+        <member name="M:streaming_tools.Twitch.TwitchChatManager.#ctor">
+            <summary>
+                Initializes a new instance of the <see cref="T:streaming_tools.Twitch.TwitchChatManager" /> class.
+            </summary>
+            <remarks>This is protected to prevent instantiation outside of our singleton.</remarks>
+        </member>
+        <member name="P:streaming_tools.Twitch.TwitchChatManager.Instance">
+            <summary>
+                Gets the singleton instance of the class.
+            </summary>
+        </member>
+        <member name="M:streaming_tools.Twitch.TwitchChatManager.AddTwitchChannel(streaming_tools.TwitchAccount,System.String,System.Action{TwitchLib.Client.TwitchClient,TwitchLib.Client.Events.OnMessageReceivedArgs})">
+            <summary>
+                Adds a callback from receiving twitch chat messages.
+            </summary>
+            <param name="account">The account to connect with.</param>
+            <param name="channel">The name of the channel to join.</param>
+            <param name="messageCallback">The callback to invoke when a message is received.</param>
+        </member>
+        <member name="M:streaming_tools.Twitch.TwitchChatManager.AddTwitchChannelAdminFilter(streaming_tools.TwitchAccount,System.String,System.Func{TwitchLib.Client.TwitchClient,TwitchLib.Client.Events.OnMessageReceivedArgs,System.Boolean})">
+            <summary>
+                Adds a callback to perform administrative functions on twitch chat (e.g. like banning users) and optionally
+                preventing messages
+                from being propagated to other callbacks.
+            </summary>
+            <param name="account">The account to connect with.</param>
+            <param name="channel">The name of the channel to join.</param>
+            <param name="adminCallback">The callback to invoke when a message is received.</param>
+        </member>
+        <member name="M:streaming_tools.Twitch.TwitchChatManager.RemoveTwitchChannel(streaming_tools.TwitchAccount,System.String,System.Action{TwitchLib.Client.TwitchClient,TwitchLib.Client.Events.OnMessageReceivedArgs})">
+            <summary>
+                Remove a callback from receiving twitch chat messages.
+            </summary>
+            <param name="account">The account originally subscribed with.</param>
+            <param name="channel">The name of the channel that was joined.</param>
+            <param name="messageCallback">The callback to remove.</param>
+        </member>
+        <member name="M:streaming_tools.Twitch.TwitchChatManager.RemoveTwitchChannelAdminFilter(streaming_tools.TwitchAccount,System.String,System.Func{TwitchLib.Client.TwitchClient,TwitchLib.Client.Events.OnMessageReceivedArgs,System.Boolean})">
+            <summary>
+                Remove a callback from administering twitch chat.
+            </summary>
+            <param name="account">The account originally subscribed with.</param>
+            <param name="channel">The name of the channel that was joined.</param>
+            <param name="adminCallback">The callback to remove.</param>
+        </member>
+        <member name="M:streaming_tools.Twitch.TwitchChatManager.GetOrCreateConnection(streaming_tools.TwitchAccount,System.String)">
+            <summary>
+                Gets or creates a new connection to a twitch chat.
+            </summary>
+            <param name="account">The account to connect with.</param>
+            <param name="channel">The twitch channel to connect to.</param>
+            <returns>An instance of the twitch connection.</returns>
+        </member>
+        <member name="M:streaming_tools.Twitch.TwitchChatManager.TwitchClient_OnMessageReceived(System.Object,TwitchLib.Client.Events.OnMessageReceivedArgs)">
+            <summary>
+            The callback invoked when a message is received in twitch chat.
+            </summary>
+            <param name="sender">The twitch chat client.</param>
+            <param name="e">The message information.</param>
+        </member>
+        <member name="T:streaming_tools.Twitch.TwitchChatManager.TwitchConnection">
+            <summary>
+            A mapping of all information related to a single twitch chat connection.
+            </summary>
+        </member>
+        <member name="P:streaming_tools.Twitch.TwitchChatManager.TwitchConnection.Account">
+            <summary>
+            Gets or sets the account connected with.
+            </summary>
+        </member>
+        <member name="P:streaming_tools.Twitch.TwitchChatManager.TwitchConnection.Channel">
+            <summary>
+            Gets or sets the channel connected to.
+            </summary>
+        </member>
+        <member name="P:streaming_tools.Twitch.TwitchChatManager.TwitchConnection.AdminCallbacks">
+            <summary>
+            Gets or sets the callbacks used to administrate the twitch chat.
+            </summary>
+        </member>
+        <member name="P:streaming_tools.Twitch.TwitchChatManager.TwitchConnection.MessageCallbacks">
+            <summary>
+            Gets or sets the callbacks to handle chat messages.
+            </summary>
+        </member>
+        <member name="T:streaming_tools.Utilities.MonitorUtilities">
+            <summary>
+                Helpers for dealing with low level calls to the OS' monitor interface.
+            </summary>
+        </member>
+        <member name="F:streaming_tools.Utilities.MonitorUtilities.MONITOR_NOT_FOUND_DEVICE_NAME">
+            <summary>
+                The default name to return when a monitor isn't found.
+            </summary>
+        </member>
+        <member name="F:streaming_tools.Utilities.MonitorUtilities.MONITOR_NOT_FOUND">
+            <summary>
+                The default struct to return when a monitor isn't found.
+            </summary>
+        </member>
+        <member name="M:streaming_tools.Utilities.MonitorUtilities.GetMonitors">
+            <summary>
+                Gets a collection representing all monitors on the machine.
+            </summary>
+            <returns>A collection of all monitors if successful, an empty collection otherwise.</returns>
+        </member>
+        <member name="M:streaming_tools.Utilities.MonitorUtilities.GetPrimaryMonitor">
+            <summary>
+                Gets the primary monitor.
+            </summary>
+            <returns>The primary monitor if found, <see cref="F:streaming_tools.Utilities.MonitorUtilities.MONITOR_NOT_FOUND" /> otherwise.</returns>
+        </member>
+        <member name="T:streaming_tools.Utilities.NAudioUtilities">
+            <summary>
+                Utilities for simplifying interactions with the NAudio library.
+            </summary>
+        </member>
+        <member name="M:streaming_tools.Utilities.NAudioUtilities.GetInputDevice(System.Int32)">
+            <summary>
+                Retrieves the input device.
+            </summary>
+            <param name="index">Device to retrieve.</param>
+            <returns>The input device capabilities.</returns>
+        </member>
+        <member name="M:streaming_tools.Utilities.NAudioUtilities.GetOutputDevice(System.Int32)">
+            <summary>
+                Retrieves the output device.
+            </summary>
+            <param name="index">The index of the device.</param>
+            <returns>The output device capabilities.</returns>
+        </member>
+        <member name="M:streaming_tools.Utilities.NAudioUtilities.GetOutputDeviceIndex(System.String)">
+            <summary>
+                Converts the device name to an index.
+            </summary>
+            <param name="name">The name of the device.</param>
+            <returns>The index of the device if found, -1 otherwise.</returns>
+        </member>
+        <member name="M:streaming_tools.Utilities.NAudioUtilities.GetTotalInputDevices">
+            <summary>
+                Get the total number of devices according to NAudio's wave functionality.
+            </summary>
+            <returns>The number of devices.</returns>
+        </member>
+        <member name="M:streaming_tools.Utilities.NAudioUtilities.GetTotalOutputDevices">
+            <summary>
+                Returns the number of output devices available in the system.
+            </summary>
+            <remarks>Add two to the end to get all devices?</remarks>
+            <returns>The total number of output devices.</returns>
+        </member>
+        <member name="F:streaming_tools.Utilities.PInvokeUtilities.CCHDEVICENAME">
+            <summary>
+                size of a device name string
+            </summary>
+        </member>
+        <member name="M:streaming_tools.Utilities.PInvokeUtilities.GetMonitorInfo(System.IntPtr,streaming_tools.Utilities.PInvokeUtilities.MonitorInfoEx@)">
+            <summary>
+                Retrieves information about a display monitor.
+            </summary>
+            <param name="hMonitor">A handle to the display monitor of interest.</param>
+            <param name="lpmi">
+                A pointer to a <see cref="!:MONITORINFO" /> or <see cref="!:MONITORINFOEX" /> structure that receives information about
+                the specified display monitor.
+                You must set the cbSize member of the structure to <c>sizeof(MONITORINFO)</c> or <c>sizeof(MONITORINFOEX)</c>
+                before calling the
+                <see cref="!:GetMonitorInfo(IntPtr, MONITORINFO*)" /> function. Doing so lets the function determine the type of
+                structure you are passing to it.
+                The <see cref="!:MONITORINFOEX" /> structure is a superset of the <see cref="!:MONITORINFO" /> structure. It has one
+                additional member: a
+                string that contains a name for the display monitor. Most applications have no use for a display monitor name, and
+                so can save some
+                bytes by using a <see cref="!:MONITORINFO" /> structure.
+            </param>
+            <returns>
+                If the function succeeds, the return value is <c>true</c>.
+                If the function fails, the return value is <c>false</c>.
+            </returns>
+        </member>
+        <member name="T:streaming_tools.Utilities.PInvokeUtilities.MonitorInfoEx">
+            <summary>
+                The MONITORINFOEX structure contains information about a display monitor.
+                The GetMonitorInfo function stores information into a MONITORINFOEX structure or a MONITORINFO structure.
+                The MONITORINFOEX structure is a superset of the MONITORINFO structure. The MONITORINFOEX structure adds a string
+                member to contain a name
+                for the display monitor.
+            </summary>
+        </member>
+        <member name="F:streaming_tools.Utilities.PInvokeUtilities.MonitorInfoEx.Size">
+            <summary>
+                The size, in bytes, of the structure. Set this member to sizeof(MONITORINFOEX) (72) before calling the
+                GetMonitorInfo function.
+                Doing so lets the function determine the type of structure you are passing to it.
+            </summary>
+        </member>
+        <member name="F:streaming_tools.Utilities.PInvokeUtilities.MonitorInfoEx.Monitor">
+            <summary>
+                A RECT structure that specifies the display monitor rectangle, expressed in virtual-screen coordinates.
+                Note that if the monitor is not the primary display monitor, some of the rectangle's coordinates may be negative
+                values.
+            </summary>
+        </member>
+        <member name="F:streaming_tools.Utilities.PInvokeUtilities.MonitorInfoEx.WorkArea">
+            <summary>
+                A RECT structure that specifies the work area rectangle of the display monitor that can be used by applications,
+                expressed in virtual-screen coordinates. Windows uses this rectangle to maximize an application on the monitor.
+                The rest of the area in rcMonitor contains system windows such as the task bar and side bars.
+                Note that if the monitor is not the primary display monitor, some of the rectangle's coordinates may be negative
+                values.
+            </summary>
+        </member>
+        <member name="F:streaming_tools.Utilities.PInvokeUtilities.MonitorInfoEx.Flags">
+            <summary>
+                The attributes of the display monitor.
+                This member can be the following value:
+                1 : MONITORINFOF_PRIMARY
+            </summary>
+        </member>
+        <member name="F:streaming_tools.Utilities.PInvokeUtilities.MonitorInfoEx.DeviceName">
+            <summary>
+                A string that specifies the device name of the monitor being used. Most applications have no use for a display
+                monitor name,
+                and so can save some bytes by using a MONITORINFO structure.
+            </summary>
+        </member>
+        <member name="T:streaming_tools.Utilities.PInvokeUtilities.RectStruct">
+            <summary>
+                The RECT structure defines the coordinates of the upper-left and lower-right corners of a rectangle.
+            </summary>
+            <see cref="!:http://msdn.microsoft.com/en-us/library/dd162897%28VS.85%29.aspx" />
+            <remarks>
+                By convention, the right and bottom edges of the rectangle are normally considered exclusive.
+                In other words, the pixel whose coordinates are ( right, bottom ) lies immediately outside of the the rectangle.
+                For example, when RECT is passed to the FillRect function, the rectangle is filled up to, but not including,
+                the right column and bottom row of pixels. This structure is identical to the RECTL structure.
+            </remarks>
+        </member>
+        <member name="F:streaming_tools.Utilities.PInvokeUtilities.RectStruct.Left">
+            <summary>
+                The x-coordinate of the upper-left corner of the rectangle.
+            </summary>
+        </member>
+        <member name="F:streaming_tools.Utilities.PInvokeUtilities.RectStruct.Top">
+            <summary>
+                The y-coordinate of the upper-left corner of the rectangle.
+            </summary>
+        </member>
+        <member name="F:streaming_tools.Utilities.PInvokeUtilities.RectStruct.Right">
+            <summary>
+                The x-coordinate of the lower-right corner of the rectangle.
+            </summary>
+        </member>
+        <member name="F:streaming_tools.Utilities.PInvokeUtilities.RectStruct.Bottom">
+            <summary>
+                The y-coordinate of the lower-right corner of the rectangle.
+            </summary>
+        </member>
+        <member name="T:streaming_tools.ViewModels.AccountsViewModel">
+            <summary>
+                Handles updating the list and credentials for twitch accounts.
+            </summary>
+        </member>
+        <member name="F:streaming_tools.ViewModels.AccountsViewModel.config">
+            <summary>
+                The singleton collection for configuring the application.
+            </summary>
+        </member>
+        <member name="F:streaming_tools.ViewModels.AccountsViewModel.oAuth">
+            <summary>
+                The OAuth token of the currently added/edited twitch account.
+            </summary>
+        </member>
+        <member name="F:streaming_tools.ViewModels.AccountsViewModel.username">
+            <summary>
+                The username of the currently added/edited twitch account.
+            </summary>
+        </member>
+        <member name="M:streaming_tools.ViewModels.AccountsViewModel.#ctor">
+            <summary>
+                Initializes a new instance of the <see cref="T:streaming_tools.ViewModels.AccountsViewModel" /> class.
+            </summary>
+        </member>
+        <member name="P:streaming_tools.ViewModels.AccountsViewModel.Accounts">
+            <summary>
+                Gets or sets the list of twitch accounts.
+            </summary>
+        </member>
+        <member name="P:streaming_tools.ViewModels.AccountsViewModel.OAuth">
+            <summary>
+                Gets or sets the OAuth token of the currently added/edited twitch account.
+            </summary>
+        </member>
+        <member name="P:streaming_tools.ViewModels.AccountsViewModel.Username">
+            <summary>
+                Gets or sets the username of the currently added/edited twitch account.
+            </summary>
+        </member>
+        <member name="M:streaming_tools.ViewModels.AccountsViewModel.CancelEditing">
+            <summary>
+                Clears the form when we cancel adding/editing a twitch account.
+            </summary>
+        </member>
+        <member name="M:streaming_tools.ViewModels.AccountsViewModel.DeleteAccount(System.String)">
+            <summary>
+                Deletes the specified twitch account.
+            </summary>
+            <param name="twitchUsername">The twitch account to delete.</param>
+        </member>
+        <member name="M:streaming_tools.ViewModels.AccountsViewModel.LaunchOAuthWebpage">
+            <summary>
+                Launches the twitch OAuth webpage.
+            </summary>
+        </member>
+        <member name="M:streaming_tools.ViewModels.AccountsViewModel.SaveAccount">
+            <summary>
+                Saves the current twitch account details.
+            </summary>
+        </member>
+        <member name="M:streaming_tools.ViewModels.AccountsViewModel.CreateAccountViewModel(System.String)">
+            <summary>
+                Creates a new account view model.
+            </summary>
+            <param name="twitchUsername">The username of the currently added twitch account.</param>
+            <returns>A new instance of the view model.</returns>
+        </member>
+        <member name="M:streaming_tools.ViewModels.AccountsViewModel.EditAccount(System.String)">
+            <summary>
+                Edits an existing twitch account.
+            </summary>
+            <param name="twitchUsername">The username of the twitch account to edit..</param>
+        </member>
+        <member name="T:streaming_tools.ViewModels.AccountViewModel">
+            <summary>
+                The UI representation of a twitch account.
+            </summary>
+        </member>
+        <member name="P:streaming_tools.ViewModels.AccountViewModel.DeleteAccount">
+            <summary>
+                Gets or sets the delegate provided from the parent control when deleting an account.
+            </summary>
+        </member>
+        <member name="P:streaming_tools.ViewModels.AccountViewModel.EditAccount">
+            <summary>
+                Gets or sets the delegate provided from the parent control when editing an account.
+            </summary>
+        </member>
+        <member name="P:streaming_tools.ViewModels.AccountViewModel.Username">
+            <summary>
+                Gets or sets the username of the twitch account.
+            </summary>
+        </member>
+        <member name="M:streaming_tools.ViewModels.AccountViewModel.DeleteAccountCommand">
+            <summary>
+                Handles executing the delete account action.
+            </summary>
+        </member>
+        <member name="M:streaming_tools.ViewModels.AccountViewModel.EditAccountCommand">
+            <summary>
+                Handles executing the edit account action.
+            </summary>
+        </member>
+        <member name="T:streaming_tools.ViewModels.LayoutsViewModel">
+            <summary>
+                The view model for handling laying out windows on the OS.
+            </summary>
+        </member>
+        <member name="F:streaming_tools.ViewModels.LayoutsViewModel.PADDING">
+            <summary>
+                The amount of padding to add to the width.
+                TODO: Make this configurable in the app
+            </summary>
+        </member>
+        <member name="F:streaming_tools.ViewModels.LayoutsViewModel.previousWindowSettings">
+            <summary>
+                The previous window settings before we touched them.
+            </summary>
+        </member>
+        <member name="M:streaming_tools.ViewModels.LayoutsViewModel.#ctor">
+            <summary>
+                Initializes a new instance of the <see cref="T:streaming_tools.ViewModels.LayoutsViewModel" /> class.
+            </summary>
+        </member>
+        <member name="P:streaming_tools.ViewModels.LayoutsViewModel.SelectedMonitor">
+            <summary>
+                Gets or sets the currently selected monitor to move the windows to.
+            </summary>
+        </member>
+        <member name="M:streaming_tools.ViewModels.LayoutsViewModel.OnExecuteClicked">
+            <summary>
+                Handles rearranging the windows.
+            </summary>
+        </member>
+        <member name="M:streaming_tools.ViewModels.LayoutsViewModel.OnUndoClicked">
+            <summary>
+                Handles rolling back the rearranging of windows.
+            </summary>
+        </member>
+        <member name="T:streaming_tools.ViewModels.MainWindowViewModel">
+            <summary>
+                The business logic behind the main UI.
+            </summary>
+        </member>
+        <member name="F:streaming_tools.ViewModels.MainWindowViewModel.pathOfExileEnabled">
+            <summary>
+                A flag indicating whether the path of exile integration is turned on.
+            </summary>
+        </member>
+        <member name="F:streaming_tools.ViewModels.MainWindowViewModel.poe">
+            <summary>
+                The path of exile game integration.
+            </summary>
+        </member>
+        <member name="P:streaming_tools.ViewModels.MainWindowViewModel.AccountsViewModel">
+            <summary>
+                The view responsible for specifying twitch accounts.
+            </summary>
+        </member>
+        <member name="P:streaming_tools.ViewModels.MainWindowViewModel.LayoutViewModel">
+            <summary>
+                The view responsible for laying out windows on the OS.
+            </summary>
+        </member>
+        <member name="P:streaming_tools.ViewModels.MainWindowViewModel.TtsPauseConfigViewModel">
+            <summary>
+            The view responsible for pausing TTS when the microphone hears things.
+            </summary>
+        </member>
+        <member name="P:streaming_tools.ViewModels.MainWindowViewModel.TwitchChatConfigs">
+            <summary>
+            The view responsible for holding the configurations for each twitch chat connection.
+            </summary>
+        </member>
+        <member name="P:streaming_tools.ViewModels.MainWindowViewModel.PathOfExileEnabled">
+            <summary>
+                Gets or sets a value indicating whether the path of exile integration is enable.
+            </summary>
+        </member>
+        <member name="T:streaming_tools.ViewModels.TtsPauseConfigViewModel">
+            <summary>
+            The view responsible for pausing twitch chat TTS when the microphone hears things.
+            </summary>
+        </member>
+        <member name="F:streaming_tools.ViewModels.TtsPauseConfigViewModel.config">
+            <summary>
+                The persisted configuration.
+            </summary>
+        </member>
+        <member name="F:streaming_tools.ViewModels.TtsPauseConfigViewModel.pausingObject">
+            <summary>
+            A reference to the object that encapsulates reading microphone volume
+            in order to pause TTS.
+            </summary>
+        </member>
+        <member name="F:streaming_tools.ViewModels.TtsPauseConfigViewModel.microphoneMicrophoneThresholdVisualizationMargin">
+            <summary>
+                The margin to use on the visual indicator for the pause threshold.
+            </summary>
+        </member>
+        <member name="F:streaming_tools.ViewModels.TtsPauseConfigViewModel.microphoneMicrophoneVoiceVolume">
+            <summary>
+                The current volume of the voice read from the microphone.
+            </summary>
+        </member>
+        <member name="F:streaming_tools.ViewModels.TtsPauseConfigViewModel.pauseThreshold">
+            <summary>
+            The 0% - 100% microphone  at which to pause TTS.
+            </summary>
+        </member>
+        <member name="F:streaming_tools.ViewModels.TtsPauseConfigViewModel.selectedMicrophone">
+            <summary>
+                The string representation of the microphone device name from NAudio.
+            </summary>
+        </member>
+        <member name="M:streaming_tools.ViewModels.TtsPauseConfigViewModel.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:streaming_tools.ViewModels.TtsPauseConfigViewModel"/> class.
+            </summary>
+        </member>
+        <member name="P:streaming_tools.ViewModels.TtsPauseConfigViewModel.MicrophoneDevices">
+            <summary>
+            Gets or sets the collection of microphone devices currently attached to the computer.
+            </summary>
+        </member>
+        <member name="P:streaming_tools.ViewModels.TtsPauseConfigViewModel.MicrophoneThresholdVisualizationMargin">
+            <summary>
+                Gets or sets the margin used to push the visual representation of the threshold marker on the UI.
+            </summary>
+        </member>
+        <member name="P:streaming_tools.ViewModels.TtsPauseConfigViewModel.MicrophoneVoiceVolume">
+            <summary>
+                Gets or sets the current volume of the voice read from the microphone.
+            </summary>
+        </member>
+        <member name="P:streaming_tools.ViewModels.TtsPauseConfigViewModel.PauseThreshold">
+            <summary>
+                Gets or sets the percentage of volume at which we should pause TTS when we detect microphone data.
+            </summary>
+        </member>
+        <member name="P:streaming_tools.ViewModels.TtsPauseConfigViewModel.SelectedMicrophone">
+            <summary>
+                Gets or sets the string representation of the microphone device name from NAudio.
+            </summary>
+        </member>
+        <member name="M:streaming_tools.ViewModels.TtsPauseConfigViewModel.OnPropertyChanged(System.Object,System.ComponentModel.PropertyChangedEventArgs)">
+            <summary>
+            Raised when properties are changed on the object.
+            </summary>
+            <param name="sender">The object invoked on.</param>
+            <param name="e">The property changed information.</param>
+        </member>
+        <member name="M:streaming_tools.ViewModels.TtsPauseConfigViewModel.Pauser_PropertyChanged(System.Object,System.ComponentModel.PropertyChangedEventArgs)">
+            <summary>
+            Raised when properties change on the <see cref="F:streaming_tools.ViewModels.TtsPauseConfigViewModel.pausingObject"/>.
+            </summary>
+            <param name="sender">The <see cref="F:streaming_tools.ViewModels.TtsPauseConfigViewModel.pausingObject"/>.</param>
+            <param name="e">The property changed information.</param>
+        </member>
+        <member name="T:streaming_tools.ViewModels.TwitchChatConfigsViewModel">
+            <summary>
+            The view responsible for keeping track of the configuration to each twitch chat.
+            </summary>
+        </member>
+        <member name="F:streaming_tools.ViewModels.TwitchChatConfigsViewModel.config">
+            <summary>
+                The singleton collection for configuring the application.
+            </summary>
+        </member>
+        <member name="F:streaming_tools.ViewModels.TwitchChatConfigsViewModel.twitchChatConfigs">
+            <summary>
+            The collection of all twitch chat configurations.
+            </summary>
+        </member>
+        <member name="M:streaming_tools.ViewModels.TwitchChatConfigsViewModel.#ctor">
+            <summary>
+                Initializes a new instance of the <see cref="T:streaming_tools.ViewModels.TwitchChatConfigsViewModel" /> class.
+            </summary>
+        </member>
+        <member name="P:streaming_tools.ViewModels.TwitchChatConfigsViewModel.TwitchChatConfigs">
+            <summary>
+            Gets or sets the collection of all twitch chat configurations.
+            </summary>
+        </member>
+        <member name="M:streaming_tools.ViewModels.TwitchChatConfigsViewModel.AddConfigCommand">
+            <summary>
+            Creates a new configuration object.
+            </summary>
+        </member>
+        <member name="M:streaming_tools.ViewModels.TwitchChatConfigsViewModel.CreateTwitchChatConfig(streaming_tools.TwitchChatConfiguration)">
+            <summary>
+            Creates a new configuration object.
+            </summary>
+            <param name="twitchConfig">The twitch chat configuration to base the config on.</param>
+        </member>
+        <member name="T:streaming_tools.ViewModels.TwitchChatConfigViewModel">
+            <summary>
+            The view responsible for a single entry in the twitch chat configuration list.
+            </summary>
+        </member>
+        <member name="F:streaming_tools.ViewModels.TwitchChatConfigViewModel.admin">
+            <summary>
+            The twitch chat administration singleton for registering for twitch chat callbacks.
+            </summary>
+        </member>
+        <member name="F:streaming_tools.ViewModels.TwitchChatConfigViewModel.adminOn">
+            <summary>
+            True if the bot should provide administration commands, false otherwise.
+            </summary>
+        </member>
+        <member name="F:streaming_tools.ViewModels.TwitchChatConfigViewModel.chatConfig">
+            <summary>
+            The twitch chat configuration object from the persistent configuration.
+            </summary>
+        </member>
+        <member name="F:streaming_tools.ViewModels.TwitchChatConfigViewModel.outputDevice">
+            <summary>
+            The output device to send TTS to.
+            </summary>
+        </member>
+        <member name="F:streaming_tools.ViewModels.TwitchChatConfigViewModel.pauseDuringSpeech">
+            <summary>
+            True if the bot should pause TTS based on microphone data, false otherwise.
+            </summary>
+        </member>
+        <member name="F:streaming_tools.ViewModels.TwitchChatConfigViewModel.pauseObject">
+            <summary>
+            The object responsible for pausing TTS based on microphone data.
+            </summary>
+        </member>
+        <member name="F:streaming_tools.ViewModels.TwitchChatConfigViewModel.tts">
+            <summary>
+            The TTS object that turns text to speech.
+            </summary>
+        </member>
+        <member name="F:streaming_tools.ViewModels.TwitchChatConfigViewModel.ttsOn">
+            <summary>
+            True if TTS is on, false otherwise.
+            </summary>
+        </member>
+        <member name="F:streaming_tools.ViewModels.TwitchChatConfigViewModel.ttsVoice">
+            <summary>
+            The voice to use for TTS.
+            </summary>
+        </member>
+        <member name="F:streaming_tools.ViewModels.TwitchChatConfigViewModel.ttsVolume">
+            <summary>
+            The volume of TTS on the output device.
+            </summary>
+        </member>
+        <member name="F:streaming_tools.ViewModels.TwitchChatConfigViewModel.twitchChannel">
+            <summary>
+            The twitch channel to connect to.
+            </summary>
+        </member>
+        <member name="F:streaming_tools.ViewModels.TwitchChatConfigViewModel.username">
+            <summary>
+            The username to connect to the <see cref="F:streaming_tools.ViewModels.TwitchChatConfigViewModel.twitchChannel"/> with.
+            </summary>
+        </member>
+        <member name="M:streaming_tools.ViewModels.TwitchChatConfigViewModel.#ctor">
+            <summary>
+                Initializes a new instance of the <see cref="T:streaming_tools.ViewModels.TwitchChatConfigViewModel" /> class.
+            </summary>
+        </member>
+        <member name="M:streaming_tools.ViewModels.TwitchChatConfigViewModel.#ctor(streaming_tools.TwitchChatConfiguration)">
+            <summary>
+            Initializes a new instance of the <see cref="T:streaming_tools.ViewModels.TwitchChatConfigViewModel" /> class.
+            </summary>
+            <param name="config">The twitch chat configuration to base the row on.</param>
+        </member>
+        <member name="M:streaming_tools.ViewModels.TwitchChatConfigViewModel.Dispose">
+            <summary>
+            Disposes of unmanaged resources.
+            </summary>
+        </member>
+        <member name="P:streaming_tools.ViewModels.TwitchChatConfigViewModel.AdminOn">
+            <summary>
+            Gets or sets a value indicating whether the bot should provide administration commands.
+            </summary>
+        </member>
+        <member name="P:streaming_tools.ViewModels.TwitchChatConfigViewModel.DeleteConfig">
+            <summary>
+            Gets or sets a delegate for deleting this configuration object when the UI is clicked.
+            </summary>
+        </member>
+        <member name="P:streaming_tools.ViewModels.TwitchChatConfigViewModel.OutputDevice">
+            <summary>
+                Gets or sets the output device to send audio to.
+            </summary>
+        </member>
+        <member name="P:streaming_tools.ViewModels.TwitchChatConfigViewModel.OutputDevices">
+            <summary>
+            Gets or sets the collection of possible output devices on the machine.
+            </summary>
+        </member>
+        <member name="P:streaming_tools.ViewModels.TwitchChatConfigViewModel.PauseDuringSpeech">
+            <summary>
+                Gets or sets a value indicating whether text to speech should pause when someone talks into the microphone.
+            </summary>
+        </member>
+        <member name="P:streaming_tools.ViewModels.TwitchChatConfigViewModel.TtsOn">
+            <summary>
+                Gets or sets a value indicating whether text to speech is on.
+            </summary>
+        </member>
+        <member name="P:streaming_tools.ViewModels.TwitchChatConfigViewModel.TtsVoice">
+            <summary>
+                Gets or sets the selected Microsoft Text to Speech voice.
+            </summary>
+        </member>
+        <member name="P:streaming_tools.ViewModels.TwitchChatConfigViewModel.TtsVoices">
+            <summary>
+            Gets or sets the collection of possible TTS voices from Microsoft OS.
+            </summary>
+        </member>
+        <member name="P:streaming_tools.ViewModels.TwitchChatConfigViewModel.TtsVolume">
+            <summary>
+                Gets or sets the volume of the text to speech voice.
+            </summary>
+        </member>
+        <member name="P:streaming_tools.ViewModels.TwitchChatConfigViewModel.TwitchChannel">
+            <summary>
+                Gets or sets the twitch channel to read chat from.
+            </summary>
+        </member>
+        <member name="P:streaming_tools.ViewModels.TwitchChatConfigViewModel.Username">
+            <summary>
+                Gets or sets the twitch username.
+            </summary>
+        </member>
+        <member name="P:streaming_tools.ViewModels.TwitchChatConfigViewModel.Config">
+            <summary>
+            Gets the persistent configuration object.
+            </summary>
+        </member>
+        <member name="M:streaming_tools.ViewModels.TwitchChatConfigViewModel.DeleteConfigCommand">
+            <summary>
+            Invokes the <see cref="P:streaming_tools.ViewModels.TwitchChatConfigViewModel.DeleteConfig"/> passed to us from a parent object.
+            </summary>
+        </member>
+        <member name="M:streaming_tools.ViewModels.TwitchChatConfigViewModel.CopyFromConfig(streaming_tools.TwitchChatConfiguration)">
+            <summary>
+            Copies the values from the persistent configuration object to this view.
+            </summary>
+            <param name="config">The persistent configuration object.</param>
+        </member>
+        <member name="M:streaming_tools.ViewModels.TwitchChatConfigViewModel.CopyToConfig(streaming_tools.TwitchChatConfiguration)">
+            <summary>
+            Copies the values from this view to the persistent configuration object and writes it to disk.
+            </summary>
+            <param name="config">The persistent configuration object.</param>
+        </member>
+        <member name="M:streaming_tools.ViewModels.TwitchChatConfigViewModel.OnPropertyChanged(System.Object,System.ComponentModel.PropertyChangedEventArgs)">
+            <summary>
+            Raised when a property changes on this object.
+            </summary>
+            <param name="sender">This object.</param>
+            <param name="e">The property changed information.</param>
+        </member>
+        <member name="T:streaming_tools.ViewModels.ViewModelBase">
+            <summary>
+                The base view for common functionality.
+            </summary>
+        </member>
+        <member name="T:streaming_tools.Views.AccountsView">
+            <summary>
+            Handles updating the list and credentials for twitch accounts.
+            </summary>
+        </member>
+        <member name="M:streaming_tools.Views.AccountsView.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:streaming_tools.Views.AccountsView"/> class.
+            </summary>
+        </member>
+        <member name="M:streaming_tools.Views.AccountsView.InitializeComponent">
+            <summary>
+            Creates the UI components.
+            </summary>
+        </member>
+        <member name="T:streaming_tools.Views.AccountView">
+            <summary>
+            The UI representation of a twitch account.
+            </summary>
+        </member>
+        <member name="M:streaming_tools.Views.AccountView.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:streaming_tools.Views.AccountView"/> class.
+            </summary>
+        </member>
+        <member name="M:streaming_tools.Views.AccountView.InitializeComponent">
+            <summary>
+            Creates the UI components.
+            </summary>
+        </member>
+        <member name="T:streaming_tools.Views.Converters.RoundingValueConverter">
+            <summary>
+                Converts back and forth from percentages.
+            </summary>
+        </member>
+        <member name="M:streaming_tools.Views.Converters.RoundingValueConverter.Convert(System.Object,System.Type,System.Object,System.Globalization.CultureInfo)">
+            <summary>
+                Converts from an integer to a string representation of a percentage.
+            </summary>
+            <param name="value">The value to convert.</param>
+            <param name="targetType">The parameter is not used.</param>
+            <param name="parameter">The parameter is not used.</param>
+            <param name="culture">The parameter is not used.</param>
+            <returns>The string representation of a percentage in "#%" format.</returns>
+        </member>
+        <member name="M:streaming_tools.Views.Converters.RoundingValueConverter.ConvertBack(System.Object,System.Type,System.Object,System.Globalization.CultureInfo)">
+            <summary>
+                Convert from a string representation of a percentage back to a integer.
+            </summary>
+            <param name="value">The value to convert.</param>
+            <param name="targetType">The parameter is not used.</param>
+            <param name="parameter">The parameter is not used.</param>
+            <param name="culture">The parameter is not used.</param>
+            <returns>The integer value of a percentage.</returns>
+        </member>
+        <member name="T:streaming_tools.Views.Converters.TwitchAccountUsernameConverter">
+            <summary>
+                Converts back and forth from Twitch Account objects to a string representation of a username.
+            </summary>
+        </member>
+        <member name="M:streaming_tools.Views.Converters.TwitchAccountUsernameConverter.Convert(System.Object,System.Type,System.Object,System.Globalization.CultureInfo)">
+            <summary>
+                Converts from a collection of Twitch Account objects to a collection of string usernames.
+            </summary>
+            <param name="value">The collection of <seealso cref="T:streaming_tools.TwitchAccount" />.</param>
+            <param name="targetType">The parameter is not used.</param>
+            <param name="parameter">The parameter is not used.</param>
+            <param name="culture">The parameter is not used.</param>
+            <returns>The string representation of a percentage in "#%" format.</returns>
+        </member>
+        <member name="M:streaming_tools.Views.Converters.TwitchAccountUsernameConverter.ConvertBack(System.Object,System.Type,System.Object,System.Globalization.CultureInfo)">
+            <summary>
+                Not implemented.
+            </summary>
+            <param name="value">The value to convert.</param>
+            <param name="targetType">The parameter is not used.</param>
+            <param name="parameter">The parameter is not used.</param>
+            <param name="culture">The parameter is not used.</param>
+            <returns>Absolutely nothing.</returns>
+        </member>
+        <member name="T:streaming_tools.Views.Layouts">
+            <summary>
+                The UI for laying out windows on the OS.
+            </summary>
+        </member>
+        <member name="M:streaming_tools.Views.Layouts.#ctor">
+            <summary>
+                Initializes a new instance of the <see cref="T:streaming_tools.Views.Layouts" /> class.
+            </summary>
+        </member>
+        <member name="M:streaming_tools.Views.Layouts.InitializeComponent">
+            <summary>
+                Handles getting the list of monitors for the combo box.
+            </summary>
+        </member>
+        <member name="T:streaming_tools.Views.MainWindow">
+            <summary>
+                The main UI.
+            </summary>
+        </member>
+        <member name="M:streaming_tools.Views.MainWindow.#ctor">
+            <summary>
+                Initializes a new instance of the <see cref="T:streaming_tools.Views.MainWindow"/> class.
+            </summary>
+        </member>
+        <member name="M:streaming_tools.Views.MainWindow.InitializeComponent">
+            <summary>
+                Initializes the controls values.
+            </summary>
+        </member>
+        <member name="T:streaming_tools.Views.TtsPauseConfigView">
+            <summary>
+            The view responsible for pausing twitch chat TTS when the microphone hears things.
+            </summary>
+        </member>
+        <member name="M:streaming_tools.Views.TtsPauseConfigView.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:streaming_tools.Views.TtsPauseConfigView"/> class.
+            </summary>
+        </member>
+        <member name="M:streaming_tools.Views.TtsPauseConfigView.InitializeComponent">
+            <summary>
+            Creates the UI components.
+            </summary>
+        </member>
+        <member name="T:streaming_tools.Views.TwitchChatConfigsView">
+            <summary>
+            The view responsible for keeping track of the configuration to each twitch chat.
+            </summary>
+        </member>
+        <member name="M:streaming_tools.Views.TwitchChatConfigsView.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:streaming_tools.Views.TwitchChatConfigsView"/> class.
+            </summary>
+        </member>
+        <member name="M:streaming_tools.Views.TwitchChatConfigsView.InitializeComponent">
+            <summary>
+            Creates the UI components.
+            </summary>
+        </member>
+        <member name="T:streaming_tools.Views.TwitchChatConfigView">
+            <summary>
+            The view responsible for a single entry in the twitch chat configuration list.
+            </summary>
+        </member>
+        <member name="M:streaming_tools.Views.TwitchChatConfigView.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:streaming_tools.Views.TwitchChatConfigView"/> class.
+            </summary>
+        </member>
+        <member name="M:streaming_tools.Views.TwitchChatConfigView.InitializeComponent">
+            <summary>
+            Creates the UI components.
+            </summary>
+        </member>
+    </members>
+</doc>

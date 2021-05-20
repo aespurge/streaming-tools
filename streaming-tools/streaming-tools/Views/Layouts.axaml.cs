@@ -1,9 +1,11 @@
-using System.Linq;
-using Avalonia.Controls;
-using Avalonia.Markup.Xaml;
-using streaming_tools.Utilities;
-
 namespace streaming_tools.Views {
+    using System.Linq;
+
+    using Avalonia.Controls;
+    using Avalonia.Markup.Xaml;
+
+    using streaming_tools.Utilities;
+
     /// <summary>
     ///     The UI for laying out windows on the OS.
     /// </summary>
@@ -12,7 +14,7 @@ namespace streaming_tools.Views {
         ///     Initializes a new instance of the <see cref="Layouts" /> class.
         /// </summary>
         public Layouts() {
-            InitializeComponent();
+            this.InitializeComponent();
         }
 
         /// <summary>
