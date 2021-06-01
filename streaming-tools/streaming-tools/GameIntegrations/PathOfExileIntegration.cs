@@ -1,9 +1,6 @@
 ﻿namespace streaming_tools.GameIntegrations {
     using System;
-    using System.IO;
     using System.Timers;
-
-    using TwitchLib.Client;
 
     /// <summary>
     ///     Integration for the Path of Exile game to increment the death counter when our character dies.

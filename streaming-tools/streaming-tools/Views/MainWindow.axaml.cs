@@ -8,7 +8,7 @@ namespace streaming_tools.Views {
     /// </summary>
     public class MainWindow : Window {
         /// <summary>
-        ///     Initializes a new instance of the <see cref="MainWindow"/> class.
+        ///     Initializes a new instance of the <see cref="MainWindow" /> class.
         /// </summary>
         public MainWindow() {
             this.InitializeComponent();

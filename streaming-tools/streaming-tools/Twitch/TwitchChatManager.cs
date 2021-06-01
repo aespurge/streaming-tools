@@ -1,5 +1,4 @@
-﻿namespace streaming_tools.Twitch
-{
+﻿namespace streaming_tools.Twitch {
     using System;
     using System.Collections.Generic;
     using System.Linq;
@@ -144,9 +143,9 @@
             if (existing.Any())
                 return existing.First();
 
-            var conn = new TwitchConnection() { Account = account, Channel = channel };
+            var conn = new TwitchConnection { Account = account, Channel = channel };
 
-            string? password = (null != account.OAuth) ? Encoding.UTF8.GetString(Convert.FromBase64String(account.OAuth)) : null;
+            var password = null != account.OAuth ? Encoding.UTF8.GetString(Convert.FromBase64String(account.OAuth)) : null;
             var credentials = new ConnectionCredentials(account.Username, password);
             var clientOptions = new ClientOptions { MessagesAllowedInPeriod = 750, ThrottlingPeriod = TimeSpan.FromSeconds(30) };
 
@@ -162,7 +161,7 @@
         }
 
         /// <summary>
-        /// The callback invoked when a message is received in twitch chat.
+        ///     The callback invoked when a message is received in twitch chat.
         /// </summary>
         /// <param name="sender">The twitch chat client.</param>
         /// <param name="e">The message information.</param>
@@ -190,26 +189,26 @@
         }
 
         /// <summary>
-        /// A mapping of all information related to a single twitch chat connection.
+        ///     A mapping of all information related to a single twitch chat connection.
         /// </summary>
         private class TwitchConnection {
             /// <summary>
-            /// Gets or sets the account connected with.
+            ///     Gets or sets the account connected with.
             /// </summary>
             public TwitchAccount? Account { get; set; }
 
             /// <summary>
-            /// Gets or sets the channel connected to.
-            /// </summary>
-            public string? Channel { get; set; }
-
-            /// <summary>
-            /// Gets or sets the callbacks used to administrate the twitch chat.
+            ///     Gets or sets the callbacks used to administrate the twitch chat.
             /// </summary>
             public Func<TwitchClient, OnMessageReceivedArgs, bool>? AdminCallbacks { get; set; }
 
             /// <summary>
-            /// Gets or sets the callbacks to handle chat messages.
+            ///     Gets or sets the channel connected to.
+            /// </summary>
+            public string? Channel { get; set; }
+
+            /// <summary>
+            ///     Gets or sets the callbacks to handle chat messages.
             /// </summary>
             public Action<TwitchClient, OnMessageReceivedArgs>? MessageCallbacks { get; set; }
         }

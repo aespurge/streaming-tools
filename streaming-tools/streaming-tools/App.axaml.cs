@@ -7,18 +7,18 @@ namespace streaming_tools {
     using streaming_tools.Views;
 
     /// <summary>
-    /// The main entry point of the application.
+    ///     The main entry point of the application.
     /// </summary>
     public class App : Application {
         /// <summary>
-        /// Creates the UI components.
+        ///     Creates the UI components.
         /// </summary>
         public override void Initialize() {
             AvaloniaXamlLoader.Load(this);
         }
 
         /// <summary>
-        /// The initialization method for performing one time initialization for the application.
+        ///     The initialization method for performing one time initialization for the application.
         /// </summary>
         public override void OnFrameworkInitializationCompleted() {
             if (this.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)

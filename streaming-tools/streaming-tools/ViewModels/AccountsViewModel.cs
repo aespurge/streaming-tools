@@ -88,11 +88,11 @@
                 return;
 
             var existingControl = this.Accounts.FirstOrDefault(a => twitchUsername.Equals((a.DataContext as AccountViewModel)?.Username, StringComparison.InvariantCultureIgnoreCase));
-            if (null != existingControl) 
+            if (null != existingControl)
                 this.Accounts.Remove(existingControl);
 
             var existingAccount = this.config.GetTwitchAccount(twitchUsername);
-            if (null == existingAccount) 
+            if (null == existingAccount)
                 return;
 
             this.config.TwitchAccounts.Remove(existingAccount);

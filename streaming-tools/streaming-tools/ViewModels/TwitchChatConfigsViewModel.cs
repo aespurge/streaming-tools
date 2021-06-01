@@ -6,7 +6,7 @@
     using streaming_tools.Views;
 
     /// <summary>
-    /// The view responsible for keeping track of the configuration to each twitch chat.
+    ///     The view responsible for keeping track of the configuration to each twitch chat.
     /// </summary>
     public class TwitchChatConfigsViewModel : ViewModelBase {
         /// <summary>
@@ -15,7 +15,7 @@
         private readonly Configuration config;
 
         /// <summary>
-        /// The collection of all twitch chat configurations.
+        ///     The collection of all twitch chat configurations.
         /// </summary>
         private ObservableCollection<TwitchChatConfigView> twitchChatConfigs = new();
 
@@ -34,7 +34,7 @@
         }
 
         /// <summary>
-        /// Gets or sets the collection of all twitch chat configurations.
+        ///     Gets or sets the collection of all twitch chat configurations.
         /// </summary>
         public ObservableCollection<TwitchChatConfigView> TwitchChatConfigs {
             get => this.twitchChatConfigs;
@@ -42,14 +42,14 @@
         }
 
         /// <summary>
-        /// Creates a new configuration object.
+        ///     Creates a new configuration object.
         /// </summary>
         public void AddConfigCommand() {
             this.CreateTwitchChatConfig(null);
         }
 
         /// <summary>
-        /// Creates a new configuration object.
+        ///     Creates a new configuration object.
         /// </summary>
         /// <param name="twitchConfig">The twitch chat configuration to base the config on.</param>
         public void CreateTwitchChatConfig(TwitchChatConfiguration? twitchConfig) {

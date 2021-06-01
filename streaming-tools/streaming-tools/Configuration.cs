@@ -25,28 +25,40 @@
         private static Configuration? instance;
 
         /// <summary>
-        /// The <seealso cref="Guid"/> of the microphone used to pause TTS.
+        ///     The <seealso cref="Guid" /> of the microphone used to pause TTS.
         /// </summary>
         private string? microphoneGuid;
 
         /// <summary>
-        /// The 0% - 100% microphone volume at which to pause TTS.
+        ///     The 0% - 100% microphone volume at which to pause TTS.
         /// </summary>
         private int pauseThreshold;
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="Configuration"/> class.
+        ///     Initializes a new instance of the <see cref="Configuration" /> class.
         /// </summary>
         /// <remarks>Prevents the class from being instantiated outside of our singleton.</remarks>
         protected Configuration() { }
 
         /// <summary>
-        /// Raised when a property is changed on this object.
+        ///     Raised when a property is changed on this object.
         /// </summary>
         public event PropertyChangedEventHandler? PropertyChanged;
 
         /// <summary>
-        ///     Gets or sets the <seealso cref="Guid"/> of the microphone used to pause TTS.
+        ///     Gets the singleton instance of our class.
+        /// </summary>
+        public static Configuration Instance {
+            get {
+                if (null == instance)
+                    instance = ReadConfiguration();
+
+                return instance;
+            }
+        }
+
+        /// <summary>
+        ///     Gets or sets the <seealso cref="Guid" /> of the microphone used to pause TTS.
         /// </summary>
         public string? MicrophoneGuid {
             get => this.microphoneGuid;
@@ -79,21 +91,9 @@
         public ObservableCollection<TwitchAccount>? TwitchAccounts { get; set; }
 
         /// <summary>
-        /// Gets or sets the collection of twitch chat configurations.
+        ///     Gets or sets the collection of twitch chat configurations.
         /// </summary>
         public ObservableCollection<TwitchChatConfiguration>? TwitchChatConfigs { get; set; }
-
-        /// <summary>
-        ///     Gets the singleton instance of our class.
-        /// </summary>
-        public static Configuration Instance {
-            get {
-                if (null == instance)
-                    instance = ReadConfiguration();
-
-                return instance;
-            }
-        }
 
         /// <summary>
         ///     Read the configuration from disk.
@@ -125,10 +125,10 @@
         }
 
         /// <summary>
-        /// Gets the twitch account object associated with the username.
+        ///     Gets the twitch account object associated with the username.
         /// </summary>
         /// <param name="username">The username.</param>
-        /// <returns>The <see cref="TwitchAccount"/> object if found, null otherwise.</returns>
+        /// <returns>The <see cref="TwitchAccount" /> object if found, null otherwise.</returns>
         public TwitchAccount? GetTwitchAccount(string? username) {
             if (null == this.TwitchAccounts || string.IsNullOrWhiteSpace(username))
                 return null;
@@ -159,7 +159,7 @@
         }
 
         /// <summary>
-        /// Raised when a property changes on this class.
+        ///     Raised when a property changes on this class.
         /// </summary>
         /// <param name="propertyName">The name of the property.</param>
         [NotifyPropertyChangedInvocator]
@@ -184,16 +184,16 @@
     }
 
     /// <summary>
-    /// Represents a single connection to a twitch chat by a single user.
+    ///     Represents a single connection to a twitch chat by a single user.
     /// </summary>
     public class TwitchChatConfiguration {
         /// <summary>
-        /// Gets or sets the twitch username.
+        ///     Gets or sets the twitch username.
         /// </summary>
         public string? AccountUsername { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether the bot should provide administration commands.
+        ///     Gets or sets a value indicating whether the bot should provide administration commands.
         /// </summary>
         public bool AdminOn { get; set; }
 

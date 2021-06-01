@@ -14,66 +14,66 @@
     using streaming_tools.Utilities;
 
     /// <summary>
-    /// The view responsible for a single entry in the twitch chat configuration list.
+    ///     The view responsible for a single entry in the twitch chat configuration list.
     /// </summary>
     public class TwitchChatConfigViewModel : ViewModelBase, IDisposable {
         /// <summary>
-        /// The twitch chat administration singleton for registering for twitch chat callbacks.
+        ///     The twitch chat administration singleton for registering for twitch chat callbacks.
         /// </summary>
         private TwitchChatAdmin? admin;
 
         /// <summary>
-        /// True if the bot should provide administration commands, false otherwise.
+        ///     True if the bot should provide administration commands, false otherwise.
         /// </summary>
         private bool adminOn;
 
         /// <summary>
-        /// The twitch chat configuration object from the persistent configuration.
+        ///     The twitch chat configuration object from the persistent configuration.
         /// </summary>
         private TwitchChatConfiguration? chatConfig;
 
         /// <summary>
-        /// The output device to send TTS to.
+        ///     The output device to send TTS to.
         /// </summary>
         private string? outputDevice;
 
         /// <summary>
-        /// True if the bot should pause TTS based on microphone data, false otherwise.
+        ///     True if the bot should pause TTS based on microphone data, false otherwise.
         /// </summary>
         private bool pauseDuringSpeech;
 
         /// <summary>
-        /// The object responsible for pausing TTS based on microphone data.
+        ///     The object responsible for pausing TTS based on microphone data.
         /// </summary>
         private TwitchChatTtsPauser? pauseObject;
 
         /// <summary>
-        /// The TTS object that turns text to speech.
+        ///     The TTS object that turns text to speech.
         /// </summary>
         private TwitchChatTts? tts;
 
         /// <summary>
-        /// True if TTS is on, false otherwise.
+        ///     True if TTS is on, false otherwise.
         /// </summary>
         private bool ttsOn;
 
         /// <summary>
-        /// The voice to use for TTS.
+        ///     The voice to use for TTS.
         /// </summary>
         private string? ttsVoice;
 
         /// <summary>
-        /// The volume of TTS on the output device.
+        ///     The volume of TTS on the output device.
         /// </summary>
         private uint ttsVolume;
 
         /// <summary>
-        /// The twitch channel to connect to.
+        ///     The twitch channel to connect to.
         /// </summary>
         private string? twitchChannel;
 
         /// <summary>
-        /// The username to connect to the <see cref="twitchChannel"/> with.
+        ///     The username to connect to the <see cref="twitchChannel" /> with.
         /// </summary>
         private string? username;
 
@@ -98,7 +98,7 @@
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TwitchChatConfigViewModel" /> class.
+        ///     Initializes a new instance of the <see cref="TwitchChatConfigViewModel" /> class.
         /// </summary>
         /// <param name="config">The twitch chat configuration to base the row on.</param>
         public TwitchChatConfigViewModel(TwitchChatConfiguration config)
@@ -110,16 +110,7 @@
         }
 
         /// <summary>
-        /// Disposes of unmanaged resources.
-        /// </summary>
-        public void Dispose() {
-            this.tts?.Dispose();
-            this.tts = null;
-            this.PropertyChanged -= this.OnPropertyChanged;
-        }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether the bot should provide administration commands.
+        ///     Gets or sets a value indicating whether the bot should provide administration commands.
         /// </summary>
         public bool AdminOn {
             get => this.adminOn;
@@ -140,7 +131,7 @@
         }
 
         /// <summary>
-        /// Gets or sets a delegate for deleting this configuration object when the UI is clicked.
+        ///     Gets or sets a delegate for deleting this configuration object when the UI is clicked.
         /// </summary>
         public Action? DeleteConfig { get; set; }
 
@@ -153,7 +144,7 @@
         }
 
         /// <summary>
-        /// Gets or sets the collection of possible output devices on the machine.
+        ///     Gets or sets the collection of possible output devices on the machine.
         /// </summary>
         public ObservableCollection<string> OutputDevices { get; set; }
 
@@ -216,7 +207,7 @@
         }
 
         /// <summary>
-        /// Gets or sets the collection of possible TTS voices from Microsoft OS.
+        ///     Gets or sets the collection of possible TTS voices from Microsoft OS.
         /// </summary>
         public ObservableCollection<string> TtsVoices { get; set; }
 
@@ -245,19 +236,28 @@
         }
 
         /// <summary>
-        /// Gets the persistent configuration object.
+        ///     Gets the persistent configuration object.
         /// </summary>
         private Configuration Config { get; }
 
         /// <summary>
-        /// Invokes the <see cref="DeleteConfig"/> passed to us from a parent object.
+        ///     Invokes the <see cref="DeleteConfig" /> passed to us from a parent object.
         /// </summary>
         public void DeleteConfigCommand() {
             this.DeleteConfig?.Invoke();
         }
 
         /// <summary>
-        /// Copies the values from the persistent configuration object to this view.
+        ///     Disposes of unmanaged resources.
+        /// </summary>
+        public void Dispose() {
+            this.tts?.Dispose();
+            this.tts = null;
+            this.PropertyChanged -= this.OnPropertyChanged;
+        }
+
+        /// <summary>
+        ///     Copies the values from the persistent configuration object to this view.
         /// </summary>
         /// <param name="config">The persistent configuration object.</param>
         private void CopyFromConfig(TwitchChatConfiguration? config) {
@@ -275,7 +275,7 @@
         }
 
         /// <summary>
-        /// Copies the values from this view to the persistent configuration object and writes it to disk.
+        ///     Copies the values from this view to the persistent configuration object and writes it to disk.
         /// </summary>
         /// <param name="config">The persistent configuration object.</param>
         private void CopyToConfig(TwitchChatConfiguration? config) {
@@ -295,7 +295,7 @@
         }
 
         /// <summary>
-        /// Raised when a property changes on this object.
+        ///     Raised when a property changes on this object.
         /// </summary>
         /// <param name="sender">This object.</param>
         /// <param name="e">The property changed information.</param>
@@ -303,7 +303,7 @@
             if (null == this.Config.TwitchChatConfigs)
                 return;
 
-            if (null == this.chatConfig) 
+            if (null == this.chatConfig)
                 this.chatConfig = this.Config.TwitchChatConfigs.FirstOrDefault(c => null != c?.TwitchChannel && c.TwitchChannel.Equals(this.TwitchChannel, StringComparison.InvariantCultureIgnoreCase));
 
             if (null == this.chatConfig) {

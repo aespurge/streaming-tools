@@ -39,7 +39,7 @@
         /// <param name="name">The name of the device.</param>
         /// <returns>The index of the device if found, -1 otherwise.</returns>
         public static int GetOutputDeviceIndex(string? name) {
-            if (string.IsNullOrWhiteSpace(name)) 
+            if (string.IsNullOrWhiteSpace(name))
                 return -1;
 
             for (var i = 0; i < GetTotalOutputDevices(); i++) {

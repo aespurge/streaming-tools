@@ -14,7 +14,7 @@
     using streaming_tools.Utilities;
 
     /// <summary>
-    /// The view responsible for pausing twitch chat TTS when the microphone hears things.
+    ///     The view responsible for pausing twitch chat TTS when the microphone hears things.
     /// </summary>
     public class TtsPauseConfigViewModel : ViewModelBase {
         /// <summary>
@@ -23,8 +23,8 @@
         private readonly Configuration config;
 
         /// <summary>
-        /// A reference to the object that encapsulates reading microphone volume
-        /// in order to pause TTS.
+        ///     A reference to the object that encapsulates reading microphone volume
+        ///     in order to pause TTS.
         /// </summary>
         private readonly TwitchChatTtsPauser pausingObject = new();
 
@@ -39,7 +39,7 @@
         private int microphoneMicrophoneVoiceVolume;
 
         /// <summary>
-        /// The 0% - 100% microphone  at which to pause TTS.
+        ///     The 0% - 100% microphone  at which to pause TTS.
         /// </summary>
         private int pauseThreshold;
 
@@ -49,7 +49,7 @@
         private int selectedMicrophone;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TtsPauseConfigViewModel"/> class.
+        ///     Initializes a new instance of the <see cref="TtsPauseConfigViewModel" /> class.
         /// </summary>
         public TtsPauseConfigViewModel() {
             // Get the configuration and assign the values.
@@ -73,7 +73,7 @@
         }
 
         /// <summary>
-        /// Gets or sets the collection of microphone devices currently attached to the computer.
+        ///     Gets or sets the collection of microphone devices currently attached to the computer.
         /// </summary>
         public ObservableCollection<string> MicrophoneDevices { get; set; }
 
@@ -117,7 +117,7 @@
         }
 
         /// <summary>
-        /// Raised when properties are changed on the object.
+        ///     Raised when properties are changed on the object.
         /// </summary>
         /// <param name="sender">The object invoked on.</param>
         /// <param name="e">The property changed information.</param>
@@ -134,9 +134,9 @@
         }
 
         /// <summary>
-        /// Raised when properties change on the <see cref="pausingObject"/>.
+        ///     Raised when properties change on the <see cref="pausingObject" />.
         /// </summary>
-        /// <param name="sender">The <see cref="pausingObject"/>.</param>
+        /// <param name="sender">The <see cref="pausingObject" />.</param>
         /// <param name="e">The property changed information.</param>
         private void Pauser_PropertyChanged(object? sender, PropertyChangedEventArgs e) {
             if (!nameof(this.pausingObject.MicrophoneVoiceVolume).Equals(e.PropertyName, StringComparison.InvariantCultureIgnoreCase))

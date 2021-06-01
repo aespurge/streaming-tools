@@ -23,7 +23,9 @@
                                                                                           { "lonkwore", "lonk" },
                                                                                           { "yahya11419", "yah yah" },
                                                                                           { "AresWyler", "aireese" },
-                                                                                          { "byblyss", "ByeBliss" }
+                                                                                          { "roxanepigiste", "RocksAnnePeegeest" },
+                                                                                          { "alphastar592004", "AlphaStar" },
+                                                                                          { "derpidyderp", "Derpity Derp" }
                                                                                       };
 
         /// <summary>

@@ -1,7 +1,6 @@
 ﻿namespace streaming_tools.Twitch.Tts {
     using System;
     using System.ComponentModel;
-    using System.Linq;
     using System.Runtime.CompilerServices;
     using System.Timers;
 
@@ -62,7 +61,7 @@
         }
 
         /// <summary>
-        /// Invoked when properties on the class change.
+        ///     Invoked when properties on the class change.
         /// </summary>
         public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -104,7 +103,7 @@
         }
 
         /// <summary>
-        /// Gets or sets the reference to the TTS class the reads twitch chat.
+        ///     Gets or sets the reference to the TTS class the reads twitch chat.
         /// </summary>
         public TwitchChatTts? Tts { get; set; }
 
@@ -162,7 +161,7 @@
         }
 
         /// <summary>
-        /// Raised when a property is changed on the class.
+        ///     Raised when a property is changed on the class.
         /// </summary>
         /// <param name="propertyName">The name of the property.</param>
         [NotifyPropertyChangedInvocator]

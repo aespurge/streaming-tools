@@ -24,7 +24,7 @@
         /// <summary>
         ///     Filters for modifying an incoming message for text to speech.
         /// </summary>
-        private readonly ITtsFilter[] ttsFilters = { new LinkFilter(), new UsernameSkipFilter(), new UsernamePhoneticFilter() };
+        private readonly ITtsFilter[] ttsFilters = { new LinkFilter(), new UsernameSkipFilter(), new UsernameRemoveCharactersFilter(), new UsernamePhoneticFilter() };
 
         /// <summary>
         ///     The lock for ensuring mutual exclusion on the <see cref="ttsSoundOutput" /> object.
@@ -52,6 +52,7 @@
         /// <param name="config">The configuration for the twitch chat.</param>
         public TwitchChatTts(TwitchChatConfiguration? config) {
             this.chatConfig = config;
+            GlobalKeyboardListener.Instance.Callback += this.KeyboardPressCallback;
         }
 
         /// <summary>
@@ -197,6 +198,19 @@
                     }
                 }
             }
+        }
+
+        /// <summary>
+        ///     Handles key press anywhere in the OS.
+        /// </summary>
+        /// <param name="keyboard">The key that was pressed in string format.</param>
+        /// <remarks>
+        ///     See:
+        ///     <see href="https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes?redirectedfrom=MSDN" />
+        /// </remarks>
+        private void KeyboardPressCallback(string keyboard) {
+            if ("123".Equals(keyboard, StringComparison.InvariantCultureIgnoreCase))
+                this.ttsSoundOutput?.Stop();
         }
     }
 }

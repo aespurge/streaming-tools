@@ -26,16 +26,6 @@ namespace streaming_tools.ViewModels {
         public LayoutsViewModel LayoutViewModel => new();
 
         /// <summary>
-        /// The view responsible for pausing TTS when the microphone hears things.
-        /// </summary>
-        public TtsPauseConfigViewModel TtsPauseConfigViewModel => new();
-
-        /// <summary>
-        /// The view responsible for holding the configurations for each twitch chat connection.
-        /// </summary>
-        public TwitchChatConfigsViewModel TwitchChatConfigs => new();
-
-        /// <summary>
         ///     Gets or sets a value indicating whether the path of exile integration is enable.
         /// </summary>
         public bool PathOfExileEnabled {
@@ -51,5 +41,15 @@ namespace streaming_tools.ViewModels {
                 }
             }
         }
+
+        /// <summary>
+        ///     The view responsible for pausing TTS when the microphone hears things.
+        /// </summary>
+        public TtsPauseConfigViewModel TtsPauseConfigViewModel => new();
+
+        /// <summary>
+        ///     The view responsible for holding the configurations for each twitch chat connection.
+        /// </summary>
+        public TwitchChatConfigsViewModel TwitchChatConfigs => new();
     }
 }
