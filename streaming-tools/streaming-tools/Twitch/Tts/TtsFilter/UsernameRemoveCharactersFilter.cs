@@ -11,12 +11,12 @@
         /// <summary>
         ///     Handles identifying usernames in chat messages (anything that starts with a @).
         /// </summary>
-        private readonly Regex regexMessageUsernames = new(@"[@][a-zA-Z]+[\S]+", RegexOptions.Compiled | RegexOptions.CultureInvariant);
+        private readonly Regex regexMessageUsernames = new Regex(@"[@][a-zA-Z]+[\S]+", RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
         /// <summary>
         ///     Handles removing numbers and underscores from usernames.
         /// </summary>
-        private readonly Regex regexUsername = new(@"[0-9_]+", RegexOptions.Compiled | RegexOptions.CultureInvariant);
+        private readonly Regex regexUsername = new Regex(@"[0-9_]+", RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
         /// <summary>
         ///     Updates usernames to remove the _s and numbers.

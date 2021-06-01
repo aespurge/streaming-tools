@@ -19,12 +19,12 @@
         /// <summary>
         ///     The process we launched.
         /// </summary>
-        private readonly Process process;
+        private readonly Process? process;
 
         /// <summary>
         ///     Thread monitoring standard output of <seealso cref="process" /> in order to give the keystrokes.
         /// </summary>
-        private readonly Thread thread;
+        private readonly Thread? thread;
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="GlobalKeyboardListener" /> class.
@@ -59,7 +59,7 @@
         /// <summary>
         ///     Gets or sets the callbacks to invoke when a keystroke is pressed.
         /// </summary>
-        public Action<string> Callback { get; set; }
+        public Action<string>? Callback { get; set; }
 
         /// <summary>
         ///     The main entry point of the <see cref="thread" /> which listens for output from the
@@ -70,7 +70,7 @@
                 if (null == this.process)
                     return;
 
-                string line;
+                string? line;
                 while (null != (line = this.process.StandardOutput.ReadLine())) {
                     this.Callback?.Invoke(line);
                 }
