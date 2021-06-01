@@ -66,8 +66,6 @@
         /// </summary>
         /// <param name="args">We don't use arguments.</param>
         private static void Main(string[] args) {
-            Debugger.Launch();
-
             var pid = -1;
             if (args.Length > 0)
                 int.TryParse(args[0], out pid);
