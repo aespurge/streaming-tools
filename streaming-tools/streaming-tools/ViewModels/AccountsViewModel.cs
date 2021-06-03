@@ -175,8 +175,8 @@
             }
 
             this.Username = existingAccount.Username;
-            this.OAuth = existingAccount.OAuth;
-            this.ClientId = existingAccount.ClientId;
+            this.OAuth = null != existingAccount.OAuth ? Encoding.UTF8.GetString(Convert.FromBase64String(existingAccount.OAuth)) : "";
+            this.ClientId = null != existingAccount.ClientId ? Encoding.UTF8.GetString(Convert.FromBase64String(existingAccount.ClientId)) : "";
         }
     }
 }
