@@ -5,9 +5,9 @@
         xmlns:viewModels="clr-namespace:streaming_tools.ViewModels"
         xmlns:views="clr-namespace:streaming_tools.Views"
         mc:Ignorable="d"
-        d:DesignWidth="965" d:DesignHeight="570"
-        Width="965" Height="570"
-        MinWidth="965" MinHeight="570"
+        d:DesignWidth="965" d:DesignHeight="590"
+        Width="965" Height="590"
+        MinWidth="965" MinHeight="590"
         x:Class="streaming_tools.Views.MainWindow"
         Icon="/Assets/icon.ico"
         Title="notification_app">
