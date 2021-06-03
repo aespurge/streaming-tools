@@ -147,6 +147,10 @@
             existingAccount.OAuth = Convert.ToBase64String(Encoding.UTF8.GetBytes(this.OAuth));
             existingAccount.ClientId = Convert.ToBase64String(Encoding.UTF8.GetBytes(this.ClientId));
             this.config.WriteConfiguration();
+
+            this.Username = "";
+            this.OAuth = "";
+            this.ClientId = "";
         }
 
         /// <summary>
