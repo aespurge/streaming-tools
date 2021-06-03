@@ -13,6 +13,11 @@
         /// </summary>
         public const string TWITCH_OAUTH_SITE = @"https://twitchapps.com/tmi/";
 
+        /// <summary>
+        ///     The address to get a client id.
+        /// </summary>
+        public const string TWITCH_DEVELOPER_SITE = @"https://dev.twitch.tv/console/apps";
+
 #if DEBUG
         /// <summary>
         ///     The hard coded location for where the keyboard hooks executable lives.

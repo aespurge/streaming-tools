@@ -1,5 +1,6 @@
 ﻿namespace streaming_tools {
     using System;
+    using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.ComponentModel;
     using System.IO;
@@ -86,6 +87,21 @@
         }
 
         /// <summary>
+        ///     Gets or sets the collection of usernames that the bot doesn't pronounce correctly.
+        /// </summary>
+        public ObservableCollection<KeyValuePair<string, string>>? TtsPhoneticUsernames { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the collection of words the bot doesn't pronounce correctly.
+        /// </summary>
+        public ObservableCollection<KeyValuePair<string, string>>? TtsPhoneticWords { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the collection of usernames to not read messages from in twitch chat.
+        /// </summary>
+        public ObservableCollection<string>? TtsUsernamesToSkip { get; set; }
+
+        /// <summary>
         ///     Gets or sets the collection of all twitch accounts.
         /// </summary>
         public ObservableCollection<TwitchAccount>? TwitchAccounts { get; set; }
@@ -120,6 +136,15 @@
 
             if (null == config.TwitchChatConfigs)
                 config.TwitchChatConfigs = new ObservableCollection<TwitchChatConfiguration>();
+
+            if (null == config.TtsUsernamesToSkip)
+                config.TtsUsernamesToSkip = new ObservableCollection<string>();
+
+            if (null == config.TtsPhoneticUsernames)
+                config.TtsPhoneticUsernames = new ObservableCollection<KeyValuePair<string, string>>();
+
+            if (null == config.TtsPhoneticWords)
+                config.TtsPhoneticWords = new ObservableCollection<KeyValuePair<string, string>>();
 
             return config;
         }
@@ -172,6 +197,11 @@
     ///     Represents a twitch account.
     /// </summary>
     public class TwitchAccount {
+        /// <summary>
+        ///     Gets or sets the client id.
+        /// </summary>
+        public string? ClientId { get; set; }
+
         /// <summary>
         ///     Gets or sets the twitch OAuth token.
         /// </summary>

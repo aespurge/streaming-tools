@@ -3,7 +3,9 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Text;
+    using System.Threading.Tasks;
 
+    using TwitchLib.Api;
     using TwitchLib.Client;
     using TwitchLib.Client.Events;
     using TwitchLib.Client.Models;
@@ -12,8 +14,7 @@
 
     /// <summary>
     ///     Organizes and aggregates the clients connected to zero or more twitch chats. Invokes callbacks for messages
-    ///     received
-    ///     in chats.
+    ///     received in chats.
     /// </summary>
     public class TwitchChatManager {
         /// <summary>
@@ -78,6 +79,23 @@
                 return;
 
             conn.AdminCallbacks += adminCallback;
+        }
+
+        /// <summary>
+        ///     Retrieves all users from all currently connected chats.
+        /// </summary>
+        /// <returns>A collection of currently existing users in chat.</returns>
+        public async Task<TwitchChatter[]> GetUsersFromAllChats() {
+            var tasks = this.twitchClients.Values.Select(this.GetUsersFromChat);
+            var allChatters = new List<TwitchChatter>();
+            foreach (var chatters in await Task.WhenAll(tasks)) {
+                if (null == chatters)
+                    continue;
+
+                allChatters.AddRange(chatters);
+            }
+
+            return allChatters.ToArray();
         }
 
         /// <summary>
@@ -148,6 +166,9 @@
             var password = null != account.OAuth ? Encoding.UTF8.GetString(Convert.FromBase64String(account.OAuth)) : null;
             var credentials = new ConnectionCredentials(account.Username, password);
             var clientOptions = new ClientOptions { MessagesAllowedInPeriod = 750, ThrottlingPeriod = TimeSpan.FromSeconds(30) };
+            conn.Api = new TwitchAPI();
+            conn.Api.Settings.ClientId = null != account.ClientId ? Encoding.UTF8.GetString(Convert.FromBase64String(account.ClientId)) : null;
+            conn.Api.Settings.AccessToken = password;
 
             WebSocketClient customClient = new(clientOptions);
             var twitchClient = new TwitchClient(customClient);
@@ -158,6 +179,19 @@
             this.twitchClients[twitchClient] = conn;
 
             return conn;
+        }
+
+        /// <summary>
+        ///     Gets all of the users from a twitch connection.
+        /// </summary>
+        /// <param name="conn">The connection to get the user list from the chat of.</param>
+        /// <returns>A collection of currently existing users in chat.</returns>
+        private async Task<ICollection<TwitchChatter>?> GetUsersFromChat(TwitchConnection? conn) {
+            if (null == conn?.Channel || null == conn.Api)
+                return default;
+
+            var resp = await conn.Api.Undocumented.GetChattersAsync(conn.Channel);
+            return resp.Select(c => new TwitchChatter(conn.Channel, c.Username)).ToArray();
         }
 
         /// <summary>
@@ -189,6 +223,31 @@
         }
 
         /// <summary>
+        ///     Represents a twitch chatter in a channel.
+        /// </summary>
+        public struct TwitchChatter {
+            /// <summary>
+            ///     The channel the user is in.
+            /// </summary>
+            public string Channel;
+
+            /// <summary>
+            ///     The username of the user.
+            /// </summary>
+            public string Username;
+
+            /// <summary>
+            ///     Initializes a new instance of the <see cref="TwitchChatter" /> struct.
+            /// </summary>
+            /// <param name="channel">The channel the user is in.</param>
+            /// <param name="username">The username of the user.</param>
+            public TwitchChatter(string channel, string username) {
+                this.Channel = channel;
+                this.Username = username;
+            }
+        }
+
+        /// <summary>
         ///     A mapping of all information related to a single twitch chat connection.
         /// </summary>
         private class TwitchConnection {
@@ -201,6 +260,11 @@
             ///     Gets or sets the callbacks used to administrate the twitch chat.
             /// </summary>
             public Func<TwitchClient, OnMessageReceivedArgs, bool>? AdminCallbacks { get; set; }
+
+            /// <summary>
+            ///     Gets or sets the reference to the twitch API.
+            /// </summary>
+            public TwitchAPI? Api { get; set; }
 
             /// <summary>
             ///     Gets or sets the channel connected to.

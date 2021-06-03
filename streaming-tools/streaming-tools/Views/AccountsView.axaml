@@ -3,7 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:viewModels="clr-namespace:streaming_tools.ViewModels"
-             mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="130"
+             mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="160"
              x:Class="streaming_tools.Views.AccountsView">
     <Design.DataContext>
         <viewModels:AccountsViewModel />
@@ -31,6 +31,7 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                     <RowDefinition />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
@@ -46,7 +47,11 @@
                 <TextBox Grid.Row="2" Grid.Column="1" Width="160" PasswordChar="*" HorizontalAlignment="Left"
                          Text="{Binding OAuth, Mode=TwoWay}" />
                 <Button Grid.Row="2" Grid.Column="2" Command="{Binding LaunchOAuthWebpage}">Get Token</Button>
-                <StackPanel Grid.Row="3" Grid.ColumnSpan="3" Orientation="Horizontal" VerticalAlignment="Top"
+                <Label Grid.Row="3" VerticalAlignment="Center">Client ID:</Label>
+                <TextBox Grid.Row="3" Grid.Column="1" Width="160" PasswordChar="*" HorizontalAlignment="Left"
+                         Text="{Binding ClientId, Mode=TwoWay}" />
+                <Button Grid.Row="3" Grid.Column="2" Command="{Binding LaunchDeveloperWebpage}">Get ID</Button>
+                <StackPanel Grid.Row="4" Grid.ColumnSpan="3" Orientation="Horizontal" VerticalAlignment="Top"
                             HorizontalAlignment="Right">
                     <Button Command="{Binding SaveAccount}">Save</Button>
                     <Button Command="{Binding CancelEditing}">Cancel</Button>

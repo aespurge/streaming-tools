@@ -58,5 +58,8 @@
     <Compile Update="Views\AccountsView.axaml.cs">
       <DependentUpon>AccountsView.axaml</DependentUpon>
     </Compile>
+    <Compile Update="Views\TtsSkipUsernamesView.axaml.cs">
+      <DependentUpon>TtsSkipUsernamesView.axaml</DependentUpon>
+    </Compile>
   </ItemGroup>
 </Project>

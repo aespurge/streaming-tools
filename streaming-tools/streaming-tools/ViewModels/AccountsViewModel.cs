@@ -19,6 +19,11 @@
         private readonly Configuration config;
 
         /// <summary>
+        ///     The client id associated with the app on the twitch account.
+        /// </summary>
+        private string? clientId;
+
+        /// <summary>
         ///     The OAuth token of the currently added/edited twitch account.
         /// </summary>
         private string? oAuth;
@@ -56,6 +61,14 @@
         public ObservableCollection<AccountView> Accounts { get; set; }
 
         /// <summary>
+        ///     Gets or sets the client id associated with the app on the twitch account.
+        /// </summary>
+        public string? ClientId {
+            get => this.clientId;
+            set => this.RaiseAndSetIfChanged(ref this.clientId, value);
+        }
+
+        /// <summary>
         ///     Gets or sets the OAuth token of the currently added/edited twitch account.
         /// </summary>
         public string? OAuth {
@@ -77,6 +90,7 @@
         public void CancelEditing() {
             this.Username = "";
             this.OAuth = "";
+            this.ClientId = "";
         }
 
         /// <summary>
@@ -100,6 +114,13 @@
         }
 
         /// <summary>
+        ///     Launches the twitch developer webpage.
+        /// </summary>
+        public void LaunchDeveloperWebpage() {
+            Process.Start(new ProcessStartInfo("cmd", $"/c start {Constants.TWITCH_DEVELOPER_SITE}") { CreateNoWindow = true });
+        }
+
+        /// <summary>
         ///     Launches the twitch OAuth webpage.
         /// </summary>
         public void LaunchOAuthWebpage() {
@@ -110,12 +131,13 @@
         ///     Saves the current twitch account details.
         /// </summary>
         public void SaveAccount() {
-            if (string.IsNullOrWhiteSpace(this.Username) || string.IsNullOrWhiteSpace(this.OAuth) || null == this.config.TwitchAccounts)
+            if (string.IsNullOrWhiteSpace(this.Username) || string.IsNullOrWhiteSpace(this.OAuth) || string.IsNullOrWhiteSpace(this.ClientId) || null == this.config.TwitchAccounts)
                 return;
 
             var existingAccount = this.config.GetTwitchAccount(this.Username);
             if (null == existingAccount) {
-                this.config.TwitchAccounts.Add(new TwitchAccount { Username = this.Username, OAuth = Convert.ToBase64String(Encoding.UTF8.GetBytes(this.OAuth)) });
+                this.config.TwitchAccounts.Add(new TwitchAccount { Username = this.Username, OAuth = Convert.ToBase64String(Encoding.UTF8.GetBytes(this.OAuth)), ClientId = Convert.ToBase64String(Encoding.UTF8.GetBytes(this.ClientId)) });
+
                 this.Accounts.Add(new AccountView { DataContext = this.CreateAccountViewModel(this.Username) });
                 this.config.WriteConfiguration();
                 return;
@@ -123,6 +145,8 @@
 
             existingAccount.Username = this.Username;
             existingAccount.OAuth = Convert.ToBase64String(Encoding.UTF8.GetBytes(this.OAuth));
+            existingAccount.ClientId = Convert.ToBase64String(Encoding.UTF8.GetBytes(this.ClientId));
+            this.config.WriteConfiguration();
         }
 
         /// <summary>
@@ -146,11 +170,13 @@
             if (null == existingAccount) {
                 this.Username = "";
                 this.OAuth = "";
+                this.ClientId = "";
                 return;
             }
 
             this.Username = existingAccount.Username;
             this.OAuth = existingAccount.OAuth;
+            this.ClientId = existingAccount.ClientId;
         }
     }
 }
