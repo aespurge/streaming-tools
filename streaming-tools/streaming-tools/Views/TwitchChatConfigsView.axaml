@@ -38,6 +38,8 @@
                 <Image Source="/Assets/add.png" VerticalAlignment="Center" HorizontalAlignment="Center" />
             </Button>
         </Grid>
-        <ItemsControl Items="{Binding TwitchChatConfigs}" />
+        <ScrollViewer MaxHeight="150" VerticalScrollBarVisibility="Auto">
+            <ItemsControl Items="{Binding TwitchChatConfigs}" />
+        </ScrollViewer>
     </StackPanel>
 </UserControl>
