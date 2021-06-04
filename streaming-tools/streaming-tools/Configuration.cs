@@ -31,6 +31,11 @@
         private KeystokeCommand? keystokeCommand;
 
         /// <summary>
+        ///     The monitor selected in the layout view.
+        /// </summary>
+        private string? layoutSelectedMonitor;
+
+        /// <summary>
         ///     The <seealso cref="Guid" /> of the microphone used to pause TTS.
         /// </summary>
         private string? microphoneGuid;
@@ -70,6 +75,17 @@
             get => this.keystokeCommand;
             set {
                 this.keystokeCommand = value;
+                this.OnPropertyChanged();
+            }
+        }
+
+        /// <summary>
+        ///     Gets or sets the monitor selected in the layout view.
+        /// </summary>
+        public string? LayoutSelectedMonitor {
+            get => this.layoutSelectedMonitor;
+            set {
+                this.layoutSelectedMonitor = value;
                 this.OnPropertyChanged();
             }
         }

@@ -1,10 +1,13 @@
 ﻿namespace streaming_tools.ViewModels {
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel;
     using System.Diagnostics;
     using System.Linq;
 
     using PInvoke;
+
+    using ReactiveUI;
 
     using streaming_tools.Utilities;
 
@@ -24,22 +27,36 @@
         private readonly Dictionary<int, User32.SetWindowLongFlags> previousWindowSettings = new();
 
         /// <summary>
+        ///     The currently selected monitor to move the windows to.
+        /// </summary>
+        private string? selectedMonitor;
+
+        /// <summary>
         ///     Initializes a new instance of the <see cref="LayoutsViewModel" /> class.
         /// </summary>
         public LayoutsViewModel() {
             var primaryMonitor = MonitorUtilities.GetPrimaryMonitor();
-            this.SelectedMonitor = MonitorUtilities.MONITOR_NOT_FOUND_DEVICE_NAME != primaryMonitor.DeviceName ? primaryMonitor.DeviceName : MonitorUtilities.GetMonitors().FirstOrDefault().DeviceName;
+
+            if (string.IsNullOrWhiteSpace(Configuration.Instance.LayoutSelectedMonitor))
+                this.SelectedMonitor = MonitorUtilities.MONITOR_NOT_FOUND_DEVICE_NAME != primaryMonitor.DeviceName ? primaryMonitor.DeviceName : MonitorUtilities.GetMonitors().FirstOrDefault().DeviceName;
+            else
+                this.SelectedMonitor = Configuration.Instance.LayoutSelectedMonitor;
+
+            this.PropertyChanged += this.OnPropertyChanged;
         }
 
         /// <summary>
         ///     Gets or sets the currently selected monitor to move the windows to.
         /// </summary>
-        public string SelectedMonitor { get; set; }
+        public string? SelectedMonitor {
+            get => this.selectedMonitor;
+            set => this.RaiseAndSetIfChanged(ref this.selectedMonitor, value);
+        }
 
         /// <summary>
         ///     Handles rearranging the windows.
         /// </summary>
-        private void OnExecuteClicked() {
+        public void OnExecuteClicked() {
             // Get the monitors
             var monitors = MonitorUtilities.GetMonitors();
             var processes = Process.GetProcessesByName("vlc").ToList();
@@ -81,13 +98,23 @@
         /// <summary>
         ///     Handles rolling back the rearranging of windows.
         /// </summary>
-        private void OnUndoClicked() {
+        public void OnUndoClicked() {
             foreach (var process in Process.GetProcessesByName("vlc")) {
                 if (!this.previousWindowSettings.TryGetValue(process.Id, out var oldValue))
                     continue;
 
                 User32.SetWindowLong(process.MainWindowHandle, User32.WindowLongIndexFlags.GWL_STYLE, oldValue);
             }
+        }
+
+        /// <summary>
+        ///     Raised when properties are changed to update the configuration file.
+        /// </summary>
+        /// <param name="sender">This class' object.</param>
+        /// <param name="e">The event arguments.</param>
+        private void OnPropertyChanged(object? sender, PropertyChangedEventArgs e) {
+            Configuration.Instance.LayoutSelectedMonitor = this.SelectedMonitor;
+            Configuration.Instance.WriteConfiguration();
         }
     }
 }
