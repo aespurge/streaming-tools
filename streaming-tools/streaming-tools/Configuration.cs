@@ -26,6 +26,11 @@
         private static Configuration? instance;
 
         /// <summary>
+        ///     The command to execute on keystroke.
+        /// </summary>
+        private KeystokeCommand? keystokeCommand;
+
+        /// <summary>
         ///     The <seealso cref="Guid" /> of the microphone used to pause TTS.
         /// </summary>
         private string? microphoneGuid;
@@ -55,6 +60,17 @@
                     instance = ReadConfiguration();
 
                 return instance;
+            }
+        }
+
+        /// <summary>
+        ///     Gets or sets the command to execute on keystroke.
+        /// </summary>
+        public KeystokeCommand? KeystokeCommand {
+            get => this.keystokeCommand;
+            set {
+                this.keystokeCommand = value;
+                this.OnPropertyChanged();
             }
         }
 
@@ -137,6 +153,9 @@
 
             if (null == config.TtsPhoneticUsernames)
                 config.TtsPhoneticUsernames = new ObservableCollection<KeyValuePair<string, string>>();
+
+            if (null == config.KeystokeCommand)
+                config.KeystokeCommand = new KeystokeCommand();
 
             return config;
         }
@@ -248,5 +267,25 @@
         ///     Gets or sets the twitch channel to read chat from.
         /// </summary>
         public string? TwitchChannel { get; set; }
+    }
+
+    /// <summary>
+    ///     Represents a command to execute on keystroke.
+    /// </summary>
+    public class KeystokeCommand {
+        /// <summary>
+        ///     Gets or sets the command to type in chat.
+        /// </summary>
+        public string? Command { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the key code of the keystroke.
+        /// </summary>
+        public int? KeyCode { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the twitch chat to type in.
+        /// </summary>
+        public string? TwitchChat { get; set; }
     }
 }

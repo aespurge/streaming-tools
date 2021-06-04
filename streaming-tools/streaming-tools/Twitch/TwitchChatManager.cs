@@ -82,6 +82,23 @@
         }
 
         /// <summary>
+        ///     Gets the twitch client connected to the specified channel.
+        /// </summary>
+        /// <param name="channel">The twitch channel that we are connected to.</param>
+        /// <returns>The twitch client if a connection exists, null otherwise.</returns>
+        public TwitchClient? GetTwitchChannelClient(string channel) {
+            var existing = from connection in this.twitchClients
+                           where connection.Value.Channel?.Equals(channel, StringComparison.InvariantCultureIgnoreCase) == true
+                           select connection;
+
+            var pair = existing.FirstOrDefault();
+            if (default(KeyValuePair<TwitchClient, TwitchConnection>).Equals(pair))
+                return null;
+
+            return pair.Key;
+        }
+
+        /// <summary>
         ///     Retrieves all users from all currently connected chats.
         /// </summary>
         /// <returns>A collection of currently existing users in chat.</returns>

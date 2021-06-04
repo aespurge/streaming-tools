@@ -122,6 +122,9 @@
         /// <param name="sender">The object invoked on.</param>
         /// <param name="e">The property changed information.</param>
         private void OnPropertyChanged(object? sender, PropertyChangedEventArgs e) {
+            if (nameof(this.MicrophoneVoiceVolume).Equals(e.PropertyName, StringComparison.InvariantCultureIgnoreCase))
+                return;
+
             if (nameof(this.SelectedMicrophone).Equals(e.PropertyName, StringComparison.InvariantCultureIgnoreCase)) {
                 this.pausingObject.SelectedMicrophone = this.SelectedMicrophone;
                 this.pausingObject.StopListenToMicrophone();

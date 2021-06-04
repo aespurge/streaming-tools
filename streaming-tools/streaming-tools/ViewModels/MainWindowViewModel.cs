@@ -21,6 +21,11 @@ namespace streaming_tools.ViewModels {
         public AccountsViewModel AccountsViewModel => new();
 
         /// <summary>
+        ///     The view responsible for managing the keystroke command.
+        /// </summary>
+        public KeystrokeCommandViewModel KeystrokeCommandViewModel => new();
+
+        /// <summary>
         ///     The view responsible for laying out windows on the OS.
         /// </summary>
         public LayoutsViewModel LayoutViewModel => new();
