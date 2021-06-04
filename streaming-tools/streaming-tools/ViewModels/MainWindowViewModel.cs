@@ -48,6 +48,11 @@ namespace streaming_tools.ViewModels {
         public TtsPauseConfigViewModel TtsPauseConfigViewModel => new();
 
         /// <summary>
+        ///     The view model for the phonetic words list.
+        /// </summary>
+        public TtsPhoneticWordsViewModel TtsPhoneticWordsViewModel => new();
+
+        /// <summary>
         ///     The view responsible for managing the list of usernames to skip.
         /// </summary>
         public TtsSkipUsernamesViewModel TtsSkipUsernamesViewModel => new();

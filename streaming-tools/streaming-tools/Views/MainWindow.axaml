@@ -5,9 +5,9 @@
         xmlns:viewModels="clr-namespace:streaming_tools.ViewModels"
         xmlns:views="clr-namespace:streaming_tools.Views"
         mc:Ignorable="d"
-        d:DesignWidth="965" d:DesignHeight="590"
-        Width="965" Height="590"
-        MinWidth="965" MinHeight="590"
+        d:DesignWidth="1125" d:DesignHeight="590"
+        Width="1125" Height="590"
+        MinWidth="1125" MinHeight="590"
         x:Class="streaming_tools.Views.MainWindow"
         Icon="/Assets/icon.ico"
         Title="notification_app">
@@ -28,6 +28,7 @@
     <StackPanel Margin="10">
         <StackPanel Orientation="Horizontal" Margin="0,0,0,2">
             <views:TtsSkipUsernamesView Margin="0,0,5,0" DataContext="{Binding TtsSkipUsernamesViewModel}" />
+            <views:TtsPhoneticWordsView DataContext="{Binding TtsPhoneticWordsViewModel}" />
             <views:AccountsView DataContext="{Binding AccountsViewModel}" />
         </StackPanel>
 

@@ -92,11 +92,6 @@
         public ObservableCollection<KeyValuePair<string, string>>? TtsPhoneticUsernames { get; set; }
 
         /// <summary>
-        ///     Gets or sets the collection of words the bot doesn't pronounce correctly.
-        /// </summary>
-        public ObservableCollection<KeyValuePair<string, string>>? TtsPhoneticWords { get; set; }
-
-        /// <summary>
         ///     Gets or sets the collection of usernames to not read messages from in twitch chat.
         /// </summary>
         public ObservableCollection<string>? TtsUsernamesToSkip { get; set; }
@@ -142,9 +137,6 @@
 
             if (null == config.TtsPhoneticUsernames)
                 config.TtsPhoneticUsernames = new ObservableCollection<KeyValuePair<string, string>>();
-
-            if (null == config.TtsPhoneticWords)
-                config.TtsPhoneticWords = new ObservableCollection<KeyValuePair<string, string>>();
 
             return config;
         }

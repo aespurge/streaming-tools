@@ -28,10 +28,6 @@
                     username = foundUsername.Value;
             }
 
-            if (null != Configuration.Instance.TtsPhoneticWords)
-                foreach (var wordToPronunciation in Configuration.Instance.TtsPhoneticWords)
-                    message = message.Replace(wordToPronunciation.Key, wordToPronunciation.Value, StringComparison.InvariantCultureIgnoreCase);
-
             return new Tuple<string, string>(username, message);
         }
     }
