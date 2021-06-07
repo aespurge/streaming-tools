@@ -225,14 +225,35 @@
     /// </summary>
     public class TwitchAccount {
         /// <summary>
+        ///     Gets or sets the twitch api OAuth token.
+        /// </summary>
+        public string? ApiOAuth { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the twitch chat OAuth token.
+        /// </summary>
+        public string? ChatOAuth { get; set; }
+
+        /// <summary>
         ///     Gets or sets the client id.
         /// </summary>
         public string? ClientId { get; set; }
 
         /// <summary>
-        ///     Gets or sets the twitch OAuth token.
+        ///     Gets or sets the client secret.
         /// </summary>
-        public string? OAuth { get; set; }
+        public string? ClientSecret { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the pre-token code.
+        /// </summary>
+        public string? Code { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the redirect url.
+        /// </summary>
+        /// <remarks>Must match the registered application with twitch.</remarks>
+        public string? RedirectUrl { get; set; }
 
         /// <summary>
         ///     Gets or sets the twitch username.

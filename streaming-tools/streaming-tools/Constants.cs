@@ -1,4 +1,8 @@
 ﻿namespace streaming_tools {
+    using System.Collections.Generic;
+
+    using TwitchLib.Api.Core.Enums;
+
     /// <summary>
     ///     Global constants for use in the application.
     /// </summary>
@@ -11,12 +15,17 @@
         /// <summary>
         ///     The address to retrieve an OAuth token from twitch.
         /// </summary>
-        public const string TWITCH_OAUTH_SITE = @"https://twitchapps.com/tmi/";
+        public const string TWITCH_CHAT_OAUTH_SITE = @"https://twitchapps.com/tmi/";
 
         /// <summary>
         ///     The address to get a client id.
         /// </summary>
         public const string TWITCH_DEVELOPER_SITE = @"https://dev.twitch.tv/console/apps";
+
+        /// <summary>
+        ///     The list of authorization scopes we need for the application.
+        /// </summary>
+        public static readonly IEnumerable<AuthScopes> TWITCH_AUTH_SCOPES = new[] { AuthScopes.Helix_Channel_Read_Redemptions };
 
 #if DEBUG
         /// <summary>

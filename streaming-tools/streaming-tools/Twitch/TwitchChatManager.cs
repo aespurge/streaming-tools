@@ -180,12 +180,13 @@
 
             var conn = new TwitchConnection { Account = account, Channel = channel };
 
-            var password = null != account.OAuth ? Encoding.UTF8.GetString(Convert.FromBase64String(account.OAuth)) : null;
-            var credentials = new ConnectionCredentials(account.Username, password);
+            var password = null != account.ChatOAuth ? Encoding.UTF8.GetString(Convert.FromBase64String(account.ChatOAuth)) : null;
+            var credentials = new ConnectionCredentials(account.Username, password ?? "");
             var clientOptions = new ClientOptions { MessagesAllowedInPeriod = 750, ThrottlingPeriod = TimeSpan.FromSeconds(30) };
             conn.Api = new TwitchAPI();
             conn.Api.Settings.ClientId = null != account.ClientId ? Encoding.UTF8.GetString(Convert.FromBase64String(account.ClientId)) : null;
-            conn.Api.Settings.AccessToken = password;
+            conn.Api.Settings.Secret = null != account.ClientSecret ? Encoding.UTF8.GetString(Convert.FromBase64String(account.ClientSecret)) : null;
+            conn.Api.Settings.AccessToken = null != account.ApiOAuth ? Encoding.UTF8.GetString(Convert.FromBase64String(account.ApiOAuth)) : null;
 
             WebSocketClient customClient = new(clientOptions);
             var twitchClient = new TwitchClient(customClient);
@@ -207,8 +208,12 @@
             if (null == conn?.Channel || null == conn.Api)
                 return default;
 
-            var resp = await conn.Api.Undocumented.GetChattersAsync(conn.Channel);
-            return resp.Select(c => new TwitchChatter(conn.Channel, c.Username)).ToArray();
+            try {
+                var resp = await conn.Api.Undocumented.GetChattersAsync(conn.Channel);
+                return resp.Select(c => new TwitchChatter(conn.Channel, c.Username)).ToArray();
+            } catch (Exception) {
+                return null;
+            }
         }
 
         /// <summary>
