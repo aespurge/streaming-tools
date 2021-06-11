@@ -69,6 +69,16 @@
         }
 
         /// <summary>
+        ///     Gets or sets the audio channel that sound channel point redemptions use.
+        /// </summary>
+        public string? ChannelPointSoundRedemptionOutputChannel { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the channel point redemption sounds.
+        /// </summary>
+        public ObservableCollection<ChannelPointSoundRedemption>? ChannelPointSoundRedemptions { get; set; }
+
+        /// <summary>
         ///     Gets or sets the command to execute on keystroke.
         /// </summary>
         public KeystokeCommand? KeystokeCommand {
@@ -173,6 +183,9 @@
             if (null == config.KeystokeCommand)
                 config.KeystokeCommand = new KeystokeCommand();
 
+            if (null == config.ChannelPointSoundRedemptions)
+                config.ChannelPointSoundRedemptions = new ObservableCollection<ChannelPointSoundRedemption>();
+
             return config;
         }
 
@@ -230,6 +243,16 @@
         public string? ApiOAuth { get; set; }
 
         /// <summary>
+        ///     Gets or sets the date time at which the OAuth token expires.
+        /// </summary>
+        public DateTime? ApiOAuthExpires { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the refresh token used to refresh the <see cref="ApiOAuth" />.
+        /// </summary>
+        public string? ApiOAuthRefresh { get; set; }
+
+        /// <summary>
         ///     Gets or sets the twitch chat OAuth token.
         /// </summary>
         public string? ChatOAuth { get; set; }
@@ -248,6 +271,11 @@
         ///     Gets or sets the pre-token code.
         /// </summary>
         public string? Code { get; set; }
+
+        /// <summary>
+        ///     Gets or sets a value indicating whether the account is the account the user uses to stream.
+        /// </summary>
+        public bool IsUsersStreamingAccount { get; set; }
 
         /// <summary>
         ///     Gets or sets the redirect url.
@@ -324,5 +352,25 @@
         ///     Gets or sets the twitch chat to type in.
         /// </summary>
         public string? TwitchChat { get; set; }
+    }
+
+    /// <summary>
+    ///     The mapping of a channel point redemption to its sound.
+    /// </summary>
+    public class ChannelPointSoundRedemption {
+        /// <summary>
+        ///     Gets or sets the filename of the sound to play.
+        /// </summary>
+        public string? Filename { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the name of the channel point redemption associated with the sound.
+        /// </summary>
+        public string? Name { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the volume of the channel point sound.
+        /// </summary>
+        public int? Volume { get; set; }
     }
 }

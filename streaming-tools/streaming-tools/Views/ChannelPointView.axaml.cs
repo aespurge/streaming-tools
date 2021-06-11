@@ -1,25 +1,20 @@
 namespace streaming_tools.Views {
-    using Avalonia;
     using Avalonia.Controls;
     using Avalonia.Markup.Xaml;
 
     /// <summary>
-    ///     The main UI.
+    ///     The view responsible for mapping channel point redemptions to sounds.
     /// </summary>
-    public class MainWindow : Window {
+    public class ChannelPointView : UserControl {
         /// <summary>
-        ///     Initializes a new instance of the <see cref="MainWindow" /> class.
+        ///     Initializes a new instance of the <see cref="ChannelPointView" /> class.
         /// </summary>
-        public MainWindow() {
-            Constants.MAIN_WINDOW = this;
+        public ChannelPointView() {
             this.InitializeComponent();
-#if DEBUG
-            this.AttachDevTools();
-#endif
         }
 
         /// <summary>
-        ///     Initializes the controls values.
+        ///     Initializes the UI components.
         /// </summary>
         private void InitializeComponent() {
             AvaloniaXamlLoader.Load(this);

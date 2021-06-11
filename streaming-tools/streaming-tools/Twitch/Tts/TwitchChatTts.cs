@@ -160,6 +160,9 @@
                 stream.Seek(0, SeekOrigin.Begin);
                 var reader = new WaveFileReader(stream);
 
+                while (GlobalSoundManager.Instance.CurrentlyPlayingSound)
+                    Thread.Sleep(100);
+
                 try {
                     // Make sure we lock the objects used on multiple threads and play the file.
                     lock (this.ttsSoundOutputLock)
@@ -186,7 +189,7 @@
 
                     // Wait for the play to finish, we will get signaled.
                     var signal = this.ttsSoundOutputSignal;
-                    this.ttsSoundOutputSignal?.WaitOne();
+                    signal?.WaitOne();
                 } finally {
                     // Finally dispose of everything safely in the lock.
                     lock (this.ttsSoundOutputLock)

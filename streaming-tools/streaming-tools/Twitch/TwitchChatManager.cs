@@ -6,6 +6,7 @@
     using System.Threading.Tasks;
 
     using TwitchLib.Api;
+    using TwitchLib.Api.Core.Enums;
     using TwitchLib.Client;
     using TwitchLib.Client.Events;
     using TwitchLib.Client.Models;
@@ -99,6 +100,38 @@
         }
 
         /// <summary>
+        ///     Gets the twitch client connected to the specified channel.
+        /// </summary>
+        /// <param name="username">The twitch username that is connected.</param>
+        /// <returns>The twitch client if a connection exists, null otherwise.</returns>
+        public TwitchAPI? GetTwitchClientApi(string username) {
+            var account = Configuration.Instance.TwitchAccounts?.FirstOrDefault(a => username.Equals(a.Username, StringComparison.InvariantCultureIgnoreCase));
+            if (null == account || string.IsNullOrWhiteSpace(account.Username) || string.IsNullOrWhiteSpace(account.ClientId) || string.IsNullOrWhiteSpace(account.ClientSecret) || string.IsNullOrWhiteSpace(account.ApiOAuth))
+                return null;
+
+            var api = new TwitchAPI();
+            api.Settings.ClientId = Encoding.UTF8.GetString(Convert.FromBase64String(account.ClientId));
+            api.Settings.Secret = Encoding.UTF8.GetString(Convert.FromBase64String(account.ClientSecret));
+            api.Settings.Scopes = new List<AuthScopes>(new[] { AuthScopes.Helix_Channel_Manage_Redemptions });
+
+            if (account.ApiOAuthExpires <= DateTime.UtcNow && null != account.ApiOAuthRefresh) {
+                try {
+                    var refreshToken = Encoding.UTF8.GetString(Convert.FromBase64String(account.ApiOAuthRefresh));
+                    var task = api.V5.Auth.RefreshAuthTokenAsync(refreshToken, api.Settings.Secret);
+                    Task.WaitAll(task);
+                    var response = task.Result;
+                    account.ApiOAuth = Convert.ToBase64String(Encoding.UTF8.GetBytes(response.AccessToken));
+                    account.ApiOAuthRefresh = Convert.ToBase64String(Encoding.UTF8.GetBytes(response.RefreshToken));
+                    account.ApiOAuthExpires = DateTime.UtcNow + new TimeSpan(0, 0, response.ExpiresIn - 300);
+                    Configuration.Instance.WriteConfiguration();
+                } catch (Exception) { }
+            }
+
+            api.Settings.AccessToken = Encoding.UTF8.GetString(Convert.FromBase64String(account.ApiOAuth));
+            return api;
+        }
+
+        /// <summary>
         ///     Retrieves all users from all currently connected chats.
         /// </summary>
         /// <returns>A collection of currently existing users in chat.</returns>
@@ -183,10 +216,6 @@
             var password = null != account.ChatOAuth ? Encoding.UTF8.GetString(Convert.FromBase64String(account.ChatOAuth)) : null;
             var credentials = new ConnectionCredentials(account.Username, password ?? "");
             var clientOptions = new ClientOptions { MessagesAllowedInPeriod = 750, ThrottlingPeriod = TimeSpan.FromSeconds(30) };
-            conn.Api = new TwitchAPI();
-            conn.Api.Settings.ClientId = null != account.ClientId ? Encoding.UTF8.GetString(Convert.FromBase64String(account.ClientId)) : null;
-            conn.Api.Settings.Secret = null != account.ClientSecret ? Encoding.UTF8.GetString(Convert.FromBase64String(account.ClientSecret)) : null;
-            conn.Api.Settings.AccessToken = null != account.ApiOAuth ? Encoding.UTF8.GetString(Convert.FromBase64String(account.ApiOAuth)) : null;
 
             WebSocketClient customClient = new(clientOptions);
             var twitchClient = new TwitchClient(customClient);
@@ -205,11 +234,15 @@
         /// <param name="conn">The connection to get the user list from the chat of.</param>
         /// <returns>A collection of currently existing users in chat.</returns>
         private async Task<ICollection<TwitchChatter>?> GetUsersFromChat(TwitchConnection? conn) {
-            if (null == conn?.Channel || null == conn.Api)
+            if (null == conn?.Channel || null == conn.Account?.Username)
+                return default;
+
+            var api = this.GetTwitchClientApi(conn.Account.Username);
+            if (null == api)
                 return default;
 
             try {
-                var resp = await conn.Api.Undocumented.GetChattersAsync(conn.Channel);
+                var resp = await api.Undocumented.GetChattersAsync(conn.Channel);
                 return resp.Select(c => new TwitchChatter(conn.Channel, c.Username)).ToArray();
             } catch (Exception) {
                 return null;
@@ -282,11 +315,6 @@
             ///     Gets or sets the callbacks used to administrate the twitch chat.
             /// </summary>
             public Func<TwitchClient, OnMessageReceivedArgs, bool>? AdminCallbacks { get; set; }
-
-            /// <summary>
-            ///     Gets or sets the reference to the twitch API.
-            /// </summary>
-            public TwitchAPI? Api { get; set; }
 
             /// <summary>
             ///     Gets or sets the channel connected to.

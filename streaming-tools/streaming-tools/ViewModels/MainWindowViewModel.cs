@@ -21,6 +21,11 @@ namespace streaming_tools.ViewModels {
         public AccountsViewModel AccountsViewModel => new();
 
         /// <summary>
+        ///     The view responsible for managing the sounds played for channel point redemptions.
+        /// </summary>
+        public ChannelPointViewModel ChannelPointViewModel => new();
+
+        /// <summary>
         ///     The view responsible for managing the keystroke command.
         /// </summary>
         public KeystrokeCommandViewModel KeystrokeCommandViewModel => new();

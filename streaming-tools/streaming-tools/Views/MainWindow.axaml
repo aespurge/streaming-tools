@@ -50,6 +50,7 @@
                 <views:Layouts DataContext="{Binding LayoutViewModel}" />
             </Border>
             <views:KeystrokeCommandView DataContext="{Binding KeystrokeCommandViewModel}" />
+            <views:ChannelPointView DataContext="{Binding ChannelPointViewModel}" />
         </StackPanel>
         <CheckBox IsChecked="{Binding PathOfExileEnabled}">Path of Exile Integration</CheckBox>
         <views:TwitchChatConfigsView DataContext="{Binding TwitchChatConfigs}" />

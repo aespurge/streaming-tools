@@ -25,6 +25,7 @@
     <AvaloniaResource Include="Assets\**" />
   </ItemGroup>
   <ItemGroup>
+    <None Remove="Assets\4593523901540882618-128.png" />
     <None Remove="Assets\add.png" />
     <None Remove="Assets\delete.png" />
     <None Remove="Assets\icon.ico" />

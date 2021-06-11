@@ -30,6 +30,16 @@
         private string? apiOAuth;
 
         /// <summary>
+        ///     The date time at which the OAuth token expires.
+        /// </summary>
+        private DateTime? apiTokenExpires;
+
+        /// <summary>
+        ///     The refresh token used to refresh the <see cref="ApiOAuth" />.
+        /// </summary>
+        private string? apiTokenRefresh;
+
+        /// <summary>
         ///     The OAuth token for chat of the currently added/edited twitch account.
         /// </summary>
         private string? chatOAuth;
@@ -48,6 +58,11 @@
         ///     The "code" for getting a api OAuth token of the currently added/edited twitch account.
         /// </summary>
         private string? code;
+
+        /// <summary>
+        ///     A value indicating whether the account is the account the user uses to stream.
+        /// </summary>
+        private bool isUsersStreamingAccount;
 
         /// <summary>
         ///     The redirect uri for the registered client id/secret.
@@ -127,6 +142,14 @@
         }
 
         /// <summary>
+        ///     Gets or sets a value indicating whether the account is the account the user uses to stream.
+        /// </summary>
+        public bool IsUsersStreamingAccount {
+            get => this.isUsersStreamingAccount;
+            set => this.RaiseAndSetIfChanged(ref this.isUsersStreamingAccount, value);
+        }
+
+        /// <summary>
         ///     Gets or sets the redirect uri for the registered client id/secret.
         /// </summary>
         public string? RedirectUrl {
@@ -182,7 +205,12 @@
 
             var responseString = await response.Content.ReadAsStringAsync();
             var json = JsonConvert.DeserializeObject<TwitchTokenResponseJson>(responseString);
-            this.ApiOAuth = json?.access_token;
+            if (null == json)
+                return;
+
+            this.ApiOAuth = json.access_token;
+            this.apiTokenRefresh = json.refresh_token;
+            this.apiTokenExpires = DateTime.UtcNow + new TimeSpan(0, 0, json.expires_in - 300);
         }
 
         /// <summary>
@@ -214,7 +242,7 @@
         ///     Saves the current twitch account details.
         /// </summary>
         public void SaveAccount() {
-            if (string.IsNullOrWhiteSpace(this.Username) || string.IsNullOrWhiteSpace(this.ClientId) || string.IsNullOrWhiteSpace(this.ClientSecret) || string.IsNullOrWhiteSpace(this.Code) || string.IsNullOrWhiteSpace(this.ApiOAuth) || string.IsNullOrWhiteSpace(this.ChatOAuth) || string.IsNullOrWhiteSpace(this.RedirectUrl) || null == this.config.TwitchAccounts)
+            if (string.IsNullOrWhiteSpace(this.Username) || string.IsNullOrWhiteSpace(this.ClientId) || string.IsNullOrWhiteSpace(this.ClientSecret) || string.IsNullOrWhiteSpace(this.Code) || string.IsNullOrWhiteSpace(this.ApiOAuth) || string.IsNullOrWhiteSpace(this.ChatOAuth) || string.IsNullOrWhiteSpace(this.RedirectUrl) || null == this.config.TwitchAccounts || null == this.apiTokenRefresh)
                 return;
 
             var existingAccount = this.config.GetTwitchAccount(this.Username);
@@ -233,6 +261,9 @@
             existingAccount.Code = Convert.ToBase64String(Encoding.UTF8.GetBytes(this.Code));
             existingAccount.ApiOAuth = Convert.ToBase64String(Encoding.UTF8.GetBytes(this.ApiOAuth));
             existingAccount.ChatOAuth = Convert.ToBase64String(Encoding.UTF8.GetBytes(this.ChatOAuth));
+            existingAccount.IsUsersStreamingAccount = this.IsUsersStreamingAccount;
+            existingAccount.ApiOAuthRefresh = Convert.ToBase64String(Encoding.UTF8.GetBytes(this.apiTokenRefresh));
+            existingAccount.ApiOAuthExpires = this.apiTokenExpires;
             this.config.WriteConfiguration();
 
             if (isNew)
@@ -252,6 +283,9 @@
             this.ClientSecret = "";
             this.RedirectUrl = "";
             this.Code = "";
+            this.apiTokenExpires = DateTime.MinValue;
+            this.apiTokenRefresh = "";
+            this.IsUsersStreamingAccount = false;
         }
 
         /// <summary>
@@ -284,6 +318,9 @@
             this.Code = null != existingAccount.Code ? Encoding.UTF8.GetString(Convert.FromBase64String(existingAccount.Code)) : "";
             this.ApiOAuth = null != existingAccount.ApiOAuth ? Encoding.UTF8.GetString(Convert.FromBase64String(existingAccount.ApiOAuth)) : "";
             this.ChatOAuth = null != existingAccount.ChatOAuth ? Encoding.UTF8.GetString(Convert.FromBase64String(existingAccount.ChatOAuth)) : "";
+            this.IsUsersStreamingAccount = existingAccount.IsUsersStreamingAccount;
+            this.apiTokenExpires = existingAccount.ApiOAuthExpires;
+            this.apiTokenRefresh = null != existingAccount.ApiOAuthRefresh ? Encoding.UTF8.GetString(Convert.FromBase64String(existingAccount.ApiOAuthRefresh)) : "";
         }
     }
 }

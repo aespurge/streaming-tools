@@ -1,6 +1,8 @@
 ﻿namespace streaming_tools {
     using System.Collections.Generic;
 
+    using Avalonia.Controls;
+
     using TwitchLib.Api.Core.Enums;
 
     /// <summary>
@@ -26,6 +28,12 @@
         ///     The list of authorization scopes we need for the application.
         /// </summary>
         public static readonly IEnumerable<AuthScopes> TWITCH_AUTH_SCOPES = new[] { AuthScopes.Helix_Channel_Read_Redemptions };
+
+        /// <summary>
+        ///     The reference to the main window of the application.
+        /// </summary>
+        /// <remarks>This is a hack for modal dialogs.</remarks>
+        public static Window? MAIN_WINDOW;
 
 #if DEBUG
         /// <summary>
