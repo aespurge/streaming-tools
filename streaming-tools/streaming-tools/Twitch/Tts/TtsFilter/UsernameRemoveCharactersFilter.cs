@@ -26,7 +26,10 @@
         /// <param name="currentMessage">The message from twitch chat.</param>
         /// <returns>The new TTS message and username.</returns>
         public Tuple<string, string> Filter(OnMessageReceivedArgs twitchInfo, string username, string currentMessage) {
-            foreach (Capture usernameMatch in this.regexMessageUsernames.Matches(currentMessage)) {
+            foreach (Capture? usernameMatch in this.regexMessageUsernames.Matches(currentMessage)) {
+                if (null == usernameMatch)
+                    continue;
+
                 currentMessage = currentMessage.Replace(usernameMatch.Value, this.regexUsername.Replace(usernameMatch.Value, " "));
             }
 

@@ -1,10 +1,32 @@
 namespace streaming_tools.ViewModels {
+    using ReactiveUI;
+
     using streaming_tools.GameIntegrations;
 
     /// <summary>
     ///     The business logic behind the main UI.
     /// </summary>
     public class MainWindowViewModel : ViewModelBase {
+        /// <summary>
+        ///     The view responsible for laying out windows on the OS.
+        /// </summary>
+        public LayoutsViewModel LayoutViewModel;
+
+        /// <summary>
+        /// The view responsible for specifying twitch accounts.
+        /// </summary>
+        private AccountsViewModel accountsViewModel;
+
+        /// <summary>
+        /// The view responsible for managing the sounds played for channel point redemptions.
+        /// </summary>
+        private ChannelPointViewModel channelPointViewModel;
+
+        /// <summary>
+        /// The view responsible for managing the keystroke command.
+        /// </summary>
+        private KeystrokeCommandViewModel keystrokeCommandViewModel;
+
         /// <summary>
         ///     A flag indicating whether the path of exile integration is turned on.
         /// </summary>
@@ -16,24 +38,64 @@ namespace streaming_tools.ViewModels {
         private PathOfExileIntegration? poe;
 
         /// <summary>
-        ///     The view responsible for specifying twitch accounts.
+        ///  The view responsible for pausing TTS when the microphone hears things.
         /// </summary>
-        public AccountsViewModel AccountsViewModel => new();
+        private TtsPauseConfigViewModel ttsPauseConfigViewModel;
 
         /// <summary>
-        ///     The view responsible for managing the sounds played for channel point redemptions.
+        /// The view model for the phonetic words list.
         /// </summary>
-        public ChannelPointViewModel ChannelPointViewModel => new();
+        private TtsPhoneticWordsViewModel ttsPhoneticWordsViewModel;
 
         /// <summary>
-        ///     The view responsible for managing the keystroke command.
+        /// The view responsible for managing the list of usernames to skip.
         /// </summary>
-        public KeystrokeCommandViewModel KeystrokeCommandViewModel => new();
+        private TtsSkipUsernamesViewModel ttsSkipUsernamesViewModel;
 
         /// <summary>
-        ///     The view responsible for laying out windows on the OS.
+        /// The view responsible for holding the configurations for each twitch chat connection.
         /// </summary>
-        public LayoutsViewModel LayoutViewModel => new();
+        private TwitchChatConfigsViewModel twitchChatConfigs;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MainWindowViewModel"/> class.
+        /// </summary>
+#pragma warning disable 8618
+        public MainWindowViewModel() {
+#pragma warning restore 8618
+            this.AccountsViewModel = new AccountsViewModel();
+            this.ChannelPointViewModel = new ChannelPointViewModel();
+            this.KeystrokeCommandViewModel = new KeystrokeCommandViewModel();
+            this.LayoutViewModel = new LayoutsViewModel();
+            this.TtsPauseConfigViewModel = new TtsPauseConfigViewModel();
+            this.TtsPhoneticWordsViewModel = new TtsPhoneticWordsViewModel();
+            this.TtsSkipUsernamesViewModel = new TtsSkipUsernamesViewModel();
+            this.TwitchChatConfigs = new TwitchChatConfigsViewModel();
+        }
+
+        /// <summary>
+        ///     Gets or sets the view responsible for specifying twitch accounts.
+        /// </summary>
+        public AccountsViewModel AccountsViewModel {
+            get => this.accountsViewModel;
+            set => this.RaiseAndSetIfChanged(ref this.accountsViewModel, value);
+        }
+
+        /// <summary>
+        ///     Gets or sets the  view responsible for managing the sounds played for channel point redemptions.
+        /// </summary>
+        public ChannelPointViewModel ChannelPointViewModel {
+            get => this.channelPointViewModel;
+            set => this.RaiseAndSetIfChanged(ref this.channelPointViewModel, value);
+        }
+
+        /// <summary>
+        ///     Gets or sets the  view responsible for managing the keystroke command.
+        /// </summary>
+        public KeystrokeCommandViewModel KeystrokeCommandViewModel {
+            get => this.keystrokeCommandViewModel;
+            set => this.RaiseAndSetIfChanged(ref this.keystrokeCommandViewModel, value);
+        }
 
         /// <summary>
         ///     Gets or sets a value indicating whether the path of exile integration is enable.
@@ -53,23 +115,35 @@ namespace streaming_tools.ViewModels {
         }
 
         /// <summary>
-        ///     The view responsible for pausing TTS when the microphone hears things.
+        ///     Gets or sets the  view responsible for pausing TTS when the microphone hears things.
         /// </summary>
-        public TtsPauseConfigViewModel TtsPauseConfigViewModel => new();
+        public TtsPauseConfigViewModel TtsPauseConfigViewModel {
+            get => this.ttsPauseConfigViewModel;
+            set => this.RaiseAndSetIfChanged(ref this.ttsPauseConfigViewModel, value);
+        }
 
         /// <summary>
-        ///     The view model for the phonetic words list.
+        ///     Gets or sets the  view model for the phonetic words list.
         /// </summary>
-        public TtsPhoneticWordsViewModel TtsPhoneticWordsViewModel => new();
+        public TtsPhoneticWordsViewModel TtsPhoneticWordsViewModel {
+            get => this.ttsPhoneticWordsViewModel;
+            set => this.RaiseAndSetIfChanged(ref this.ttsPhoneticWordsViewModel, value);
+        }
 
         /// <summary>
-        ///     The view responsible for managing the list of usernames to skip.
+        ///     Gets or sets the  view responsible for managing the list of usernames to skip.
         /// </summary>
-        public TtsSkipUsernamesViewModel TtsSkipUsernamesViewModel => new();
+        public TtsSkipUsernamesViewModel TtsSkipUsernamesViewModel {
+            get => this.ttsSkipUsernamesViewModel;
+            set => this.RaiseAndSetIfChanged(ref this.ttsSkipUsernamesViewModel, value);
+        }
 
         /// <summary>
-        ///     The view responsible for holding the configurations for each twitch chat connection.
+        ///     Gets or sets the  view responsible for holding the configurations for each twitch chat connection.
         /// </summary>
-        public TwitchChatConfigsViewModel TwitchChatConfigs => new();
+        public TwitchChatConfigsViewModel TwitchChatConfigs {
+            get => this.twitchChatConfigs;
+            set => this.RaiseAndSetIfChanged(ref this.twitchChatConfigs, value);
+        }
     }
 }
