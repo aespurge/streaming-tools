@@ -238,8 +238,11 @@
             WebSocketClient customClient = new(clientOptions);
             var twitchClient = new TwitchClient(customClient);
             twitchClient.Initialize(credentials, channel);
-
+            twitchClient.AutoReListenOnException = true;
             twitchClient.OnMessageReceived += this.TwitchClient_OnMessageReceived;
+            twitchClient.OnBeingHosted += this.TwitchClient_OnBeingHosted;
+            twitchClient.OnRaidNotification += this.TwitchClient_OnRaidNotification;
+
             twitchClient.Connect();
             this.twitchClients[twitchClient] = conn;
 
@@ -268,6 +271,19 @@
         }
 
         /// <summary>
+        ///     Automatically shouts out a channel that hosts us.
+        /// </summary>
+        /// <param name="sender">The twitch client.</param>
+        /// <param name="e">The host information.</param>
+        private void TwitchClient_OnBeingHosted(object? sender, OnBeingHostedArgs e) {
+            var twitchClient = sender as TwitchClient;
+            if (null == twitchClient)
+                return;
+
+            twitchClient.SendMessage(e.BeingHostedNotification.Channel, $"!so {e.BeingHostedNotification.HostedByChannel}");
+        }
+
+        /// <summary>
         ///     The callback invoked when a message is received in twitch chat.
         /// </summary>
         /// <param name="sender">The twitch chat client.</param>
@@ -293,6 +309,19 @@
             }
 
             conn.MessageCallbacks?.Invoke(twitchClient, e);
+        }
+
+        /// <summary>
+        ///     Automatically shouts out a channel that raids us.
+        /// </summary>
+        /// <param name="sender">The twitch client.</param>
+        /// <param name="e">The raid information.</param>
+        private void TwitchClient_OnRaidNotification(object? sender, OnRaidNotificationArgs e) {
+            var twitchClient = sender as TwitchClient;
+            if (null == twitchClient)
+                return;
+
+            twitchClient.SendMessage(e.Channel, $"!so {e.RaidNotification.DisplayName}");
         }
 
         /// <summary>
