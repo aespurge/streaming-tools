@@ -3,7 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:viewModels="clr-namespace:streaming_tools.ViewModels"
-             mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="330"
+             mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="200"
              x:Class="streaming_tools.Views.AccountsView">
     <Design.DataContext>
         <viewModels:AccountsViewModel />
@@ -34,10 +34,6 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
@@ -48,35 +44,19 @@
                 <Label Grid.Row="1" VerticalAlignment="Center">Username:</Label>
                 <TextBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Width="250"
                          Text="{Binding Username, Mode=TwoWay}" />
-                <Label Grid.Row="2" VerticalAlignment="Center">Client ID:</Label>
+                <Label Grid.Row="2" VerticalAlignment="Center">Code:</Label>
                 <TextBox Grid.Row="2" Grid.Column="1" Width="160" PasswordChar="*" HorizontalAlignment="Left"
-                         Text="{Binding ClientId, Mode=TwoWay}" />
-                <Button Grid.Row="2" Grid.Column="2" Command="{Binding LaunchDeveloperWebpage}">Get ID</Button>
-                <Label Grid.Row="3" VerticalAlignment="Center">Client Secret:</Label>
-                <TextBox Grid.Row="3" Grid.Column="1" Width="160" PasswordChar="*" HorizontalAlignment="Left"
-                         Text="{Binding ClientSecret, Mode=TwoWay}" />
-                <Button Grid.Row="3" Grid.Column="2" Command="{Binding LaunchDeveloperWebpage}">Get Secret</Button>
-                <Label Grid.Row="4" VerticalAlignment="Center">Redirect URL:</Label>
-                <TextBox Grid.Row="4" Grid.Column="1" Width="160" HorizontalAlignment="Left"
-                         Text="{Binding RedirectUrl, Mode=TwoWay}" />
-                <Button Grid.Row="4" Grid.Column="2" Command="{Binding LaunchDeveloperWebpage}">Get URL</Button>
-                <Label Grid.Row="5" VerticalAlignment="Center">Code:</Label>
-                <TextBox Grid.Row="5" Grid.Column="1" Width="160" PasswordChar="*" HorizontalAlignment="Left"
                          Text="{Binding Code, Mode=TwoWay}" />
-                <Button Grid.Row="5" Grid.Column="2" Command="{Binding LaunchCodeWebpage}">Get Code</Button>
-                <Label Grid.Row="6" VerticalAlignment="Center">API OAuth:</Label>
-                <TextBox Grid.Row="6" Grid.Column="1" Width="160" PasswordChar="*" HorizontalAlignment="Left"
+                <Button Grid.Row="2" Grid.Column="2" Command="{Binding LaunchCodeWebpage}">Get Code</Button>
+                <Label Grid.Row="3" VerticalAlignment="Center">API OAuth:</Label>
+                <TextBox Grid.Row="3" Grid.Column="1" Width="160" PasswordChar="*" HorizontalAlignment="Left"
                          Text="{Binding ApiOAuth, Mode=TwoWay}" />
-                <Button Grid.Row="6" Grid.Column="2" Command="{Binding LaunchApiOAuthWebpage}">Get Token</Button>
-                <Label Grid.Row="7" VerticalAlignment="Center">Chat OAuth:</Label>
-                <TextBox Grid.Row="7" Grid.Column="1" Width="160" PasswordChar="*" HorizontalAlignment="Left"
-                         Text="{Binding ChatOAuth, Mode=TwoWay}" />
-                <Button Grid.Row="7" Grid.Column="2" Command="{Binding LaunchChatOAuthWebpage}">Get Token</Button>
-                <CheckBox Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="3"
+                <Button Grid.Row="3" Grid.Column="2" Command="{Binding GetApiOAuthToken}">Get Token</Button>
+                <CheckBox Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3"
                           IsChecked="{Binding IsUsersStreamingAccount}">
                     Is Streaming Account
                 </CheckBox>
-                <StackPanel Grid.Row="9" Grid.ColumnSpan="3" Orientation="Horizontal" VerticalAlignment="Top"
+                <StackPanel Grid.Row="5" Grid.ColumnSpan="3" Orientation="Horizontal" VerticalAlignment="Top"
                             HorizontalAlignment="Right">
                     <Button Command="{Binding SaveAccount}">Save</Button>
                     <Button Command="{Binding CancelEditing}">Cancel</Button>

@@ -5,6 +5,8 @@
     using System.Linq;
     using System.Net.Http;
     using System.Text;
+    using System.Threading.Tasks;
+    using System.Timers;
 
     using Newtonsoft.Json;
 
@@ -12,8 +14,6 @@
 
     using streaming_tools.Models;
     using streaming_tools.Views;
-
-    using TwitchLib.Api;
 
     /// <summary>
     ///     Handles updating the list and credentials for twitch accounts.
@@ -23,6 +23,11 @@
         ///     The singleton collection for configuring the application.
         /// </summary>
         private readonly Configuration config;
+
+        /// <summary>
+        ///     The timer that looks for the copied OAuth token on the clipboard.
+        /// </summary>
+        private readonly Timer oauthCodeCheckTimer;
 
         /// <summary>
         ///     The OAuth token for api of the currently added/edited twitch account.
@@ -40,21 +45,6 @@
         private string? apiTokenRefresh;
 
         /// <summary>
-        ///     The OAuth token for chat of the currently added/edited twitch account.
-        /// </summary>
-        private string? chatOAuth;
-
-        /// <summary>
-        ///     The client id associated with the app on the twitch account.
-        /// </summary>
-        private string? clientId;
-
-        /// <summary>
-        ///     The client secret of the currently added/edited twitch account.
-        /// </summary>
-        private string? clientSecret;
-
-        /// <summary>
         ///     The "code" for getting a api OAuth token of the currently added/edited twitch account.
         /// </summary>
         private string? code;
@@ -63,11 +53,6 @@
         ///     A value indicating whether the account is the account the user uses to stream.
         /// </summary>
         private bool isUsersStreamingAccount;
-
-        /// <summary>
-        ///     The redirect uri for the registered client id/secret.
-        /// </summary>
-        private string? redirectUrl;
 
         /// <summary>
         ///     The username of the currently added/edited twitch account.
@@ -79,6 +64,9 @@
         /// </summary>
         public AccountsViewModel() {
             this.Accounts = new ObservableCollection<AccountView>();
+            this.oauthCodeCheckTimer = new Timer(100);
+            this.oauthCodeCheckTimer.AutoReset = false;
+            this.oauthCodeCheckTimer.Elapsed += this.OauthCodeCheckTimer_Elapsed;
 
             // Loop through the list of existing accounts and add them to the UI.
             this.config = Configuration.Instance;
@@ -110,30 +98,6 @@
         }
 
         /// <summary>
-        ///     Gets or sets the OAuth token for chat of the currently added/edited twitch account.
-        /// </summary>
-        public string? ChatOAuth {
-            get => this.chatOAuth;
-            set => this.RaiseAndSetIfChanged(ref this.chatOAuth, value);
-        }
-
-        /// <summary>
-        ///     Gets or sets the client id associated with the app on the twitch account.
-        /// </summary>
-        public string? ClientId {
-            get => this.clientId;
-            set => this.RaiseAndSetIfChanged(ref this.clientId, value);
-        }
-
-        /// <summary>
-        ///     Gets or sets the client secret of the currently added/edited twitch account.
-        /// </summary>
-        public string? ClientSecret {
-            get => this.clientSecret;
-            set => this.RaiseAndSetIfChanged(ref this.clientSecret, value);
-        }
-
-        /// <summary>
         ///     Gets or sets the "code" for getting a api OAuth token of the currently added/edited twitch account.
         /// </summary>
         public string? Code {
@@ -147,14 +111,6 @@
         public bool IsUsersStreamingAccount {
             get => this.isUsersStreamingAccount;
             set => this.RaiseAndSetIfChanged(ref this.isUsersStreamingAccount, value);
-        }
-
-        /// <summary>
-        ///     Gets or sets the redirect uri for the registered client id/secret.
-        /// </summary>
-        public string? RedirectUrl {
-            get => this.redirectUrl;
-            set => this.RaiseAndSetIfChanged(ref this.redirectUrl, value);
         }
 
         /// <summary>
@@ -193,11 +149,15 @@
         }
 
         /// <summary>
-        ///     Launches the twitch OAuth webpage.
+        ///     Gets the OAuth token.
         /// </summary>
-        public async void LaunchApiOAuthWebpage() {
+        public async void GetApiOAuthToken() {
+            this.ApiOAuth = "";
+            if (string.IsNullOrWhiteSpace(this.Code))
+                return;
+
             HttpClient client = new HttpClient();
-            var response = await client.PostAsync($"https://id.twitch.tv/oauth2/token?client_id={this.ClientId}&client_secret={this.ClientSecret}&code={this.Code}&grant_type=authorization_code&redirect_uri={this.RedirectUrl}", new StringContent(""));
+            var response = await client.PostAsync($"{Constants.NULLINSIDE_TWITCH_OAUTH}?code={this.Code}", new StringContent(""));
             if (!response.IsSuccessStatusCode) {
                 this.ApiOAuth = "";
                 return;
@@ -214,35 +174,22 @@
         }
 
         /// <summary>
-        ///     Launches the twitch OAuth webpage.
-        /// </summary>
-        public void LaunchChatOAuthWebpage() {
-            Process.Start(new ProcessStartInfo("cmd", $"/c start {Constants.TWITCH_CHAT_OAUTH_SITE}") { CreateNoWindow = true });
-        }
-
-        /// <summary>
         ///     Launches the webpage to get the "code" from.
         /// </summary>
         public void LaunchCodeWebpage() {
-            var twitchClient = new TwitchAPI();
-            twitchClient.Settings.ClientId = this.ClientId;
-            twitchClient.Settings.Secret = this.ClientSecret;
-            var url = twitchClient.V5.Auth.GetAuthorizationCodeUrl(this.RedirectUrl, Constants.TWITCH_AUTH_SCOPES).Replace("&", "^&");
-            Process.Start(new ProcessStartInfo("cmd", $"/c start {url}") { CreateNoWindow = true });
-        }
+            var url = this.GetCodeUrl();
+            if (null == url)
+                return;
 
-        /// <summary>
-        ///     Launches the twitch developer webpage.
-        /// </summary>
-        public void LaunchDeveloperWebpage() {
-            Process.Start(new ProcessStartInfo("cmd", $"/c start {Constants.TWITCH_DEVELOPER_SITE}") { CreateNoWindow = true });
+            Process.Start(new ProcessStartInfo("cmd", $"/c start {url.Replace("&", "^&")}") { CreateNoWindow = true });
+            this.oauthCodeCheckTimer.Start();
         }
 
         /// <summary>
         ///     Saves the current twitch account details.
         /// </summary>
         public void SaveAccount() {
-            if (string.IsNullOrWhiteSpace(this.Username) || string.IsNullOrWhiteSpace(this.ClientId) || string.IsNullOrWhiteSpace(this.ClientSecret) || string.IsNullOrWhiteSpace(this.Code) || string.IsNullOrWhiteSpace(this.ApiOAuth) || string.IsNullOrWhiteSpace(this.ChatOAuth) || string.IsNullOrWhiteSpace(this.RedirectUrl) || null == this.config.TwitchAccounts || null == this.apiTokenRefresh)
+            if (string.IsNullOrWhiteSpace(this.Username) || string.IsNullOrWhiteSpace(this.ApiOAuth) || null == this.config.TwitchAccounts || null == this.apiTokenRefresh)
                 return;
 
             var existingAccount = this.config.GetTwitchAccount(this.Username);
@@ -255,12 +202,7 @@
 #pragma warning disable 8602
             existingAccount.Username = this.Username;
 #pragma warning restore 8602
-            existingAccount.ClientId = Convert.ToBase64String(Encoding.UTF8.GetBytes(this.ClientId));
-            existingAccount.ClientSecret = Convert.ToBase64String(Encoding.UTF8.GetBytes(this.ClientSecret));
-            existingAccount.RedirectUrl = this.RedirectUrl;
-            existingAccount.Code = Convert.ToBase64String(Encoding.UTF8.GetBytes(this.Code));
             existingAccount.ApiOAuth = Convert.ToBase64String(Encoding.UTF8.GetBytes(this.ApiOAuth));
-            existingAccount.ChatOAuth = Convert.ToBase64String(Encoding.UTF8.GetBytes(this.ChatOAuth));
             existingAccount.IsUsersStreamingAccount = this.IsUsersStreamingAccount;
             existingAccount.ApiOAuthRefresh = Convert.ToBase64String(Encoding.UTF8.GetBytes(this.apiTokenRefresh));
             existingAccount.ApiOAuthExpires = this.apiTokenExpires;
@@ -278,10 +220,6 @@
         private void ClearForm() {
             this.Username = "";
             this.ApiOAuth = "";
-            this.ChatOAuth = "";
-            this.ClientId = "";
-            this.ClientSecret = "";
-            this.RedirectUrl = "";
             this.Code = "";
             this.apiTokenExpires = DateTime.MinValue;
             this.apiTokenRefresh = "";
@@ -294,7 +232,7 @@
         /// <param name="twitchUsername">The username of the currently added twitch account.</param>
         /// <returns>A new instance of the view model.</returns>
         private AccountViewModel CreateAccountViewModel(string twitchUsername) {
-            return new() { Username = twitchUsername, DeleteAccount = () => this.DeleteAccount(twitchUsername), EditAccount = () => this.EditAccount(twitchUsername) };
+            return new AccountViewModel { Username = twitchUsername, DeleteAccount = () => this.DeleteAccount(twitchUsername), EditAccount = () => this.EditAccount(twitchUsername) };
         }
 
         /// <summary>
@@ -312,15 +250,59 @@
             }
 
             this.Username = existingAccount.Username;
-            this.ClientId = null != existingAccount.ClientId ? Encoding.UTF8.GetString(Convert.FromBase64String(existingAccount.ClientId)) : "";
-            this.ClientSecret = null != existingAccount.ClientSecret ? Encoding.UTF8.GetString(Convert.FromBase64String(existingAccount.ClientSecret)) : "";
-            this.RedirectUrl = existingAccount.RedirectUrl;
-            this.Code = null != existingAccount.Code ? Encoding.UTF8.GetString(Convert.FromBase64String(existingAccount.Code)) : "";
+            this.Code = "";
             this.ApiOAuth = null != existingAccount.ApiOAuth ? Encoding.UTF8.GetString(Convert.FromBase64String(existingAccount.ApiOAuth)) : "";
-            this.ChatOAuth = null != existingAccount.ChatOAuth ? Encoding.UTF8.GetString(Convert.FromBase64String(existingAccount.ChatOAuth)) : "";
             this.IsUsersStreamingAccount = existingAccount.IsUsersStreamingAccount;
             this.apiTokenExpires = existingAccount.ApiOAuthExpires;
             this.apiTokenRefresh = null != existingAccount.ApiOAuthRefresh ? Encoding.UTF8.GetString(Convert.FromBase64String(existingAccount.ApiOAuthRefresh)) : "";
+        }
+
+        /// <summary>
+        ///     Gets the URL to launch in the browser for the user to get the "code" to generate an OAuth token.
+        /// </summary>
+        /// <returns>The url if successful, null otherwise.</returns>
+        private string? GetCodeUrl() {
+            var response = Task.Run(
+                () => {
+                    var setText = Constants.CLIPBOARD.SetTextAsync("");
+                    Task.WaitAll(setText);
+
+                    var client = new HttpClient();
+                    var nullinsideResponse = client.GetAsync(Constants.NULLINSIDE_TWITCH_CODE);
+                    Task.WaitAll(nullinsideResponse);
+                    if (!nullinsideResponse.Result.IsSuccessStatusCode)
+                        return null;
+
+                    var body = nullinsideResponse.Result.Content.ReadAsStringAsync();
+                    Task.WaitAll(body);
+                    if (string.IsNullOrWhiteSpace(body.Result))
+                        return null;
+
+                    var json = JsonConvert.DeserializeObject<NullInsideTwitchCodeResponseJson>(body.Result);
+                    if (null == json)
+                        return null;
+
+                    return json.url;
+                });
+
+            Task.WaitAll(response);
+            return response.Result;
+        }
+
+        /// <summary>
+        ///     Searches the clipboard for the "code" to generate an OAuth token.
+        /// </summary>
+        /// <param name="sender">The timer.</param>
+        /// <param name="e">The event arguments.</param>
+        private void OauthCodeCheckTimer_Elapsed(object sender, ElapsedEventArgs e) {
+            var task = Constants.CLIPBOARD.GetTextAsync();
+            Task.WaitAll(task);
+            if (string.IsNullOrWhiteSpace(task.Result)) {
+                this.oauthCodeCheckTimer.Start();
+                return;
+            }
+
+            this.Code = task.Result;
         }
     }
 }

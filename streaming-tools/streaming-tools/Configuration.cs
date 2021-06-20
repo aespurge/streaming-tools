@@ -253,35 +253,9 @@
         public string? ApiOAuthRefresh { get; set; }
 
         /// <summary>
-        ///     Gets or sets the twitch chat OAuth token.
-        /// </summary>
-        public string? ChatOAuth { get; set; }
-
-        /// <summary>
-        ///     Gets or sets the client id.
-        /// </summary>
-        public string? ClientId { get; set; }
-
-        /// <summary>
-        ///     Gets or sets the client secret.
-        /// </summary>
-        public string? ClientSecret { get; set; }
-
-        /// <summary>
-        ///     Gets or sets the pre-token code.
-        /// </summary>
-        public string? Code { get; set; }
-
-        /// <summary>
         ///     Gets or sets a value indicating whether the account is the account the user uses to stream.
         /// </summary>
         public bool IsUsersStreamingAccount { get; set; }
-
-        /// <summary>
-        ///     Gets or sets the redirect url.
-        /// </summary>
-        /// <remarks>Must match the registered application with twitch.</remarks>
-        public string? RedirectUrl { get; set; }
 
         /// <summary>
         ///     Gets or sets the twitch username.

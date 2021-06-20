@@ -17,7 +17,7 @@
         /// <summary>
         ///     The default struct to return when a monitor isn't found.
         /// </summary>
-        public static readonly PInvokeUtilities.MonitorInfoEx MONITOR_NOT_FOUND = new() { DeviceName = MONITOR_NOT_FOUND_DEVICE_NAME };
+        public static readonly PInvokeUtilities.MonitorInfoEx MONITOR_NOT_FOUND = new PInvokeUtilities.MonitorInfoEx { DeviceName = MONITOR_NOT_FOUND_DEVICE_NAME };
 
         /// <summary>
         ///     Gets a collection representing all monitors on the machine.
@@ -33,7 +33,7 @@
                 User32.EnumDisplayMonitors(
                     IntPtr.Zero,
                     IntPtr.Zero,
-                    (monitor, _, _, _) => {
+                    (monitor, a, b, c) => {
                         var mi = new PInvokeUtilities.MonitorInfoEx();
                         mi.Size = Marshal.SizeOf(mi);
                         var success = PInvokeUtilities.GetMonitorInfo(monitor, ref mi);

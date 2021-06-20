@@ -8,24 +8,24 @@ namespace streaming_tools.ViewModels {
     /// </summary>
     public class MainWindowViewModel : ViewModelBase {
         /// <summary>
-        ///     The view responsible for laying out windows on the OS.
-        /// </summary>
-        public LayoutsViewModel LayoutViewModel;
-
-        /// <summary>
-        /// The view responsible for specifying twitch accounts.
+        ///     The view responsible for specifying twitch accounts.
         /// </summary>
         private AccountsViewModel accountsViewModel;
 
         /// <summary>
-        /// The view responsible for managing the sounds played for channel point redemptions.
+        ///     The view responsible for managing the sounds played for channel point redemptions.
         /// </summary>
         private ChannelPointViewModel channelPointViewModel;
 
         /// <summary>
-        /// The view responsible for managing the keystroke command.
+        ///     The view responsible for managing the keystroke command.
         /// </summary>
         private KeystrokeCommandViewModel keystrokeCommandViewModel;
+
+        /// <summary>
+        ///     The view responsible for laying out windows on the OS.
+        /// </summary>
+        private LayoutsViewModel layoutViewModel;
 
         /// <summary>
         ///     A flag indicating whether the path of exile integration is turned on.
@@ -38,27 +38,27 @@ namespace streaming_tools.ViewModels {
         private PathOfExileIntegration? poe;
 
         /// <summary>
-        ///  The view responsible for pausing TTS when the microphone hears things.
+        ///     The view responsible for pausing TTS when the microphone hears things.
         /// </summary>
         private TtsPauseConfigViewModel ttsPauseConfigViewModel;
 
         /// <summary>
-        /// The view model for the phonetic words list.
+        ///     The view model for the phonetic words list.
         /// </summary>
         private TtsPhoneticWordsViewModel ttsPhoneticWordsViewModel;
 
         /// <summary>
-        /// The view responsible for managing the list of usernames to skip.
+        ///     The view responsible for managing the list of usernames to skip.
         /// </summary>
         private TtsSkipUsernamesViewModel ttsSkipUsernamesViewModel;
 
         /// <summary>
-        /// The view responsible for holding the configurations for each twitch chat connection.
+        ///     The view responsible for holding the configurations for each twitch chat connection.
         /// </summary>
         private TwitchChatConfigsViewModel twitchChatConfigs;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="MainWindowViewModel"/> class.
+        ///     Initializes a new instance of the <see cref="MainWindowViewModel" /> class.
         /// </summary>
 #pragma warning disable 8618
         public MainWindowViewModel() {
@@ -95,6 +95,14 @@ namespace streaming_tools.ViewModels {
         public KeystrokeCommandViewModel KeystrokeCommandViewModel {
             get => this.keystrokeCommandViewModel;
             set => this.RaiseAndSetIfChanged(ref this.keystrokeCommandViewModel, value);
+        }
+
+        /// <summary>
+        ///     Gets or sets the view responsible for laying out windows on the OS.
+        /// </summary>
+        public LayoutsViewModel LayoutViewModel {
+            get => this.layoutViewModel;
+            set => this.RaiseAndSetIfChanged(ref this.layoutViewModel, value);
         }
 
         /// <summary>

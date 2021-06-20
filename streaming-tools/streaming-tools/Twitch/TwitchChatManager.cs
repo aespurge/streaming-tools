@@ -2,8 +2,13 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Net.Http;
     using System.Text;
     using System.Threading.Tasks;
+
+    using Newtonsoft.Json;
+
+    using streaming_tools.Models;
 
     using TwitchLib.Api;
     using TwitchLib.Api.Core.Enums;
@@ -106,23 +111,36 @@
         /// <returns>The twitch client if a connection exists, null otherwise.</returns>
         public TwitchAPI? GetTwitchClientApi(string username) {
             var account = Configuration.Instance.TwitchAccounts?.FirstOrDefault(a => username.Equals(a.Username, StringComparison.InvariantCultureIgnoreCase));
-            if (null == account || string.IsNullOrWhiteSpace(account.Username) || string.IsNullOrWhiteSpace(account.ClientId) || string.IsNullOrWhiteSpace(account.ClientSecret) || string.IsNullOrWhiteSpace(account.ApiOAuth))
+            if (null == account || string.IsNullOrWhiteSpace(account.Username) || string.IsNullOrWhiteSpace(account.ApiOAuth))
                 return null;
 
             var api = new TwitchAPI();
-            api.Settings.ClientId = Encoding.UTF8.GetString(Convert.FromBase64String(account.ClientId));
-            api.Settings.Secret = Encoding.UTF8.GetString(Convert.FromBase64String(account.ClientSecret));
-            api.Settings.Scopes = new List<AuthScopes>(new[] { AuthScopes.Helix_Channel_Manage_Redemptions });
+            api.Settings.ClientId = Constants.NULLINSIDE_CLIENT_ID;
+            api.Settings.Scopes = new List<AuthScopes>(Constants.TWITCH_AUTH_SCOPES);
 
             if (account.ApiOAuthExpires <= DateTime.UtcNow && null != account.ApiOAuthRefresh) {
                 try {
                     var refreshToken = Encoding.UTF8.GetString(Convert.FromBase64String(account.ApiOAuthRefresh));
-                    var task = api.V5.Auth.RefreshAuthTokenAsync(refreshToken, api.Settings.Secret);
+                    var task = Task.Run(
+                        () => {
+                            var client = new HttpClient();
+                            var nullinsideResponse = client.PostAsync($"{Constants.NULLINSIDE_TWITCH_REFRESH}?refresh_token={refreshToken}", new StringContent(""));
+                            Task.WaitAll(nullinsideResponse);
+                            if (!nullinsideResponse.IsCompletedSuccessfully || !nullinsideResponse.Result.IsSuccessStatusCode)
+                                return null;
+
+                            var responseString = nullinsideResponse.Result.Content.ReadAsStringAsync();
+                            Task.WaitAll(responseString);
+                            return JsonConvert.DeserializeObject<TwitchTokenResponseJson>(responseString.Result);
+                        });
                     Task.WaitAll(task);
                     var response = task.Result;
-                    account.ApiOAuth = Convert.ToBase64String(Encoding.UTF8.GetBytes(response.AccessToken));
-                    account.ApiOAuthRefresh = Convert.ToBase64String(Encoding.UTF8.GetBytes(response.RefreshToken));
-                    account.ApiOAuthExpires = DateTime.UtcNow + new TimeSpan(0, 0, response.ExpiresIn - 300);
+                    if (null == response)
+                        return api;
+
+                    account.ApiOAuth = Convert.ToBase64String(Encoding.UTF8.GetBytes(response.access_token));
+                    account.ApiOAuthRefresh = Convert.ToBase64String(Encoding.UTF8.GetBytes(response.refresh_token));
+                    account.ApiOAuthExpires = DateTime.UtcNow + new TimeSpan(0, 0, response.expires_in - 300);
                     Configuration.Instance.WriteConfiguration();
                 } catch (Exception) { }
             }
@@ -213,7 +231,7 @@
 
             var conn = new TwitchConnection { Account = account, Channel = channel };
 
-            var password = null != account.ChatOAuth ? Encoding.UTF8.GetString(Convert.FromBase64String(account.ChatOAuth)) : null;
+            var password = null != account.ApiOAuth ? Encoding.UTF8.GetString(Convert.FromBase64String(account.ApiOAuth)) : null;
             var credentials = new ConnectionCredentials(account.Username, password ?? "");
             var clientOptions = new ClientOptions { MessagesAllowedInPeriod = 750, ThrottlingPeriod = TimeSpan.FromSeconds(30) };
 

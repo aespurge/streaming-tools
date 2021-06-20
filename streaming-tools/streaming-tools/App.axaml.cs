@@ -15,6 +15,7 @@ namespace streaming_tools {
         /// </summary>
         public override void Initialize() {
             AvaloniaXamlLoader.Load(this);
+            Constants.CLIPBOARD = this.Clipboard;
         }
 
         /// <summary>
