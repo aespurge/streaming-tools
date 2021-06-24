@@ -50,7 +50,7 @@
         ///     The reference to the clipboard API.
         /// </summary>
         /// <remarks>This is a hack because it's hard to get to.</remarks>
-        public static IClipboard CLIPBOARD;
+        public static IClipboard? CLIPBOARD;
 
 #if DEBUG
         /// <summary>
