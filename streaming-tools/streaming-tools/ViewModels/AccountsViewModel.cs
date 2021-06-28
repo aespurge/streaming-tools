@@ -264,7 +264,10 @@
         private string? GetCodeUrl() {
             var response = Task.Run(
                 () => {
-                    var setText = Constants.CLIPBOARD.SetTextAsync("");
+                    var setText = Constants.CLIPBOARD?.SetTextAsync("");
+                    if (null == setText)
+                        return null;
+
                     Task.WaitAll(setText);
 
                     var client = new HttpClient();
@@ -295,7 +298,10 @@
         /// <param name="sender">The timer.</param>
         /// <param name="e">The event arguments.</param>
         private void OauthCodeCheckTimer_Elapsed(object sender, ElapsedEventArgs e) {
-            var task = Constants.CLIPBOARD.GetTextAsync();
+            var task = Constants.CLIPBOARD?.GetTextAsync();
+            if (null == task)
+                return;
+
             Task.WaitAll(task);
             if (string.IsNullOrWhiteSpace(task.Result)) {
                 this.oauthCodeCheckTimer.Start();

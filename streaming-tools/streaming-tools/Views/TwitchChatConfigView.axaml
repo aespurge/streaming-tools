@@ -16,6 +16,12 @@
     </UserControl.Resources>
 
     <StackPanel Orientation="Horizontal">
+        <Image Source="/Assets/connected.png" IsVisible="{Binding IsConnected}"
+               Width="25" Height="25"
+               VerticalAlignment="Top" Margin="0,4,5,0" />
+        <Image Source="/Assets/disconnected.png" IsVisible="{Binding !IsConnected}"
+               Width="25" Height="25"
+               VerticalAlignment="Top" Margin="0,4,5,0" />
         <TextBox VerticalAlignment="Top"
                  Width="150"
                  Height="20"

@@ -79,6 +79,11 @@
         public ObservableCollection<ChannelPointSoundRedemption>? ChannelPointSoundRedemptions { get; set; }
 
         /// <summary>
+        ///     Gets or sets the master volume to scale all channel point redemption sounds at.
+        /// </summary>
+        public uint? ChannelPointSoundRedemptionsMasterVolume { get; set; }
+
+        /// <summary>
         ///     Gets or sets the command to execute on keystroke.
         /// </summary>
         public KeystokeCommand? KeystokeCommand {
@@ -185,6 +190,9 @@
 
             if (null == config.ChannelPointSoundRedemptions)
                 config.ChannelPointSoundRedemptions = new ObservableCollection<ChannelPointSoundRedemption>();
+
+            if (null == config.ChannelPointSoundRedemptionsMasterVolume)
+                config.ChannelPointSoundRedemptionsMasterVolume = 100;
 
             return config;
         }

@@ -28,6 +28,11 @@
         private ObservableCollection<ChannelPointSoundWrapper> channelPointSounds;
 
         /// <summary>
+        ///     The master volume to scale all channel point sounds at.
+        /// </summary>
+        private uint masterVolume;
+
+        /// <summary>
         ///     The output device to send audio to.
         /// </summary>
         private string? outputDevice;
@@ -43,6 +48,7 @@
         public ChannelPointViewModel() {
             this.channelPointSounds = new ObservableCollection<ChannelPointSoundWrapper>();
             this.OutputDevice = Configuration.Instance.ChannelPointSoundRedemptionOutputChannel;
+            this.MasterVolume = Configuration.Instance.ChannelPointSoundRedemptionsMasterVolume ?? 50;
 
             // Create the list of Output devices.
             var outputDevices = NAudioUtilities.GetTotalOutputDevices();
@@ -59,6 +65,14 @@
         public ObservableCollection<ChannelPointSoundWrapper> ChannelPointSounds {
             get => this.channelPointSounds;
             set => this.RaiseAndSetIfChanged(ref this.channelPointSounds, value);
+        }
+
+        /// <summary>
+        ///     Gets or sets the master volume to scale all channel point sounds at.
+        /// </summary>
+        public uint MasterVolume {
+            get => this.masterVolume;
+            set => this.RaiseAndSetIfChanged(ref this.masterVolume, value);
         }
 
         /// <summary>
@@ -154,7 +168,14 @@
             if (null == reward || string.IsNullOrWhiteSpace(reward.Filename) || !File.Exists(reward.Filename))
                 return;
 
-            GlobalSoundManager.Instance.QueueSound(reward.Filename, this.OutputDevice, reward.Volume ?? 100);
+            double volume = reward.Volume ?? 100;
+            if (null != Configuration.Instance.ChannelPointSoundRedemptionsMasterVolume && 0 != Configuration.Instance.ChannelPointSoundRedemptionsMasterVolume.Value)
+                volume *= Configuration.Instance.ChannelPointSoundRedemptionsMasterVolume.Value / 100.0;
+
+            if (volume < 0)
+                volume = 0;
+
+            GlobalSoundManager.Instance.QueueSound(reward.Filename, this.OutputDevice, (int)volume);
         }
 
         /// <summary>
@@ -165,6 +186,9 @@
         private void PropertyChangedHandler(object? sender, PropertyChangedEventArgs e) {
             if (nameof(this.OutputDevice).Equals(e.PropertyName, StringComparison.InvariantCultureIgnoreCase)) {
                 Configuration.Instance.ChannelPointSoundRedemptionOutputChannel = this.OutputDevice;
+                Configuration.Instance.WriteConfiguration();
+            } else if (nameof(this.MasterVolume).Equals(e.PropertyName, StringComparison.InvariantCultureIgnoreCase)) {
+                Configuration.Instance.ChannelPointSoundRedemptionsMasterVolume = this.MasterVolume;
                 Configuration.Instance.WriteConfiguration();
             }
         }
@@ -257,7 +281,14 @@
                 if (string.IsNullOrWhiteSpace(this.Filename) || !File.Exists(this.Filename) || string.IsNullOrWhiteSpace(this.parent.OutputDevice))
                     return;
 
-                GlobalSoundManager.Instance.QueueSound(this.Filename, this.parent.OutputDevice, this.Volume);
+                double volume = this.Volume;
+                if (null != Configuration.Instance.ChannelPointSoundRedemptionsMasterVolume && 0 != Configuration.Instance.ChannelPointSoundRedemptionsMasterVolume.Value)
+                    volume *= Configuration.Instance.ChannelPointSoundRedemptionsMasterVolume.Value / 100.0;
+
+                if (volume < 0)
+                    volume = 0;
+
+                GlobalSoundManager.Instance.QueueSound(this.Filename, this.parent.OutputDevice, (int)volume);
             }
 
             /// <summary>

@@ -4,11 +4,13 @@
     using System.ComponentModel;
     using System.Linq;
     using System.Speech.Synthesis;
+    using System.Timers;
 
     using DynamicData;
 
     using ReactiveUI;
 
+    using streaming_tools.Twitch;
     using streaming_tools.Twitch.Admin;
     using streaming_tools.Twitch.Tts;
     using streaming_tools.Utilities;
@@ -17,6 +19,11 @@
     ///     The view responsible for a single entry in the twitch chat configuration list.
     /// </summary>
     public class TwitchChatConfigViewModel : ViewModelBase, IDisposable {
+        /// <summary>
+        ///     Check if a chat is currently connected.
+        /// </summary>
+        private readonly Timer isConnectedTimer;
+
         /// <summary>
         ///     The twitch chat administration singleton for registering for twitch chat callbacks.
         /// </summary>
@@ -31,6 +38,11 @@
         ///     The twitch chat configuration object from the persistent configuration.
         /// </summary>
         private TwitchChatConfiguration? chatConfig;
+
+        /// <summary>
+        ///     A value indicating if a chat is connected.
+        /// </summary>
+        private bool isConnected;
 
         /// <summary>
         ///     The output device to send TTS to.
@@ -82,6 +94,9 @@
         /// </summary>
         public TwitchChatConfigViewModel() {
             this.Config = Configuration.Instance;
+            this.isConnectedTimer = new Timer(500);
+            this.isConnectedTimer.AutoReset = true;
+            this.isConnectedTimer.Elapsed += this.IsConnectedTimer_OnElapsed;
 
             // Create the list of TTS voices.
             var speech = new SpeechSynthesizer();
@@ -95,6 +110,7 @@
             this.OutputDevices.AddRange(Enumerable.Range(-1, outputDevices + 1).Select(n => NAudioUtilities.GetOutputDevice(n).ProductName));
 
             this.PropertyChanged += this.OnPropertyChanged;
+            this.isConnectedTimer.Start();
         }
 
         /// <summary>
@@ -134,6 +150,14 @@
         ///     Gets or sets a delegate for deleting this configuration object when the UI is clicked.
         /// </summary>
         public Action? DeleteConfig { get; set; }
+
+        /// <summary>
+        ///     Gets or sets a value indicating whether a chat is connected.
+        /// </summary>
+        public bool IsConnected {
+            get => this.isConnected;
+            set => this.RaiseAndSetIfChanged(ref this.isConnected, value);
+        }
 
         /// <summary>
         ///     Gets or sets the output device to send audio to.
@@ -254,6 +278,8 @@
             this.tts?.Dispose();
             this.tts = null;
             this.PropertyChanged -= this.OnPropertyChanged;
+            this.isConnectedTimer.Stop();
+            this.isConnectedTimer.Dispose();
         }
 
         /// <summary>
@@ -292,6 +318,19 @@
             config.TtsVolume = this.TtsVolume;
 
             this.Config.WriteConfiguration();
+        }
+
+        /// <summary>
+        ///     Checks if the twitch chat associated with this configuration is connected.
+        /// </summary>
+        /// <param name="sender">The timer.</param>
+        /// <param name="e">The event arguments.</param>
+        private void IsConnectedTimer_OnElapsed(object sender, ElapsedEventArgs e) {
+            if (string.IsNullOrWhiteSpace(this.chatConfig?.AccountUsername) || string.IsNullOrWhiteSpace(this.chatConfig.TwitchChannel))
+                return;
+
+            var manager = TwitchChatManager.Instance;
+            this.IsConnected = manager.TwitchChannelIsConnected(this.chatConfig.AccountUsername, this.chatConfig.TwitchChannel);
         }
 
         /// <summary>

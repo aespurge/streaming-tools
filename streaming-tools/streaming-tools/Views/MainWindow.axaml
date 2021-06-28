@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         d:DesignWidth="1300" d:DesignHeight="590"
         Width="1300" Height="590"
-        MinWidth="1300" MinHeight="590"
+
         x:Class="streaming_tools.Views.MainWindow"
         Icon="/Assets/icon.ico"
         Title="notification_app">
@@ -25,7 +25,7 @@
         <viewModels:MainWindowViewModel />
     </Design.DataContext>
 
-    <StackPanel Margin="10">
+    <DockPanel LastChildFill="True">
         <TabControl TabStripPlacement="Left">
             <TabItem Header="Twitch ">
                 <views:TwitchChatConfigsView DataContext="{Binding TwitchChatConfigs}" />
@@ -50,15 +50,41 @@
                 </StackPanel>
             </TabItem>
             <TabItem Header="Twitch Streaming">
-                <StackPanel>
-                    <views:KeystrokeCommandView DataContext="{Binding KeystrokeCommandViewModel}" />
-                    <views:ChannelPointView DataContext="{Binding ChannelPointViewModel}" />
-                </StackPanel>
+                <DockPanel LastChildFill="True">
+                    <TextBlock DockPanel.Dock="Top" HorizontalAlignment="Center"
+                               FontWeight="Bold"
+                               FontSize="16"
+                               Margin="0,0,0,5">
+                        Hotkey Commands
+                    </TextBlock>
+                    <Border DockPanel.Dock="Top" BorderBrush="black"
+                            BorderThickness="1"
+                            CornerRadius="3"
+                            Padding="4"
+                            HorizontalAlignment="Stretch"
+                            Margin="0,0,2,0">
+                        <views:KeystrokeCommandView DataContext="{Binding KeystrokeCommandViewModel}" />
+                    </Border>
+                    <TextBlock DockPanel.Dock="Top" HorizontalAlignment="Center"
+                               FontWeight="Bold"
+                               FontSize="16"
+                               Margin="0,10,0,5">
+                        Channel Point Sounds
+                    </TextBlock>
+                    <Border DockPanel.Dock="Top" BorderBrush="black"
+                            BorderThickness="1"
+                            CornerRadius="3"
+                            Padding="4"
+                            HorizontalAlignment="Stretch"
+                            Margin="0,0,2,0">
+                        <views:ChannelPointView DataContext="{Binding ChannelPointViewModel}" />
+                    </Border>
+                </DockPanel>
             </TabItem>
             <TabItem Header="Layouts">
                 <views:Layouts DataContext="{Binding LayoutViewModel}" />
             </TabItem>
         </TabControl>
-        <CheckBox IsChecked="{Binding PathOfExileEnabled}">Path of Exile Integration</CheckBox>
-    </StackPanel>
+    </DockPanel>
+    <!--<CheckBox IsChecked="{Binding PathOfExileEnabled}">Path of Exile Integration</CheckBox>-->
 </Window>
