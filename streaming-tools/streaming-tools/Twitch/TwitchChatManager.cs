@@ -313,7 +313,7 @@
 
             try {
                 var resp = await api.Undocumented.GetChattersAsync(channel);
-                return resp.Select(c => new TwitchChatter(channel, username)).ToArray();
+                return resp.Select(c => new TwitchChatter(channel, c.Username)).ToArray();
             } catch (Exception) {
                 return null;
             }
