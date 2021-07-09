@@ -11,7 +11,7 @@
         /// <summary>
         ///     Matches on ! commands in chat.
         /// </summary>
-        private readonly Regex commandRegex = new(@"[!]{1}[\S]+", RegexOptions.Compiled | RegexOptions.CultureInvariant);
+        private readonly Regex commandRegex = new Regex(@"[!]{1}[\S]+", RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
         /// <summary>
         ///     The commands to always speak anyway.

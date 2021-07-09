@@ -164,7 +164,7 @@
             try {
                 if (File.Exists(Configuration.CONFIG_FILENAME)) {
                     JsonSerializer serializer = new();
-                    using (StreamReader sr = new(Configuration.CONFIG_FILENAME))
+                    using (StreamReader sr = new StreamReader(Configuration.CONFIG_FILENAME))
                     using (JsonReader jr = new JsonTextReader(sr)) {
                         config = serializer.Deserialize<Configuration>(jr);
                     }
@@ -231,7 +231,7 @@
                 }
 
                 JsonSerializer serializer = new();
-                using (StreamWriter sr = new(Configuration.CONFIG_FILENAME))
+                using (StreamWriter sr = new StreamWriter(Configuration.CONFIG_FILENAME))
                 using (JsonWriter jr = new JsonTextWriter(sr)) {
                     serializer.Serialize(jr, this);
                 }
