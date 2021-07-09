@@ -2,11 +2,9 @@
     using System.Collections.ObjectModel;
     using System.ComponentModel;
     using System.Linq;
-
     using ReactiveUI;
-
-    using streaming_tools.Twitch;
-    using streaming_tools.Utilities;
+    using Twitch;
+    using Utilities;
 
     /// <summary>
     ///     The view responsible for managing the command to execute on keystroke.
@@ -42,10 +40,11 @@
         /// </summary>
         public KeystrokeCommandViewModel() {
             var configs = Configuration.Instance.TwitchChatConfigs?.Where(c => null != c.TwitchChannel).Select(c => null != c.TwitchChannel ? c.TwitchChannel.ToString() : "");
-            if (null != configs && configs.Any())
+            if (null != configs && configs.Any()) {
                 this.twitchChats = new ObservableCollection<string>(configs);
-            else
+            } else {
                 this.twitchChats = new ObservableCollection<string>();
+            }
 
             this.KeyCode = Configuration.Instance.KeystokeCommand?.KeyCode;
             this.Command = Configuration.Instance.KeystokeCommand?.Command;
@@ -102,21 +101,26 @@
             if (this.settingKeyCode) {
                 this.settingKeyCode = false;
                 int inKeyCode;
-                if (int.TryParse(keycode, out inKeyCode))
+                if (int.TryParse(keycode, out inKeyCode)) {
                     this.KeyCode = inKeyCode;
+                }
+
                 return;
             }
 
             int receivedKeycode;
-            if (string.IsNullOrWhiteSpace(this.SelectedTwitchChat) || null == this.KeyCode || string.IsNullOrWhiteSpace(this.Command) || !int.TryParse(keycode, out receivedKeycode) || this.KeyCode != receivedKeycode)
+            if (string.IsNullOrWhiteSpace(this.SelectedTwitchChat) || null == this.KeyCode || string.IsNullOrWhiteSpace(this.Command) || !int.TryParse(keycode, out receivedKeycode) || this.KeyCode != receivedKeycode) {
                 return;
+            }
 
             var client = TwitchChatManager.Instance.GetTwitchChannelClient(this.SelectedTwitchChat);
-            if (null == client)
+            if (null == client) {
                 return;
+            }
 
-            if (!client.IsConnected)
+            if (!client.IsConnected) {
                 client.Reconnect();
+            }
 
             client.SendMessage(this.SelectedTwitchChat, this.Command);
         }
@@ -127,8 +131,9 @@
         /// <param name="sender">This class' object.</param>
         /// <param name="e">The event arguments.</param>
         private void SaveToConfiguration(object? sender, PropertyChangedEventArgs e) {
-            if (null == Configuration.Instance.KeystokeCommand)
+            if (null == Configuration.Instance.KeystokeCommand) {
                 return;
+            }
 
             Configuration.Instance.KeystokeCommand.KeyCode = this.KeyCode;
             Configuration.Instance.KeystokeCommand.Command = this.Command;

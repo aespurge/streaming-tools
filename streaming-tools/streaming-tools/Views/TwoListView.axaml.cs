@@ -2,8 +2,7 @@ namespace streaming_tools.Views {
     using Avalonia.Controls;
     using Avalonia.Interactivity;
     using Avalonia.Markup.Xaml;
-
-    using streaming_tools.ViewModels;
+    using ViewModels;
 
     /// <summary>
     ///     A control that handles maintaining two lists and moving items between them.

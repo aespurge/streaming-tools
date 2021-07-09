@@ -3,12 +3,9 @@
     using System.Collections.Specialized;
     using System.Linq;
     using System.Timers;
-
     using DynamicData;
-
     using ReactiveUI;
-
-    using streaming_tools.Twitch;
+    using Twitch;
 
     /// <summary>
     ///     Handles managing the list of users to skip in TTS.
@@ -40,8 +37,9 @@
             this.twoListViewModel = new TwoListViewModel { RightListBehavior = TwoListViewModel.DoubleClickBehavior.DeleteFromList, SortLeftList = true, SortRightList = true };
 
             if (null != Configuration.Instance.TtsUsernamesToSkip) {
-                foreach (var username in Configuration.Instance.TtsUsernamesToSkip)
+                foreach (var username in Configuration.Instance.TtsUsernamesToSkip) {
                     this.TwoListViewModel.AddRightList(username);
+                }
             }
 
             this.TwoListViewModel.RightList.CollectionChanged += this.TtsSkipped_OnCollectionChanged;
@@ -70,8 +68,9 @@
         public void AddUser() {
             var user = this.UserToAdd;
             this.UserToAdd = null;
-            if (string.IsNullOrWhiteSpace(user) || this.TwoListViewModel.RightList.Contains(user))
+            if (string.IsNullOrWhiteSpace(user) || this.TwoListViewModel.RightList.Contains(user)) {
                 return;
+            }
 
             this.TwoListViewModel.AddRightList(user);
         }
@@ -83,8 +82,9 @@
         /// <param name="e">The event arguments.</param>
         private void TtsSkipped_OnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e) {
             var current = Configuration.Instance.TtsUsernamesToSkip;
-            if (null == current)
+            if (null == current) {
                 return;
+            }
 
             var onlyNew = this.TwoListViewModel.RightList.Except(current).ToArray();
             var onlyOld = current.Except(this.TwoListViewModel.RightList).ToArray();
@@ -105,11 +105,13 @@
             var onlyNew = set.Except(this.TwoListViewModel.LeftList).Except(this.TwoListViewModel.RightList).ToArray();
             var onlyOld = this.TwoListViewModel.LeftList.Except(set).ToArray();
 
-            foreach (var oldItem in onlyOld)
+            foreach (var oldItem in onlyOld) {
                 this.TwoListViewModel.RemoveLeftList(oldItem);
+            }
 
-            foreach (var newItem in onlyNew)
+            foreach (var newItem in onlyNew) {
                 this.TwoListViewModel.AddLeftList(newItem);
+            }
 
             this.userListRefreshTimer.Interval = 5000;
             this.userListRefreshTimer.Start();

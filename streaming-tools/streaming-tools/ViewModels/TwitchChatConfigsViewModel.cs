@@ -1,9 +1,7 @@
 ﻿namespace streaming_tools.ViewModels {
     using System.Collections.ObjectModel;
-
     using ReactiveUI;
-
-    using streaming_tools.Views;
+    using Views;
 
     /// <summary>
     ///     The view responsible for keeping track of the configuration to each twitch chat.
@@ -25,8 +23,9 @@
         public TwitchChatConfigsViewModel() {
             this.config = Configuration.Instance;
 
-            if (null == this.config.TwitchChatConfigs)
+            if (null == this.config.TwitchChatConfigs) {
                 return;
+            }
 
             foreach (var twitchConfig in this.config.TwitchChatConfigs) {
                 this.CreateTwitchChatConfig(twitchConfig);
@@ -53,8 +52,9 @@
         /// </summary>
         /// <param name="twitchConfig">The twitch chat configuration to base the config on.</param>
         public void CreateTwitchChatConfig(TwitchChatConfiguration? twitchConfig) {
-            if (null == this.config.TwitchChatConfigs)
+            if (null == this.config.TwitchChatConfigs) {
                 return;
+            }
 
             if (null == twitchConfig) {
                 twitchConfig = new TwitchChatConfiguration();

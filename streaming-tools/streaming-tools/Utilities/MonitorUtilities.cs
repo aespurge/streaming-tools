@@ -2,7 +2,6 @@
     using System;
     using System.Collections.Generic;
     using System.Runtime.InteropServices;
-
     using PInvoke;
 
     /// <summary>
@@ -17,7 +16,7 @@
         /// <summary>
         ///     The default struct to return when a monitor isn't found.
         /// </summary>
-        public static readonly PInvokeUtilities.MonitorInfoEx MONITOR_NOT_FOUND = new PInvokeUtilities.MonitorInfoEx { DeviceName = MONITOR_NOT_FOUND_DEVICE_NAME };
+        public static readonly PInvokeUtilities.MonitorInfoEx MONITOR_NOT_FOUND = new() { DeviceName = MonitorUtilities.MONITOR_NOT_FOUND_DEVICE_NAME };
 
         /// <summary>
         ///     Gets a collection representing all monitors on the machine.
@@ -37,8 +36,9 @@
                         var mi = new PInvokeUtilities.MonitorInfoEx();
                         mi.Size = Marshal.SizeOf(mi);
                         var success = PInvokeUtilities.GetMonitorInfo(monitor, ref mi);
-                        if (success)
+                        if (success) {
                             monitors.Add(mi);
+                        }
 
                         return true;
                     },
@@ -55,11 +55,13 @@
         /// <returns>The primary monitor if found, <see cref="MONITOR_NOT_FOUND" /> otherwise.</returns>
         public static PInvokeUtilities.MonitorInfoEx GetPrimaryMonitor() {
             // Try to find the primary monitor using the primary monitor flag.
-            foreach (var monitor in GetMonitors())
-                if (((User32.MONITORINFO_Flags)monitor.Flags).HasFlag(User32.MONITORINFO_Flags.MONITORINFOF_PRIMARY))
+            foreach (var monitor in MonitorUtilities.GetMonitors()) {
+                if (((User32.MONITORINFO_Flags) monitor.Flags).HasFlag(User32.MONITORINFO_Flags.MONITORINFOF_PRIMARY)) {
                     return monitor;
+                }
+            }
 
-            return MONITOR_NOT_FOUND;
+            return MonitorUtilities.MONITOR_NOT_FOUND;
         }
     }
 }

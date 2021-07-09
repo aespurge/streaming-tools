@@ -1,6 +1,5 @@
 ﻿namespace streaming_tools.Twitch.Tts.TtsFilter {
     using System;
-
     using TwitchLib.Client.Events;
 
     /// <summary>

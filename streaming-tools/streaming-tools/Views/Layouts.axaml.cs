@@ -1,10 +1,8 @@
 namespace streaming_tools.Views {
     using System.Linq;
-
     using Avalonia.Controls;
     using Avalonia.Markup.Xaml;
-
-    using streaming_tools.Utilities;
+    using Utilities;
 
     /// <summary>
     ///     The UI for laying out windows on the OS.

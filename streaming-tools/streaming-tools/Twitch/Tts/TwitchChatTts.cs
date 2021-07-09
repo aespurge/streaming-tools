@@ -3,14 +3,11 @@
     using System.IO;
     using System.Speech.Synthesis;
     using System.Threading;
-
     using NAudio.Wave;
-
-    using streaming_tools.Twitch.Tts.TtsFilter;
-    using streaming_tools.Utilities;
-
+    using TtsFilter;
     using TwitchLib.Client;
     using TwitchLib.Client.Events;
+    using Utilities;
 
     /// <summary>
     ///     A twitch chat Text-to-speech client.
@@ -56,22 +53,6 @@
         }
 
         /// <summary>
-        ///     Connects to the chat to listen for messages to read in text to speech.
-        /// </summary>
-        public void Connect() {
-            if (null == this.chatConfig)
-                return;
-
-            var config = Configuration.Instance;
-            var user = config.GetTwitchAccount(this.chatConfig.AccountUsername);
-            if (null == user)
-                return;
-
-            var twitchManager = TwitchChatManager.Instance;
-            twitchManager.AddTwitchChannel(user, this.chatConfig.TwitchChannel, this.Client_OnMessageReceived);
-        }
-
-        /// <summary>
         ///     Releases unmanaged resources.
         /// </summary>
         public void Dispose() {
@@ -87,15 +68,35 @@
                 this.ttsSoundOutput = null;
             }
 
-            if (null == this.chatConfig)
+            if (null == this.chatConfig) {
                 return;
+            }
 
             var user = Configuration.Instance.GetTwitchAccount(this.chatConfig.AccountUsername);
-            if (null == user)
+            if (null == user) {
                 return;
+            }
 
             var twitchManager = TwitchChatManager.Instance;
             twitchManager.RemoveTwitchChannel(user, this.chatConfig.TwitchChannel, this.Client_OnMessageReceived);
+        }
+
+        /// <summary>
+        ///     Connects to the chat to listen for messages to read in text to speech.
+        /// </summary>
+        public void Connect() {
+            if (null == this.chatConfig) {
+                return;
+            }
+
+            var config = Configuration.Instance;
+            var user = config.GetTwitchAccount(this.chatConfig.AccountUsername);
+            if (null == user) {
+                return;
+            }
+
+            var twitchManager = TwitchChatManager.Instance;
+            twitchManager.AddTwitchChannel(user, this.chatConfig.TwitchChannel, this.Client_OnMessageReceived);
         }
 
         /// <summary>
@@ -122,30 +123,34 @@
         /// <param name="twitchClient">The twitch chat client.</param>
         /// <param name="e">The chat message information.</param>
         private void Client_OnMessageReceived(TwitchClient twitchClient, OnMessageReceivedArgs e) {
-            if (null == this.chatConfig)
+            if (null == this.chatConfig) {
                 return;
+            }
 
             // Go through the TTS filters which modify the chat message and update it.
             var chatMessageInfo = new Tuple<string, string>(e.ChatMessage.DisplayName, e.ChatMessage.Message);
             foreach (var filter in this.ttsFilters) {
-                if (null == chatMessageInfo)
+                if (null == chatMessageInfo) {
                     break;
+                }
 
                 chatMessageInfo = filter.Filter(e, chatMessageInfo.Item1, chatMessageInfo.Item2);
             }
 
             // If we don't have a chat message then the message was completely filtered out and we have nothing
             // to do here.
-            if (null == chatMessageInfo || string.IsNullOrWhiteSpace(chatMessageInfo.Item2.Trim()))
+            if (null == chatMessageInfo || string.IsNullOrWhiteSpace(chatMessageInfo.Item2.Trim())) {
                 return;
+            }
 
             // If the chat message starts with the !tts command, then TTS is supposed to read the message as if
             // they're say it. So we will handle the message as such.
             string chatMessage;
-            if (!chatMessageInfo.Item2.Trim().StartsWith("!tts", StringComparison.InvariantCultureIgnoreCase))
+            if (!chatMessageInfo.Item2.Trim().StartsWith("!tts", StringComparison.InvariantCultureIgnoreCase)) {
                 chatMessage = $"{chatMessageInfo.Item1} says {chatMessageInfo.Item2}";
-            else
+            } else {
                 chatMessage = chatMessageInfo.Item2.Replace("!tts", "");
+            }
 
             // Create a microsoft TTS object and a stream for outputting its audio file to.
             using (var synth = new SpeechSynthesizer())
@@ -153,15 +158,16 @@
                 // Setup the microsoft TTS object according to the settings.
                 synth.SetOutputToWaveStream(stream);
                 synth.SelectVoice(this.chatConfig.TtsVoice);
-                synth.Volume = (int)this.chatConfig.TtsVolume;
+                synth.Volume = (int) this.chatConfig.TtsVolume;
                 synth.Speak(chatMessage);
 
                 // Now that we filled the stream, seek to the beginning so we can play it.
                 stream.Seek(0, SeekOrigin.Begin);
                 var reader = new WaveFileReader(stream);
 
-                while (GlobalSoundManager.Instance.CurrentlyPlayingSound)
+                while (GlobalSoundManager.Instance.CurrentlyPlayingSound) {
                     Thread.Sleep(100);
+                }
 
                 try {
                     // Make sure we lock the objects used on multiple threads and play the file.
@@ -212,8 +218,9 @@
         ///     <see href="https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes?redirectedfrom=MSDN" />
         /// </remarks>
         private void KeyboardPressCallback(string keyboard) {
-            if ("123".Equals(keyboard, StringComparison.InvariantCultureIgnoreCase))
+            if ("123".Equals(keyboard, StringComparison.InvariantCultureIgnoreCase)) {
                 this.ttsSoundOutput?.Stop();
+            }
         }
     }
 }

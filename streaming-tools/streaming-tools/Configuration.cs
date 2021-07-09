@@ -6,9 +6,7 @@
     using System.IO;
     using System.Linq;
     using System.Runtime.CompilerServices;
-
     using JetBrains.Annotations;
-
     using Newtonsoft.Json;
 
     /// <summary>
@@ -52,19 +50,15 @@
         protected Configuration() { }
 
         /// <summary>
-        ///     Raised when a property is changed on this object.
-        /// </summary>
-        public event PropertyChangedEventHandler? PropertyChanged;
-
-        /// <summary>
         ///     Gets the singleton instance of our class.
         /// </summary>
         public static Configuration Instance {
             get {
-                if (null == instance)
-                    instance = ReadConfiguration();
+                if (null == Configuration.instance) {
+                    Configuration.instance = Configuration.ReadConfiguration();
+                }
 
-                return instance;
+                return Configuration.instance;
             }
         }
 
@@ -111,8 +105,9 @@
         public string? MicrophoneGuid {
             get => this.microphoneGuid;
             set {
-                if (value == this.microphoneGuid)
+                if (value == this.microphoneGuid) {
                     return;
+                }
 
                 this.microphoneGuid = value;
                 this.OnPropertyChanged();
@@ -125,8 +120,9 @@
         public int PauseThreshold {
             get => this.pauseThreshold;
             set {
-                if (value == this.pauseThreshold)
+                if (value == this.pauseThreshold) {
                     return;
+                }
 
                 this.pauseThreshold = value;
                 this.OnPropertyChanged();
@@ -154,6 +150,11 @@
         public ObservableCollection<TwitchChatConfiguration>? TwitchChatConfigs { get; set; }
 
         /// <summary>
+        ///     Raised when a property is changed on this object.
+        /// </summary>
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        /// <summary>
         ///     Read the configuration from disk.
         /// </summary>
         /// <returns>The configuration object.</returns>
@@ -161,38 +162,46 @@
             Configuration? config = null;
 
             try {
-                if (File.Exists(CONFIG_FILENAME)) {
+                if (File.Exists(Configuration.CONFIG_FILENAME)) {
                     JsonSerializer serializer = new();
-                    using (StreamReader sr = new(CONFIG_FILENAME))
+                    using (StreamReader sr = new(Configuration.CONFIG_FILENAME))
                     using (JsonReader jr = new JsonTextReader(sr)) {
                         config = serializer.Deserialize<Configuration>(jr);
                     }
                 }
             } catch (Exception) { }
 
-            if (null == config)
+            if (null == config) {
                 config = new Configuration();
+            }
 
-            if (null == config.TwitchAccounts)
+            if (null == config.TwitchAccounts) {
                 config.TwitchAccounts = new ObservableCollection<TwitchAccount>();
+            }
 
-            if (null == config.TwitchChatConfigs)
+            if (null == config.TwitchChatConfigs) {
                 config.TwitchChatConfigs = new ObservableCollection<TwitchChatConfiguration>();
+            }
 
-            if (null == config.TtsUsernamesToSkip)
+            if (null == config.TtsUsernamesToSkip) {
                 config.TtsUsernamesToSkip = new ObservableCollection<string>();
+            }
 
-            if (null == config.TtsPhoneticUsernames)
+            if (null == config.TtsPhoneticUsernames) {
                 config.TtsPhoneticUsernames = new ObservableCollection<KeyValuePair<string, string>>();
+            }
 
-            if (null == config.KeystokeCommand)
+            if (null == config.KeystokeCommand) {
                 config.KeystokeCommand = new KeystokeCommand();
+            }
 
-            if (null == config.ChannelPointSoundRedemptions)
+            if (null == config.ChannelPointSoundRedemptions) {
                 config.ChannelPointSoundRedemptions = new ObservableCollection<ChannelPointSoundRedemption>();
+            }
 
-            if (null == config.ChannelPointSoundRedemptionsMasterVolume)
+            if (null == config.ChannelPointSoundRedemptionsMasterVolume) {
                 config.ChannelPointSoundRedemptionsMasterVolume = 100;
+            }
 
             return config;
         }
@@ -203,8 +212,9 @@
         /// <param name="username">The username.</param>
         /// <returns>The <see cref="TwitchAccount" /> object if found, null otherwise.</returns>
         public TwitchAccount? GetTwitchAccount(string? username) {
-            if (null == this.TwitchAccounts || string.IsNullOrWhiteSpace(username))
+            if (null == this.TwitchAccounts || string.IsNullOrWhiteSpace(username)) {
                 return null;
+            }
 
             return this.TwitchAccounts.FirstOrDefault(a => null != a.Username && a.Username.Equals(username, StringComparison.InvariantCultureIgnoreCase));
         }
@@ -215,12 +225,13 @@
         /// <returns>True if successful, false otherwise</returns>
         public bool WriteConfiguration() {
             try {
-                var dirName = Path.GetDirectoryName(CONFIG_FILENAME);
-                if (null != dirName && !Directory.Exists(dirName))
+                var dirName = Path.GetDirectoryName(Configuration.CONFIG_FILENAME);
+                if (null != dirName && !Directory.Exists(dirName)) {
                     Directory.CreateDirectory(dirName);
+                }
 
                 JsonSerializer serializer = new();
-                using (StreamWriter sr = new(CONFIG_FILENAME))
+                using (StreamWriter sr = new(Configuration.CONFIG_FILENAME))
                 using (JsonWriter jr = new JsonTextWriter(sr)) {
                     serializer.Serialize(jr, this);
                 }

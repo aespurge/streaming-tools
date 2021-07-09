@@ -19,7 +19,7 @@
         /// <summary>
         ///     Lock for the <see cref="keyboardListenerProcess" /> to prevent concurrent access.
         /// </summary>
-        private readonly object keyboardListenerProcessLock = new object();
+        private readonly object keyboardListenerProcessLock = new();
 
         /// <summary>
         ///     Thread monitoring standard output of <seealso cref="keyboardListenerProcess" /> in order to give the keystrokes.
@@ -46,10 +46,11 @@
         /// </summary>
         public static GlobalKeyboardListener Instance {
             get {
-                if (null == instance)
-                    instance = new GlobalKeyboardListener();
+                if (null == GlobalKeyboardListener.instance) {
+                    GlobalKeyboardListener.instance = new GlobalKeyboardListener();
+                }
 
-                return instance;
+                return GlobalKeyboardListener.instance;
             }
         }
 
@@ -104,8 +105,9 @@
                 var shouldSleep = false;
 
                 lock (this.keyboardListenerProcessLock) {
-                    if (null == this.keyboardListenerProcess)
+                    if (null == this.keyboardListenerProcess) {
                         shouldSleep = true;
+                    }
 
                     try {
                         string? line;
@@ -117,8 +119,9 @@
                     }
                 }
 
-                if (shouldSleep)
+                if (shouldSleep) {
                     Thread.Sleep(1000);
+                }
             }
         }
     }

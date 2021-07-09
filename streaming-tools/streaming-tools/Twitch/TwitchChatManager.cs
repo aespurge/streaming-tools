@@ -153,8 +153,7 @@
                     account.ApiOAuthRefresh = Convert.ToBase64String(Encoding.UTF8.GetBytes(json.refresh_token));
                     account.ApiOAuthExpires = DateTime.UtcNow + new TimeSpan(0, 0, json.expires_in - 300);
                     Configuration.Instance.WriteConfiguration();
-                }
-                catch (Exception) { }
+                } catch (Exception) { }
             }
 
             api.Settings.AccessToken = Encoding.UTF8.GetString(Convert.FromBase64String(account.ApiOAuth));
@@ -311,8 +310,7 @@
                     twitchClient.OnRaidNotification += this.TwitchClient_OnRaidNotification;
 
                     twitchClient.Connect();
-                }
-                catch (Exception) { }
+                } catch (Exception) { }
             });
 
             return conn;
@@ -333,8 +331,7 @@
             try {
                 var resp = await api.Undocumented.GetChattersAsync(channel);
                 return resp.Select(c => new TwitchChatter(channel, c.Username)).ToArray();
-            }
-            catch (Exception) {
+            } catch (Exception) {
                 return null;
             }
         }
@@ -359,8 +356,7 @@
                     await Task.WhenAny(Task.Run(() => {
                         try {
                             client.Key.Reconnect();
-                        }
-                        catch (Exception) { }
+                        } catch (Exception) { }
                     }), Task.Delay(15000));
                 }
 
@@ -375,8 +371,7 @@
                             }
 
                             client.Key.JoinChannel(client.Value.Channel);
-                        }
-                        catch (Exception) { }
+                        } catch (Exception) { }
                     }), Task.Delay(15000));
                 }
             }

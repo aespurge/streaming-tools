@@ -2,7 +2,6 @@
     using System;
     using System.Diagnostics.CodeAnalysis;
     using System.Text.RegularExpressions;
-
     using TwitchLib.Client;
     using TwitchLib.Client.Events;
     using TwitchLib.Client.Extensions;

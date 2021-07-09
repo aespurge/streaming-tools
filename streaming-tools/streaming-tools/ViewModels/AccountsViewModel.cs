@@ -1,5 +1,4 @@
-﻿namespace streaming_tools.ViewModels
-{
+﻿namespace streaming_tools.ViewModels {
     using System;
     using System.Collections.ObjectModel;
     using System.Diagnostics;
@@ -8,16 +7,15 @@
     using System.Text;
     using System.Threading.Tasks;
     using System.Timers;
+    using Models;
     using Newtonsoft.Json;
     using ReactiveUI;
-    using streaming_tools.Models;
-    using streaming_tools.Views;
+    using Views;
 
     /// <summary>
     ///     Handles updating the list and credentials for twitch accounts.
     /// </summary>
-    public class AccountsViewModel : ViewModelBase
-    {
+    public class AccountsViewModel : ViewModelBase {
         /// <summary>
         ///     The singleton collection for configuring the application.
         /// </summary>
@@ -70,15 +68,17 @@
             // Loop through the list of existing accounts and add them to the UI.
             this.config = Configuration.Instance;
 
-            if (null == this.config.TwitchAccounts)
+            if (null == this.config.TwitchAccounts) {
                 return;
+            }
 
             foreach (var user in this.config.TwitchAccounts) {
-                if (null == user.Username)
+                if (null == user.Username) {
                     continue;
+                }
 
                 var viewModel = this.CreateAccountViewModel(user.Username);
-                var control = new AccountView {DataContext = viewModel};
+                var control = new AccountView { DataContext = viewModel };
                 this.Accounts.Add(control);
             }
         }
@@ -132,16 +132,19 @@
         /// </summary>
         /// <param name="twitchUsername">The twitch account to delete.</param>
         public void DeleteAccount(string? twitchUsername) {
-            if (string.IsNullOrWhiteSpace(twitchUsername) || null == this.config.TwitchAccounts)
+            if (string.IsNullOrWhiteSpace(twitchUsername) || null == this.config.TwitchAccounts) {
                 return;
+            }
 
             var existingControl = this.Accounts.FirstOrDefault(a => twitchUsername.Equals((a.DataContext as AccountViewModel)?.Username, StringComparison.InvariantCultureIgnoreCase));
-            if (null != existingControl)
+            if (null != existingControl) {
                 this.Accounts.Remove(existingControl);
+            }
 
             var existingAccount = this.config.GetTwitchAccount(twitchUsername);
-            if (null == existingAccount)
+            if (null == existingAccount) {
                 return;
+            }
 
             this.config.TwitchAccounts.Remove(existingAccount);
             this.config.WriteConfiguration();
@@ -152,10 +155,11 @@
         /// </summary>
         public async void GetApiOAuthToken() {
             this.ApiOAuth = "";
-            if (string.IsNullOrWhiteSpace(this.Code))
+            if (string.IsNullOrWhiteSpace(this.Code)) {
                 return;
+            }
 
-            HttpClient client = new HttpClient();
+            HttpClient client = new();
             var response = await client.PostAsync($"{Constants.NULLINSIDE_TWITCH_OAUTH}?code={this.Code}", new StringContent(""));
             if (!response.IsSuccessStatusCode) {
                 this.ApiOAuth = "";
@@ -164,8 +168,9 @@
 
             var responseString = await response.Content.ReadAsStringAsync();
             var json = JsonConvert.DeserializeObject<TwitchTokenResponseJson>(responseString);
-            if (null == json)
+            if (null == json) {
                 return;
+            }
 
             this.ApiOAuth = json.access_token;
             this.apiTokenRefresh = json.refresh_token;
@@ -177,10 +182,11 @@
         /// </summary>
         public async void LaunchCodeWebpage() {
             var url = await this.GetCodeUrl();
-            if (null == url)
+            if (null == url) {
                 return;
+            }
 
-            Process.Start(new ProcessStartInfo("cmd", $"/c start {url.Replace("&", "^&")}") {CreateNoWindow = true});
+            Process.Start(new ProcessStartInfo("cmd", $"/c start {url.Replace("&", "^&")}") { CreateNoWindow = true });
             this.oauthCodeCheckTimer.Start();
         }
 
@@ -188,8 +194,9 @@
         ///     Saves the current twitch account details.
         /// </summary>
         public void SaveAccount() {
-            if (string.IsNullOrWhiteSpace(this.Username) || string.IsNullOrWhiteSpace(this.ApiOAuth) || null == this.config.TwitchAccounts || null == this.apiTokenRefresh)
+            if (string.IsNullOrWhiteSpace(this.Username) || string.IsNullOrWhiteSpace(this.ApiOAuth) || null == this.config.TwitchAccounts || null == this.apiTokenRefresh) {
                 return;
+            }
 
             var existingAccount = this.config.GetTwitchAccount(this.Username);
             var isNew = null == existingAccount;
@@ -207,8 +214,9 @@
             existingAccount.ApiOAuthExpires = this.apiTokenExpires;
             this.config.WriteConfiguration();
 
-            if (isNew)
-                this.Accounts.Add(new AccountView {DataContext = this.CreateAccountViewModel(this.Username)});
+            if (isNew) {
+                this.Accounts.Add(new AccountView { DataContext = this.CreateAccountViewModel(this.Username) });
+            }
 
             this.ClearForm();
         }
@@ -231,7 +239,7 @@
         /// <param name="twitchUsername">The username of the currently added twitch account.</param>
         /// <returns>A new instance of the view model.</returns>
         private AccountViewModel CreateAccountViewModel(string twitchUsername) {
-            return new AccountViewModel {Username = twitchUsername, DeleteAccount = () => this.DeleteAccount(twitchUsername), EditAccount = () => this.EditAccount(twitchUsername)};
+            return new() { Username = twitchUsername, DeleteAccount = () => this.DeleteAccount(twitchUsername), EditAccount = () => this.EditAccount(twitchUsername) };
         }
 
         /// <summary>
@@ -239,8 +247,9 @@
         /// </summary>
         /// <param name="twitchUsername">The username of the twitch account to edit..</param>
         private void EditAccount(string twitchUsername) {
-            if (string.IsNullOrWhiteSpace(twitchUsername))
+            if (string.IsNullOrWhiteSpace(twitchUsername)) {
                 return;
+            }
 
             var existingAccount = this.config.GetTwitchAccount(twitchUsername);
             if (null == existingAccount) {
@@ -261,22 +270,26 @@
         /// </summary>
         /// <returns>The url if successful, null otherwise.</returns>
         private async Task<string?> GetCodeUrl() {
-            if (null == Constants.CLIPBOARD)
+            if (null == Constants.CLIPBOARD) {
                 return null;
+            }
 
             await Constants.CLIPBOARD.SetTextAsync("");
             var client = new HttpClient();
             var nullinsideResponse = await client.GetAsync(Constants.NULLINSIDE_TWITCH_CODE);
-            if (!nullinsideResponse.IsSuccessStatusCode)
+            if (!nullinsideResponse.IsSuccessStatusCode) {
                 return null;
+            }
 
             var body = await nullinsideResponse.Content.ReadAsStringAsync();
-            if (string.IsNullOrWhiteSpace(body))
+            if (string.IsNullOrWhiteSpace(body)) {
                 return null;
+            }
 
             var json = JsonConvert.DeserializeObject<NullInsideTwitchCodeResponseJson>(body);
-            if (null == json)
+            if (null == json) {
                 return null;
+            }
 
             return json.url;
         }
@@ -287,8 +300,9 @@
         /// <param name="sender">The timer.</param>
         /// <param name="e">The event arguments.</param>
         private async void OauthCodeCheckTimer_Elapsed(object sender, ElapsedEventArgs e) {
-            if (null == Constants.CLIPBOARD)
+            if (null == Constants.CLIPBOARD) {
                 return;
+            }
 
             var text = await Constants.CLIPBOARD.GetTextAsync();
             if (string.IsNullOrWhiteSpace(text)) {

@@ -1,7 +1,6 @@
 namespace streaming_tools.ViewModels {
+    using GameIntegrations;
     using ReactiveUI;
-
-    using streaming_tools.GameIntegrations;
 
     /// <summary>
     ///     The business logic behind the main UI.

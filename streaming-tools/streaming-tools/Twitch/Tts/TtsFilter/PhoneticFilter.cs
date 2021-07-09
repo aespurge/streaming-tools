@@ -2,7 +2,6 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-
     using TwitchLib.Client.Events;
 
     /// <summary>
@@ -20,12 +19,14 @@
             string message = currentMessage;
 
             if (null != Configuration.Instance.TtsPhoneticUsernames) {
-                foreach (var usernameToPhonetic in Configuration.Instance.TtsPhoneticUsernames)
+                foreach (var usernameToPhonetic in Configuration.Instance.TtsPhoneticUsernames) {
                     message = message.Replace(usernameToPhonetic.Key, usernameToPhonetic.Value, StringComparison.InvariantCultureIgnoreCase);
+                }
 
                 var foundUsername = Configuration.Instance.TtsPhoneticUsernames.FirstOrDefault(k => twitchInfo.ChatMessage.DisplayName.Equals(k.Key, StringComparison.InvariantCultureIgnoreCase));
-                if (!default(KeyValuePair<string, string>).Equals(foundUsername))
+                if (!default(KeyValuePair<string, string>).Equals(foundUsername)) {
                     username = foundUsername.Value;
+                }
             }
 
             return new Tuple<string, string>(username, message);

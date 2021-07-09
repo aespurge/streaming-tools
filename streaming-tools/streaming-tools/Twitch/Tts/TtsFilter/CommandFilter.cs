@@ -2,7 +2,6 @@
     using System;
     using System.Linq;
     using System.Text.RegularExpressions;
-
     using TwitchLib.Client.Events;
 
     /// <summary>
@@ -12,7 +11,7 @@
         /// <summary>
         ///     Matches on ! commands in chat.
         /// </summary>
-        private readonly Regex commandRegex = new Regex(@"[!]{1}[\S]+", RegexOptions.Compiled | RegexOptions.CultureInvariant);
+        private readonly Regex commandRegex = new(@"[!]{1}[\S]+", RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
         /// <summary>
         ///     The commands to always speak anyway.
@@ -29,8 +28,9 @@
         public Tuple<string, string> Filter(OnMessageReceivedArgs twitchInfo, string username, string currentMessage) {
             if (currentMessage.StartsWith("!")) {
                 var command = this.commandRegex.Match(currentMessage);
-                if (!this.commandWhitelist.Contains(command.Value.ToLowerInvariant()))
+                if (!this.commandWhitelist.Contains(command.Value.ToLowerInvariant())) {
                     currentMessage = "";
+                }
             }
 
             return new Tuple<string, string>(username, currentMessage);

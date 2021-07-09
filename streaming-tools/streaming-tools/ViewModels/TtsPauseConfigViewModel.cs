@@ -3,15 +3,11 @@
     using System.Collections.ObjectModel;
     using System.ComponentModel;
     using System.Linq;
-
     using Avalonia;
-
     using DynamicData;
-
     using ReactiveUI;
-
-    using streaming_tools.Twitch.Tts;
-    using streaming_tools.Utilities;
+    using Twitch.Tts;
+    using Utilities;
 
     /// <summary>
     ///     The view responsible for pausing twitch chat TTS when the microphone hears things.
@@ -99,9 +95,11 @@
         public int PauseThreshold {
             get => this.pauseThreshold;
             set {
-                if (value < 0)
+                if (value < 0) {
                     value = 0;
-                else if (value > 100) value = 100;
+                } else if (value > 100) {
+                    value = 100;
+                }
 
                 this.RaiseAndSetIfChanged(ref this.pauseThreshold, value);
                 this.MicrophoneThresholdVisualizationMargin = new Thickness(value, this.MicrophoneThresholdVisualizationMargin.Top, this.MicrophoneThresholdVisualizationMargin.Right, this.MicrophoneThresholdVisualizationMargin.Bottom);
@@ -122,8 +120,9 @@
         /// <param name="sender">The object invoked on.</param>
         /// <param name="e">The property changed information.</param>
         private void OnPropertyChanged(object? sender, PropertyChangedEventArgs e) {
-            if (nameof(this.MicrophoneVoiceVolume).Equals(e.PropertyName, StringComparison.InvariantCultureIgnoreCase))
+            if (nameof(this.MicrophoneVoiceVolume).Equals(e.PropertyName, StringComparison.InvariantCultureIgnoreCase)) {
                 return;
+            }
 
             if (nameof(this.SelectedMicrophone).Equals(e.PropertyName, StringComparison.InvariantCultureIgnoreCase)) {
                 this.pausingObject.SelectedMicrophone = this.SelectedMicrophone;
@@ -142,8 +141,9 @@
         /// <param name="sender">The <see cref="pausingObject" />.</param>
         /// <param name="e">The property changed information.</param>
         private void Pauser_PropertyChanged(object? sender, PropertyChangedEventArgs e) {
-            if (!nameof(this.pausingObject.MicrophoneVoiceVolume).Equals(e.PropertyName, StringComparison.InvariantCultureIgnoreCase))
+            if (!nameof(this.pausingObject.MicrophoneVoiceVolume).Equals(e.PropertyName, StringComparison.InvariantCultureIgnoreCase)) {
                 return;
+            }
 
             this.MicrophoneVoiceVolume = this.pausingObject.MicrophoneVoiceVolume;
         }

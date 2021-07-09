@@ -1,7 +1,6 @@
 ﻿namespace streaming_tools.Twitch.Tts.TtsFilter {
     using System;
     using System.Text.RegularExpressions;
-
     using TwitchLib.Client.Events;
 
     /// <summary>
@@ -11,12 +10,12 @@
         /// <summary>
         ///     Handles identifying usernames in chat messages (anything that starts with a @).
         /// </summary>
-        private readonly Regex regexMessageUsernames = new Regex(@"[@][a-zA-Z]+[\S]+", RegexOptions.Compiled | RegexOptions.CultureInvariant);
+        private readonly Regex regexMessageUsernames = new(@"[@][a-zA-Z]+[\S]+", RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
         /// <summary>
         ///     Handles removing numbers and underscores from usernames.
         /// </summary>
-        private readonly Regex regexUsername = new Regex(@"[0-9_]+", RegexOptions.Compiled | RegexOptions.CultureInvariant);
+        private readonly Regex regexUsername = new(@"[0-9_]+", RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
         /// <summary>
         ///     Updates usernames to remove the _s and numbers.
@@ -27,8 +26,9 @@
         /// <returns>The new TTS message and username.</returns>
         public Tuple<string, string> Filter(OnMessageReceivedArgs twitchInfo, string username, string currentMessage) {
             foreach (Capture? usernameMatch in this.regexMessageUsernames.Matches(currentMessage)) {
-                if (null == usernameMatch)
+                if (null == usernameMatch) {
                     continue;
+                }
 
                 currentMessage = currentMessage.Replace(usernameMatch.Value, this.regexUsername.Replace(usernameMatch.Value, " "));
             }

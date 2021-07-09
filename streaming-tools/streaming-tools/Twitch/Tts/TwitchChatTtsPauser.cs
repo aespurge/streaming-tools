@@ -3,13 +3,10 @@
     using System.ComponentModel;
     using System.Runtime.CompilerServices;
     using System.Timers;
-
     using JetBrains.Annotations;
-
     using NAudio.Wave;
     using NAudio.Wave.SampleProviders;
-
-    using streaming_tools.Utilities;
+    using Utilities;
 
     /// <summary>
     ///     Handles pausing twitch chat TTS when the microphone hears.
@@ -61,11 +58,6 @@
         }
 
         /// <summary>
-        ///     Invoked when properties on the class change.
-        /// </summary>
-        public event PropertyChangedEventHandler? PropertyChanged;
-
-        /// <summary>
         ///     Gets or sets the current volume of the voice read from the microphone.
         /// </summary>
         public int MicrophoneVoiceVolume {
@@ -82,9 +74,11 @@
         public int PauseThreshold {
             get => this.pauseThreshold;
             set {
-                if (value < 0)
+                if (value < 0) {
                     value = 0;
-                else if (value > 100) value = 100;
+                } else if (value > 100) {
+                    value = 100;
+                }
 
                 this.pauseThreshold = value;
                 this.OnPropertyChanged();
@@ -108,21 +102,28 @@
         public TwitchChatTts? Tts { get; set; }
 
         /// <summary>
+        ///     Invoked when properties on the class change.
+        /// </summary>
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        /// <summary>
         ///     Gets the NAudio index associated with the selected microphone.
         /// </summary>
         /// <param name="guid">The unique GUID of the microphone.</param>
         /// <returns>The index of the microphone according to NAudio.</returns>
         public static int GetSelectMicrophoneDeviceIndex(string? guid) {
-            if (null == guid)
+            if (null == guid) {
                 return -1;
+            }
 
             var totalDevices = NAudioUtilities.GetTotalInputDevices();
             var index = -1;
-            for (var i = -1; i < totalDevices - 1; i++)
+            for (var i = -1; i < totalDevices - 1; i++) {
                 if (NAudioUtilities.GetInputDevice(i).ProductGuid.ToString() == guid) {
                     index = i + 1;
                     break;
                 }
+            }
 
             return index;
         }
@@ -131,8 +132,9 @@
         ///     Starts listening to the microphone so we know when to pause TTS for microphone speaking.
         /// </summary>
         public void StartListenToMicrophone() {
-            if (-1 == this.SelectedMicrophone)
+            if (-1 == this.SelectedMicrophone) {
                 return;
+            }
 
             this.microphoneDataEvent = new WaveInEvent { DeviceNumber = this.SelectedMicrophone - 1 };
             this.microphoneDataEvent.DataAvailable += this.Microphone_DataReceived;
@@ -175,8 +177,9 @@
         /// <param name="sender">The <seealso cref="WaveInEvent" /> that captured the data from the microphone.</param>
         /// <param name="e">Data received.</param>
         private void Microphone_DataReceived(object? sender, WaveInEventArgs e) {
-            if (null == this.microphoneBufferedData || null == this.microphoneVoiceData)
+            if (null == this.microphoneBufferedData || null == this.microphoneVoiceData) {
                 return;
+            }
 
             this.microphoneBufferedData.AddSamples(e.Buffer, 0, e.BytesRecorded);
             float[] test = new float[e.Buffer.Length];

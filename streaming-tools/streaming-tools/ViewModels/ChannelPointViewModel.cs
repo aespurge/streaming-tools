@@ -5,18 +5,13 @@
     using System.ComponentModel;
     using System.IO;
     using System.Linq;
-
     using Avalonia.Controls;
-
     using DynamicData;
-
     using ReactiveUI;
-
-    using streaming_tools.Twitch;
-    using streaming_tools.Utilities;
-
+    using Twitch;
     using TwitchLib.PubSub;
     using TwitchLib.PubSub.Events;
+    using Utilities;
 
     /// <summary>
     ///     The view responsible for mapping channel point redemptions to sounds.
@@ -94,21 +89,25 @@
         public async void RefreshChannelPointRewards() {
             try {
                 this.ChannelPointSounds.Clear();
-                if (null == Configuration.Instance.ChannelPointSoundRedemptions)
+                if (null == Configuration.Instance.ChannelPointSoundRedemptions) {
                     return;
+                }
 
                 var account = Configuration.Instance.TwitchAccounts?.FirstOrDefault(a => a.IsUsersStreamingAccount);
-                if (null == account || null == account.Username)
+                if (null == account || null == account.Username) {
                     return;
+                }
 
                 var api = await TwitchChatManager.Instance.GetTwitchClientApi(account.Username);
-                if (null == api)
+                if (null == api) {
                     return;
+                }
 
                 var response = await api.Helix.Users.GetUsersAsync(logins: new List<string> { account.Username });
                 var user = response.Users.FirstOrDefault();
-                if (null == user)
+                if (null == user) {
                     return;
+                }
 
                 if (null != this.pubSub) {
                     this.pubSub.Disconnect();
@@ -127,13 +126,15 @@
                 var toAdd = actualRewardNames.Except(knownRewardNames);
                 var toDelete = knownRewardNames.Except(actualRewardNames);
 
-                foreach (var reward in toAdd)
+                foreach (var reward in toAdd) {
                     Configuration.Instance.ChannelPointSoundRedemptions.Add(new ChannelPointSoundRedemption { Name = reward });
+                }
 
                 foreach (var reward in toDelete) {
                     var found = Configuration.Instance.ChannelPointSoundRedemptions.FirstOrDefault(c => c.Name?.Equals(reward, StringComparison.InvariantCultureIgnoreCase) == true);
-                    if (null != found)
+                    if (null != found) {
                         Configuration.Instance.ChannelPointSoundRedemptions.Remove(found);
+                    }
                 }
 
                 this.ChannelPointSounds.AddRange(Configuration.Instance.ChannelPointSoundRedemptions.Select(c => new ChannelPointSoundWrapper(this, c)));
@@ -161,21 +162,25 @@
         /// <param name="sender">The pub sub object.</param>
         /// <param name="e">The reward information.</param>
         private void OnRewardRedeemed(object? sender, OnRewardRedeemedArgs e) {
-            if (null == Configuration.Instance.ChannelPointSoundRedemptions || string.IsNullOrWhiteSpace(this.OutputDevice))
+            if (null == Configuration.Instance.ChannelPointSoundRedemptions || string.IsNullOrWhiteSpace(this.OutputDevice)) {
                 return;
+            }
 
             var reward = Configuration.Instance.ChannelPointSoundRedemptions.FirstOrDefault(c => c.Name?.Equals(e.RewardTitle, StringComparison.InvariantCultureIgnoreCase) == true);
-            if (null == reward || string.IsNullOrWhiteSpace(reward.Filename) || !File.Exists(reward.Filename))
+            if (null == reward || string.IsNullOrWhiteSpace(reward.Filename) || !File.Exists(reward.Filename)) {
                 return;
+            }
 
             double volume = reward.Volume ?? 100;
-            if (null != Configuration.Instance.ChannelPointSoundRedemptionsMasterVolume && 0 != Configuration.Instance.ChannelPointSoundRedemptionsMasterVolume.Value)
+            if (null != Configuration.Instance.ChannelPointSoundRedemptionsMasterVolume && 0 != Configuration.Instance.ChannelPointSoundRedemptionsMasterVolume.Value) {
                 volume *= Configuration.Instance.ChannelPointSoundRedemptionsMasterVolume.Value / 100.0;
+            }
 
-            if (volume < 0)
+            if (volume < 0) {
                 volume = 0;
+            }
 
-            GlobalSoundManager.Instance.QueueSound(reward.Filename, this.OutputDevice, (int)volume);
+            GlobalSoundManager.Instance.QueueSound(reward.Filename, this.OutputDevice, (int) volume);
         }
 
         /// <summary>
@@ -268,8 +273,9 @@
                 dlg.AllowMultiple = false;
                 dlg.Title = "Select a Sound File";
                 var filenames = await dlg.ShowAsync(Constants.MAIN_WINDOW);
-                if (null == filenames)
+                if (null == filenames) {
                     return;
+                }
 
                 this.Filename = filenames.FirstOrDefault();
             }
@@ -278,17 +284,20 @@
             ///     Previews playing the supplied file.
             /// </summary>
             public void PlayPreview() {
-                if (string.IsNullOrWhiteSpace(this.Filename) || !File.Exists(this.Filename) || string.IsNullOrWhiteSpace(this.parent.OutputDevice))
+                if (string.IsNullOrWhiteSpace(this.Filename) || !File.Exists(this.Filename) || string.IsNullOrWhiteSpace(this.parent.OutputDevice)) {
                     return;
+                }
 
                 double volume = this.Volume;
-                if (null != Configuration.Instance.ChannelPointSoundRedemptionsMasterVolume && 0 != Configuration.Instance.ChannelPointSoundRedemptionsMasterVolume.Value)
+                if (null != Configuration.Instance.ChannelPointSoundRedemptionsMasterVolume && 0 != Configuration.Instance.ChannelPointSoundRedemptionsMasterVolume.Value) {
                     volume *= Configuration.Instance.ChannelPointSoundRedemptionsMasterVolume.Value / 100.0;
+                }
 
-                if (volume < 0)
+                if (volume < 0) {
                     volume = 0;
+                }
 
-                GlobalSoundManager.Instance.QueueSound(this.Filename, this.parent.OutputDevice, (int)volume);
+                GlobalSoundManager.Instance.QueueSound(this.Filename, this.parent.OutputDevice, (int) volume);
             }
 
             /// <summary>
@@ -297,12 +306,13 @@
             /// <param name="sender">This object.</param>
             /// <param name="e">The information on the property that changed.</param>
             private void PropertyChangedHandler(object? sender, PropertyChangedEventArgs e) {
-                if (nameof(this.Name).Equals(e.PropertyName, StringComparison.InvariantCultureIgnoreCase))
+                if (nameof(this.Name).Equals(e.PropertyName, StringComparison.InvariantCultureIgnoreCase)) {
                     this.source.Name = this.Name;
-                else if (nameof(this.Filename).Equals(e.PropertyName, StringComparison.InvariantCultureIgnoreCase))
+                } else if (nameof(this.Filename).Equals(e.PropertyName, StringComparison.InvariantCultureIgnoreCase)) {
                     this.source.Filename = this.Filename;
-                else if (nameof(this.Volume).Equals(e.PropertyName, StringComparison.InvariantCultureIgnoreCase))
+                } else if (nameof(this.Volume).Equals(e.PropertyName, StringComparison.InvariantCultureIgnoreCase)) {
                     this.source.Volume = this.Volume;
+                }
 
                 Configuration.Instance.WriteConfiguration();
             }

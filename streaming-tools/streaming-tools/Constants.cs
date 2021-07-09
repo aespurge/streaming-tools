@@ -1,9 +1,7 @@
 ﻿namespace streaming_tools {
     using System.Collections.Generic;
-
     using Avalonia.Controls;
     using Avalonia.Input.Platform;
-
     using TwitchLib.Api.Core.Enums;
 
     /// <summary>

@@ -1,7 +1,6 @@
 ﻿namespace streaming_tools.Views.Converters {
     using System;
     using System.Globalization;
-
     using Avalonia.Data.Converters;
 
     /// <summary>
@@ -29,8 +28,9 @@
         /// <param name="culture">The parameter is not used.</param>
         /// <returns>The integer value of a percentage.</returns>
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) {
-            if (null == value)
+            if (null == value) {
                 return 0;
+            }
 
             var justNumber = value.ToString()?.Replace("%", "");
             return System.Convert.ToInt32(justNumber);

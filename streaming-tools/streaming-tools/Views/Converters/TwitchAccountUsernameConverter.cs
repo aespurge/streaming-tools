@@ -3,7 +3,6 @@
     using System.Collections.Generic;
     using System.Globalization;
     using System.Linq;
-
     using Avalonia.Data.Converters;
 
     /// <summary>
@@ -20,8 +19,9 @@
         /// <returns>The string representation of a percentage in "#%" format.</returns>
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
             var valueCol = value as ICollection<TwitchAccount>;
-            if (null == valueCol)
+            if (null == valueCol) {
                 return "";
+            }
 
             return valueCol.Select(twitchUser => twitchUser.Username).ToList();
         }

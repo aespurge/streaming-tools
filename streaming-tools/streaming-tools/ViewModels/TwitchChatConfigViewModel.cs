@@ -5,15 +5,12 @@
     using System.Linq;
     using System.Speech.Synthesis;
     using System.Timers;
-
     using DynamicData;
-
     using ReactiveUI;
-
-    using streaming_tools.Twitch;
-    using streaming_tools.Twitch.Admin;
-    using streaming_tools.Twitch.Tts;
-    using streaming_tools.Utilities;
+    using Twitch;
+    using Twitch.Admin;
+    using Twitch.Tts;
+    using Utilities;
 
     /// <summary>
     ///     The view responsible for a single entry in the twitch chat configuration list.
@@ -131,8 +128,9 @@
         public bool AdminOn {
             get => this.adminOn;
             set {
-                if (value == this.adminOn)
+                if (value == this.adminOn) {
                     return;
+                }
 
                 this.RaiseAndSetIfChanged(ref this.adminOn, value);
 
@@ -178,8 +176,9 @@
         public bool PauseDuringSpeech {
             get => this.pauseDuringSpeech;
             set {
-                if (value == this.pauseDuringSpeech)
+                if (value == this.pauseDuringSpeech) {
                     return;
+                }
 
                 this.RaiseAndSetIfChanged(ref this.pauseDuringSpeech, value);
 
@@ -202,8 +201,9 @@
         public bool TtsOn {
             get => this.ttsOn;
             set {
-                if (value == this.ttsOn)
+                if (value == this.ttsOn) {
                     return;
+                }
 
                 this.RaiseAndSetIfChanged(ref this.ttsOn, value);
 
@@ -211,10 +211,13 @@
                     this.tts = new TwitchChatTts(this.chatConfig);
                     this.tts.Connect();
 
-                    if (null != this.pauseObject) this.pauseObject.Tts = this.tts;
+                    if (null != this.pauseObject) {
+                        this.pauseObject.Tts = this.tts;
+                    }
                 } else {
-                    if (null != this.pauseObject)
+                    if (null != this.pauseObject) {
                         this.pauseObject.Tts = null;
+                    }
 
                     this.tts?.Dispose();
                     this.tts = null;
@@ -265,13 +268,6 @@
         private Configuration Config { get; }
 
         /// <summary>
-        ///     Invokes the <see cref="DeleteConfig" /> passed to us from a parent object.
-        /// </summary>
-        public void DeleteConfigCommand() {
-            this.DeleteConfig?.Invoke();
-        }
-
-        /// <summary>
         ///     Disposes of unmanaged resources.
         /// </summary>
         public void Dispose() {
@@ -283,12 +279,20 @@
         }
 
         /// <summary>
+        ///     Invokes the <see cref="DeleteConfig" /> passed to us from a parent object.
+        /// </summary>
+        public void DeleteConfigCommand() {
+            this.DeleteConfig?.Invoke();
+        }
+
+        /// <summary>
         ///     Copies the values from the persistent configuration object to this view.
         /// </summary>
         /// <param name="config">The persistent configuration object.</param>
         private void CopyFromConfig(TwitchChatConfiguration? config) {
-            if (null == config)
+            if (null == config) {
                 return;
+            }
 
             this.Username = config.AccountUsername;
             this.AdminOn = config.AdminOn;
@@ -305,8 +309,9 @@
         /// </summary>
         /// <param name="config">The persistent configuration object.</param>
         private void CopyToConfig(TwitchChatConfiguration? config) {
-            if (null == config)
+            if (null == config) {
                 return;
+            }
 
             config.AccountUsername = this.Username;
             config.AdminOn = this.AdminOn;
@@ -326,8 +331,9 @@
         /// <param name="sender">The timer.</param>
         /// <param name="e">The event arguments.</param>
         private void IsConnectedTimer_OnElapsed(object sender, ElapsedEventArgs e) {
-            if (string.IsNullOrWhiteSpace(this.chatConfig?.AccountUsername) || string.IsNullOrWhiteSpace(this.chatConfig.TwitchChannel))
+            if (string.IsNullOrWhiteSpace(this.chatConfig?.AccountUsername) || string.IsNullOrWhiteSpace(this.chatConfig.TwitchChannel)) {
                 return;
+            }
 
             var manager = TwitchChatManager.Instance;
             this.IsConnected = manager.TwitchChannelIsConnected(this.chatConfig.AccountUsername, this.chatConfig.TwitchChannel);
@@ -339,11 +345,13 @@
         /// <param name="sender">This object.</param>
         /// <param name="e">The property changed information.</param>
         private void OnPropertyChanged(object? sender, PropertyChangedEventArgs e) {
-            if (null == this.Config.TwitchChatConfigs)
+            if (null == this.Config.TwitchChatConfigs) {
                 return;
+            }
 
-            if (null == this.chatConfig)
+            if (null == this.chatConfig) {
                 this.chatConfig = this.Config.TwitchChatConfigs.FirstOrDefault(c => null != c?.TwitchChannel && c.TwitchChannel.Equals(this.TwitchChannel, StringComparison.InvariantCultureIgnoreCase));
+            }
 
             if (null == this.chatConfig) {
                 this.chatConfig = new TwitchChatConfiguration();

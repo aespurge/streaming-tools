@@ -3,7 +3,6 @@
     using System.Collections.Concurrent;
     using System.IO;
     using System.Threading;
-
     using NAudio.Wave;
 
     /// <summary>
@@ -46,10 +45,11 @@
         /// </summary>
         public static GlobalSoundManager Instance {
             get {
-                if (null == instance)
-                    instance = new GlobalSoundManager();
+                if (null == GlobalSoundManager.instance) {
+                    GlobalSoundManager.instance = new GlobalSoundManager();
+                }
 
-                return instance;
+                return GlobalSoundManager.instance;
             }
         }
 
@@ -65,8 +65,9 @@
         /// <param name="outputDevice">The output device to play the file on.</param>
         /// <param name="volume">The volume to play the file at.</param>
         public void QueueSound(string filename, string outputDevice, int volume) {
-            if (string.IsNullOrWhiteSpace(filename) || string.IsNullOrWhiteSpace(outputDevice) || volume < 0 || volume > 100)
+            if (string.IsNullOrWhiteSpace(filename) || string.IsNullOrWhiteSpace(outputDevice) || volume < 0 || volume > 100) {
                 return;
+            }
 
             this.soundsToPlay.Add(new SoundPlayingWrapper(filename, outputDevice, volume));
         }
@@ -77,11 +78,13 @@
         private void SoundPlayThreadMain() {
             while (true) {
                 var sound = this.soundsToPlay.Take();
-                if (sound.Equals(this.exitSentinel))
+                if (sound.Equals(this.exitSentinel)) {
                     return;
+                }
 
-                if (string.IsNullOrWhiteSpace(sound.Filename) || !File.Exists(sound.Filename))
+                if (string.IsNullOrWhiteSpace(sound.Filename) || !File.Exists(sound.Filename)) {
                     continue;
+                }
 
                 try {
                     using (var reader = new NAudioUtilities.AudioFileReader(sound.Filename))

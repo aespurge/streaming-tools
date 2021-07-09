@@ -1,13 +1,27 @@
 ﻿namespace streaming_tools.ViewModels {
     using System;
     using System.Collections.ObjectModel;
-
     using ReactiveUI;
 
     /// <summary>
     ///     Handles maintaining two lists and moving items between them.
     /// </summary>
     public class TwoListViewModel : ViewModelBase {
+        /// <summary>
+        ///     The behavior to maintain when double clicking
+        /// </summary>
+        public enum DoubleClickBehavior {
+            /// <summary>
+            ///     Move items from the list you double clicked on to the other list when the items are double clicked.
+            /// </summary>
+            MoveToOtherList,
+
+            /// <summary>
+            ///     Delete items from the list when double clicked.
+            /// </summary>
+            DeleteFromList
+        }
+
         /// <summary>
         ///     The collection of items in the left list.
         /// </summary>
@@ -51,21 +65,6 @@
             this.rightList = new ObservableCollection<string>();
             this.OnLeftDoubleClick += this.OnLeftDoubleClicked;
             this.OnRightDoubleClick += this.OnRightDoubleClicked;
-        }
-
-        /// <summary>
-        ///     The behavior to maintain when double clicking
-        /// </summary>
-        public enum DoubleClickBehavior {
-            /// <summary>
-            ///     Move items from the list you double clicked on to the other list when the items are double clicked.
-            /// </summary>
-            MoveToOtherList,
-
-            /// <summary>
-            ///     Delete items from the list when double clicked.
-            /// </summary>
-            DeleteFromList
         }
 
         /// <summary>
@@ -129,8 +128,9 @@
         /// </summary>
         /// <param name="item">The item to add.</param>
         public void AddLeftList(string item) {
-            if (string.IsNullOrWhiteSpace(item))
+            if (string.IsNullOrWhiteSpace(item)) {
                 return;
+            }
 
             if (!this.SortLeftList) {
                 this.LeftList.Add(item);
@@ -174,8 +174,9 @@
         /// </summary>
         /// <param name="selectedItem">The item to move.</param>
         protected virtual void OnLeftDoubleClicked(string? selectedItem) {
-            if (string.IsNullOrWhiteSpace(selectedItem))
+            if (string.IsNullOrWhiteSpace(selectedItem)) {
                 return;
+            }
 
             this.LeftList.Remove(selectedItem);
             this.AddRightList(selectedItem);
@@ -186,13 +187,15 @@
         /// </summary>
         /// <param name="selectedItem">The item to move.</param>
         protected virtual void OnRightDoubleClicked(string? selectedItem) {
-            if (string.IsNullOrWhiteSpace(selectedItem))
+            if (string.IsNullOrWhiteSpace(selectedItem)) {
                 return;
+            }
 
             this.RightList.Remove(selectedItem);
 
-            if (DoubleClickBehavior.MoveToOtherList == this.RightListBehavior)
+            if (DoubleClickBehavior.MoveToOtherList == this.RightListBehavior) {
                 this.AddLeftList(selectedItem);
+            }
         }
 
         /// <summary>
@@ -201,8 +204,9 @@
         /// <param name="collection">The collection to add to.</param>
         /// <param name="item">The item to add.</param>
         private void AddToList(ObservableCollection<string> collection, string item) {
-            if (string.IsNullOrWhiteSpace(item))
+            if (string.IsNullOrWhiteSpace(item)) {
                 return;
+            }
 
             if (0 == collection.Count) {
                 collection.Add(item);

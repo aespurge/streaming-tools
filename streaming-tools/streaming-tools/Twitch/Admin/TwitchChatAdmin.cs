@@ -28,13 +28,15 @@
         ///     Connects to the chat to listen for messages to apply admin filters to.
         /// </summary>
         public void Connect() {
-            if (null == this.chatConfig)
+            if (null == this.chatConfig) {
                 return;
+            }
 
             var config = Configuration.Instance;
             var user = config.GetTwitchAccount(this.chatConfig.AccountUsername);
-            if (null == user)
+            if (null == user) {
                 return;
+            }
 
             var twitchManager = TwitchChatManager.Instance;
             twitchManager.AddTwitchChannelAdminFilter(user, this.chatConfig.TwitchChannel, this.Client_OnMessageReceived);
@@ -44,12 +46,14 @@
         ///     Releases unmanaged resources.
         /// </summary>
         public void Dispose() {
-            if (null == this.chatConfig)
+            if (null == this.chatConfig) {
                 return;
+            }
 
             var user = Configuration.Instance.GetTwitchAccount(this.chatConfig.AccountUsername);
-            if (null == user)
+            if (null == user) {
                 return;
+            }
 
             var twitchManager = TwitchChatManager.Instance;
             twitchManager.RemoveTwitchChannelAdminFilter(user, this.chatConfig.TwitchChannel, this.Client_OnMessageReceived);
@@ -62,15 +66,18 @@
         /// <param name="e">The message.</param>
         /// <returns>True if the message should be passed on, false otherwise.</returns>
         private bool Client_OnMessageReceived(TwitchClient twitchClient, OnMessageReceivedArgs e) {
-            if (null == this.chatConfig)
+            if (null == this.chatConfig) {
                 return true;
+            }
 
             // First apply any administration filters where we may need to ban people from 
             // chat, etc. If the administration filter tells us that we shouldn't process
             // the message further because it handled it, then don't.
-            foreach (var filter in this.adminFilters)
-                if (!filter.Handle(this.chatConfig, twitchClient, e))
+            foreach (var filter in this.adminFilters) {
+                if (!filter.Handle(this.chatConfig, twitchClient, e)) {
                     return false;
+                }
+            }
 
             return true;
         }

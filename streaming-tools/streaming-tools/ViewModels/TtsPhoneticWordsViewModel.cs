@@ -3,9 +3,7 @@
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Linq;
-
     using DynamicData;
-
     using ReactiveUI;
 
     /// <summary>
@@ -30,7 +28,7 @@
         /// <summary>
         ///     The collection of all phonetic words.
         /// </summary>
-        private ObservableCollection<PhoneticWord> wordsToPhonetics = new ObservableCollection<PhoneticWord>();
+        private ObservableCollection<PhoneticWord> wordsToPhonetics = new();
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="TtsPhoneticWordsViewModel" /> class.
@@ -38,9 +36,11 @@
         public TtsPhoneticWordsViewModel() {
             this.RefreshListInConfig();
 
-            if (null != Configuration.Instance.TtsPhoneticUsernames)
-                foreach (var pair in Configuration.Instance.TtsPhoneticUsernames)
+            if (null != Configuration.Instance.TtsPhoneticUsernames) {
+                foreach (var pair in Configuration.Instance.TtsPhoneticUsernames) {
                     this.wordsToPhonetics.Add(new PhoneticWord(this, pair.Key, pair.Value));
+                }
+            }
         }
 
         /// <summary>
@@ -81,12 +81,14 @@
         /// </summary>
         /// <param name="word">The word to delete.</param>
         public void DeletePhonetic(string word) {
-            if (string.IsNullOrWhiteSpace(word))
+            if (string.IsNullOrWhiteSpace(word)) {
                 return;
+            }
 
             var entry = this.wordsToPhonetics.FirstOrDefault(w => word.Equals(w.Word));
-            if (null == entry)
+            if (null == entry) {
                 return;
+            }
 
             this.wordsToPhonetics.Remove(entry);
             this.RemoveFromConfig(word);
@@ -97,12 +99,14 @@
         /// </summary>
         /// <param name="word">The word to edit.</param>
         public void EditPhonetic(string word) {
-            if (string.IsNullOrWhiteSpace(word))
+            if (string.IsNullOrWhiteSpace(word)) {
                 return;
+            }
 
             var entry = this.wordsToPhonetics.FirstOrDefault(w => word.Equals(w.Word));
-            if (null == entry)
+            if (null == entry) {
                 return;
+            }
 
             this.editingPhonetic = entry;
             this.UserEnteredWord = entry.Word;
@@ -113,8 +117,9 @@
         ///     Saves the current word.
         /// </summary>
         public void SaveEntry() {
-            if (string.IsNullOrWhiteSpace(this.UserEnteredWord) || string.IsNullOrWhiteSpace(this.UserEnteredPhonetic))
+            if (string.IsNullOrWhiteSpace(this.UserEnteredWord) || string.IsNullOrWhiteSpace(this.UserEnteredPhonetic)) {
                 return;
+            }
 
             // If we are not currently editing.
             if (null == this.editingPhonetic) {
@@ -146,12 +151,14 @@
         ///     Cleans up the phonetic word list from the configuration.
         /// </summary>
         private void RefreshListInConfig() {
-            if (null == Configuration.Instance.TtsPhoneticUsernames)
+            if (null == Configuration.Instance.TtsPhoneticUsernames) {
                 return;
+            }
 
             var dict = new Dictionary<string, string>();
-            foreach (var pair in Configuration.Instance.TtsPhoneticUsernames)
+            foreach (var pair in Configuration.Instance.TtsPhoneticUsernames) {
                 dict[pair.Key] = pair.Value;
+            }
 
             var list = dict.ToList();
             list.Sort((pair, valuePair) => pair.Key.CompareTo(valuePair.Key));
@@ -165,8 +172,9 @@
         /// </summary>
         /// <param name="word">The word to remove.</param>
         private void RemoveFromConfig(string word) {
-            if (string.IsNullOrWhiteSpace(word))
+            if (string.IsNullOrWhiteSpace(word)) {
                 return;
+            }
 
             var existing = Configuration.Instance.TtsPhoneticUsernames?.FirstOrDefault(u => word.Equals(u.Key, StringComparison.InvariantCultureIgnoreCase));
             if (null != existing && !default(KeyValuePair<string, string>).Equals(existing)) {
