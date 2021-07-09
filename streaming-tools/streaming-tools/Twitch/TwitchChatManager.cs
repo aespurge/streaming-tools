@@ -6,11 +6,8 @@
     using System.Text;
     using System.Threading.Tasks;
     using System.Timers;
-
+    using Models;
     using Newtonsoft.Json;
-
-    using streaming_tools.Models;
-
     using TwitchLib.Api;
     using TwitchLib.Api.Core.Enums;
     using TwitchLib.Client;
@@ -55,10 +52,11 @@
         /// </summary>
         public static TwitchChatManager Instance {
             get {
-                if (null == instance)
-                    instance = new TwitchChatManager();
+                if (null == TwitchChatManager.instance) {
+                    TwitchChatManager.instance = new TwitchChatManager();
+                }
 
-                return instance;
+                return TwitchChatManager.instance;
             }
         }
 
@@ -68,13 +66,15 @@
         /// <param name="account">The account to connect with.</param>
         /// <param name="channel">The name of the channel to join.</param>
         /// <param name="messageCallback">The callback to invoke when a message is received.</param>
-        public void AddTwitchChannel(TwitchAccount? account, string? channel, Action<TwitchClient, OnMessageReceivedArgs>? messageCallback) {
-            if (null == account || null == channel || null == messageCallback)
+        public async void AddTwitchChannel(TwitchAccount? account, string? channel, Action<TwitchClient, OnMessageReceivedArgs>? messageCallback) {
+            if (null == account || null == channel || null == messageCallback) {
                 return;
+            }
 
-            var conn = this.GetOrCreateConnection(account, channel);
-            if (null == conn)
+            var conn = await this.GetOrCreateConnection(account, channel);
+            if (null == conn) {
                 return;
+            }
 
             conn.MessageCallbacks += messageCallback;
         }
@@ -86,13 +86,15 @@
         /// <param name="account">The account to connect with.</param>
         /// <param name="channel">The name of the channel to join.</param>
         /// <param name="adminCallback">The callback to invoke when a message is received.</param>
-        public void AddTwitchChannelAdminFilter(TwitchAccount? account, string? channel, Func<TwitchClient, OnMessageReceivedArgs, bool>? adminCallback) {
-            if (null == account || null == channel || null == adminCallback)
+        public async void AddTwitchChannelAdminFilter(TwitchAccount? account, string? channel, Func<TwitchClient, OnMessageReceivedArgs, bool>? adminCallback) {
+            if (null == account || null == channel || null == adminCallback) {
                 return;
+            }
 
-            var conn = this.GetOrCreateConnection(account, channel);
-            if (null == conn)
+            var conn = await this.GetOrCreateConnection(account, channel);
+            if (null == conn) {
                 return;
+            }
 
             conn.AdminCallbacks += adminCallback;
         }
@@ -105,12 +107,13 @@
         public TwitchClient? GetTwitchChannelClient(string channel) {
             lock (this.twitchClients) {
                 var existing = from connection in this.twitchClients
-                               where connection.Value.Channel?.Equals(channel, StringComparison.InvariantCultureIgnoreCase) == true
-                               select connection;
+                    where connection.Value.Channel?.Equals(channel, StringComparison.InvariantCultureIgnoreCase) == true
+                    select connection;
 
                 var pair = existing.FirstOrDefault();
-                if (default(KeyValuePair<TwitchClient, TwitchConnection>).Equals(pair))
+                if (default(KeyValuePair<TwitchClient, TwitchConnection>).Equals(pair)) {
                     return null;
+                }
 
                 return pair.Key;
             }
@@ -121,10 +124,11 @@
         /// </summary>
         /// <param name="username">The twitch username that is connected.</param>
         /// <returns>The twitch client if a connection exists, null otherwise.</returns>
-        public TwitchAPI? GetTwitchClientApi(string username) {
+        public async Task<TwitchAPI?> GetTwitchClientApi(string username) {
             var account = Configuration.Instance.TwitchAccounts?.FirstOrDefault(a => username.Equals(a.Username, StringComparison.InvariantCultureIgnoreCase));
-            if (null == account || string.IsNullOrWhiteSpace(account.Username) || string.IsNullOrWhiteSpace(account.ApiOAuth))
+            if (null == account || string.IsNullOrWhiteSpace(account.Username) || string.IsNullOrWhiteSpace(account.ApiOAuth)) {
                 return null;
+            }
 
             var api = new TwitchAPI();
             api.Settings.ClientId = Constants.NULLINSIDE_CLIENT_ID;
@@ -133,28 +137,24 @@
             if (account.ApiOAuthExpires <= DateTime.UtcNow && null != account.ApiOAuthRefresh) {
                 try {
                     var refreshToken = Encoding.UTF8.GetString(Convert.FromBase64String(account.ApiOAuthRefresh));
-                    var task = Task.Run(
-                        () => {
-                            var client = new HttpClient();
-                            var nullinsideResponse = client.PostAsync($"{Constants.NULLINSIDE_TWITCH_REFRESH}?refresh_token={refreshToken}", new StringContent(""));
-                            Task.WaitAll(nullinsideResponse);
-                            if (!nullinsideResponse.IsCompletedSuccessfully || !nullinsideResponse.Result.IsSuccessStatusCode)
-                                return null;
+                    var client = new HttpClient();
+                    var nullinsideResponse = await client.PostAsync($"{Constants.NULLINSIDE_TWITCH_REFRESH}?refresh_token={refreshToken}", new StringContent(""));
+                    if (!nullinsideResponse.IsSuccessStatusCode) {
+                        return null;
+                    }
 
-                            var responseString = nullinsideResponse.Result.Content.ReadAsStringAsync();
-                            Task.WaitAll(responseString);
-                            return JsonConvert.DeserializeObject<TwitchTokenResponseJson>(responseString.Result);
-                        });
-                    Task.WaitAll(task);
-                    var response = task.Result;
-                    if (null == response)
+                    var responseString = await nullinsideResponse.Content.ReadAsStringAsync();
+                    var json = JsonConvert.DeserializeObject<TwitchTokenResponseJson>(responseString);
+                    if (null == json) {
                         return api;
+                    }
 
-                    account.ApiOAuth = Convert.ToBase64String(Encoding.UTF8.GetBytes(response.access_token));
-                    account.ApiOAuthRefresh = Convert.ToBase64String(Encoding.UTF8.GetBytes(response.refresh_token));
-                    account.ApiOAuthExpires = DateTime.UtcNow + new TimeSpan(0, 0, response.expires_in - 300);
+                    account.ApiOAuth = Convert.ToBase64String(Encoding.UTF8.GetBytes(json.access_token));
+                    account.ApiOAuthRefresh = Convert.ToBase64String(Encoding.UTF8.GetBytes(json.refresh_token));
+                    account.ApiOAuthExpires = DateTime.UtcNow + new TimeSpan(0, 0, json.expires_in - 300);
                     Configuration.Instance.WriteConfiguration();
-                } catch (Exception) { }
+                }
+                catch (Exception) { }
             }
 
             api.Settings.AccessToken = Encoding.UTF8.GetString(Convert.FromBase64String(account.ApiOAuth));
@@ -169,8 +169,9 @@
             var usernameChannels = new List<Tuple<string, string>>();
             lock (this.twitchClients) {
                 foreach (var connection in this.twitchClients.Values) {
-                    if (null == connection?.Account?.Username || null == connection.Channel)
+                    if (null == connection?.Account?.Username || null == connection.Channel) {
                         continue;
+                    }
 
                     // False positive
 #pragma warning disable CS8604
@@ -182,8 +183,9 @@
             var tasks = usernameChannels.Select(tuple => this.GetUsersFromChat(tuple.Item1, tuple.Item2));
             var allChatters = new List<TwitchChatter>();
             foreach (var chatters in await Task.WhenAll(tasks)) {
-                if (null == chatters)
+                if (null == chatters) {
                     continue;
+                }
 
                 allChatters.AddRange(chatters);
             }
@@ -198,13 +200,14 @@
         /// <param name="channel">The name of the channel that was joined.</param>
         /// <param name="messageCallback">The callback to remove.</param>
         public void RemoveTwitchChannel(TwitchAccount? account, string? channel, Action<TwitchClient, OnMessageReceivedArgs>? messageCallback) {
-            if (null == account || null == channel || null == messageCallback)
+            if (null == account || null == channel || null == messageCallback) {
                 return;
+            }
 
             lock (this.twitchClients) {
                 var allExisting = from connection in this.twitchClients
-                                  where connection.Value.Account == account && connection.Value.Channel?.Equals(channel, StringComparison.InvariantCultureIgnoreCase) == true
-                                  select connection;
+                    where connection.Value.Account == account && connection.Value.Channel?.Equals(channel, StringComparison.InvariantCultureIgnoreCase) == true
+                    select connection;
 
                 foreach (var existing in allExisting.ToArray()) {
                     existing.Value.MessageCallbacks -= messageCallback;
@@ -224,17 +227,19 @@
         /// <param name="channel">The name of the channel that was joined.</param>
         /// <param name="adminCallback">The callback to remove.</param>
         public void RemoveTwitchChannelAdminFilter(TwitchAccount? account, string? channel, Func<TwitchClient, OnMessageReceivedArgs, bool>? adminCallback) {
-            if (null == account || null == channel || null == adminCallback)
+            if (null == account || null == channel || null == adminCallback) {
                 return;
+            }
 
             lock (this.twitchClients) {
                 var allExisting = from connection in this.twitchClients
-                                  where connection.Value.Account == account && connection.Value.Channel?.Equals(channel, StringComparison.InvariantCultureIgnoreCase) == true
-                                  select connection;
+                    where connection.Value.Account == account && connection.Value.Channel?.Equals(channel, StringComparison.InvariantCultureIgnoreCase) == true
+                    select connection;
 
                 foreach (var existing in allExisting.ToArray()) {
-                    if (null != existing.Value?.AdminCallbacks)
+                    if (null != existing.Value?.AdminCallbacks) {
                         existing.Value.AdminCallbacks -= adminCallback;
+                    }
 
                     if (null == existing.Value?.MessageCallbacks && null == existing.Value?.AdminCallbacks) {
                         this.twitchClients.Remove(existing.Key);
@@ -253,14 +258,15 @@
         public bool TwitchChannelIsConnected(string username, string channel) {
             lock (this.twitchClients) {
                 var allExisting = from connection in this.twitchClients
-                                  where username.Equals(connection.Value.Account?.Username) && connection.Value.Channel?.Equals(channel, StringComparison.InvariantCultureIgnoreCase) == true
-                                  select connection;
+                    where username.Equals(connection.Value.Account?.Username) && connection.Value.Channel?.Equals(channel, StringComparison.InvariantCultureIgnoreCase) == true
+                    select connection;
 
-                if (!allExisting.Any())
+                if (!allExisting.Any()) {
                     return false;
+                }
 
                 var conn = allExisting.FirstOrDefault().Key;
-                return conn.IsConnected;
+                return conn.IsConnected && conn.JoinedChannels.Count > 0;
             }
         }
 
@@ -270,34 +276,46 @@
         /// <param name="account">The account to connect with.</param>
         /// <param name="channel">The twitch channel to connect to.</param>
         /// <returns>An instance of the twitch connection.</returns>
-        private TwitchConnection GetOrCreateConnection(TwitchAccount account, string channel) {
+        private async Task<TwitchConnection?> GetOrCreateConnection(TwitchAccount account, string channel) {
+            TwitchConnection conn;
+            TwitchClient twitchClient;
+
+            // Modify the global connection.
             lock (this.twitchClients) {
                 var existing = from connection in this.twitchClients.Values
-                               where connection.Account == account && connection.Channel?.Equals(channel, StringComparison.InvariantCultureIgnoreCase) == true
-                               select connection;
+                    where connection.Account == account && connection.Channel?.Equals(channel, StringComparison.InvariantCultureIgnoreCase) == true
+                    select connection;
 
-                if (existing.Any())
+                if (existing.Any()) {
                     return existing.First();
+                }
 
-                var conn = new TwitchConnection { Account = account, Channel = channel };
-
-                var password = null != account.ApiOAuth ? Encoding.UTF8.GetString(Convert.FromBase64String(account.ApiOAuth)) : null;
-                var credentials = new ConnectionCredentials(account.Username, password ?? "");
+                conn = new TwitchConnection { Account = account, Channel = channel };
                 var clientOptions = new ClientOptions { MessagesAllowedInPeriod = 750, ThrottlingPeriod = TimeSpan.FromSeconds(30) };
 
                 WebSocketClient customClient = new(clientOptions);
-                var twitchClient = new TwitchClient(customClient);
-                twitchClient.Initialize(credentials, channel);
-                twitchClient.AutoReListenOnException = true;
-                twitchClient.OnMessageReceived += this.TwitchClient_OnMessageReceived;
-                twitchClient.OnBeingHosted += this.TwitchClient_OnBeingHosted;
-                twitchClient.OnRaidNotification += this.TwitchClient_OnRaidNotification;
-
-                twitchClient.Connect();
+                twitchClient = new TwitchClient(customClient);
                 this.twitchClients[twitchClient] = conn;
-
-                return conn;
             }
+
+            // Run the connecting asynchronously
+            await Task.Run(() => {
+                try {
+                    var password = null != account.ApiOAuth ? Encoding.UTF8.GetString(Convert.FromBase64String(account.ApiOAuth)) : null;
+                    var credentials = new ConnectionCredentials(account.Username, password ?? "");
+
+                    twitchClient.Initialize(credentials, channel);
+                    twitchClient.AutoReListenOnException = true;
+                    twitchClient.OnMessageReceived += this.TwitchClient_OnMessageReceived;
+                    twitchClient.OnBeingHosted += this.TwitchClient_OnBeingHosted;
+                    twitchClient.OnRaidNotification += this.TwitchClient_OnRaidNotification;
+
+                    twitchClient.Connect();
+                }
+                catch (Exception) { }
+            });
+
+            return conn;
         }
 
         /// <summary>
@@ -307,14 +325,16 @@
         /// <param name="username">The username to user to check.</param>
         /// <returns>A collection of currently existing users in chat.</returns>
         private async Task<ICollection<TwitchChatter>?> GetUsersFromChat(string channel, string username) {
-            var api = this.GetTwitchClientApi(username);
-            if (null == api)
+            var api = await this.GetTwitchClientApi(username);
+            if (null == api) {
                 return null;
+            }
 
             try {
                 var resp = await api.Undocumented.GetChattersAsync(channel);
                 return resp.Select(c => new TwitchChatter(channel, c.Username)).ToArray();
-            } catch (Exception) {
+            }
+            catch (Exception) {
                 return null;
             }
         }
@@ -324,11 +344,40 @@
         /// </summary>
         /// <param name="sender">The timer.</param>
         /// <param name="e">The event arguments.</param>
-        private void ReconnectTimer_OnElapsed(object sender, ElapsedEventArgs e) {
+        private async void ReconnectTimer_OnElapsed(object sender, ElapsedEventArgs e) {
+            // This is a race condition but we're going with it for now. We will grab the entire list of clients
+            // and loop through for information and connecting outside of the lock. Technically we could be removing
+            // something at the same time as we're trying to reconnect to them.
+            KeyValuePair<TwitchClient, TwitchConnection?>[] clients;
             lock (this.twitchClients) {
-                foreach (var client in this.twitchClients.Keys) {
-                    if (!client.IsConnected)
-                        client.Reconnect();
+                clients = this.twitchClients.ToArray();
+            }
+
+            foreach (var client in clients) {
+                // If the connection is established, perform a reconnection.
+                if (!client.Key.IsConnected) {
+                    await Task.WhenAny(Task.Run(() => {
+                        try {
+                            client.Key.Reconnect();
+                        }
+                        catch (Exception) { }
+                    }), Task.Delay(15000));
+                }
+
+                // If we are connected but we are not actually in the twitch chat channel like
+                // we're supposed to be, join the channel. I don't know why sometimes we lose
+                // the joined channel completely after being connected but we do.
+                if (0 == client.Key.JoinedChannels.Count) {
+                    await Task.WhenAny(Task.Run(() => {
+                        try {
+                            if (null == client.Value) {
+                                return;
+                            }
+
+                            client.Key.JoinChannel(client.Value.Channel);
+                        }
+                        catch (Exception) { }
+                    }), Task.Delay(15000));
                 }
             }
         }
@@ -340,8 +389,9 @@
         /// <param name="e">The host information.</param>
         private void TwitchClient_OnBeingHosted(object? sender, OnBeingHostedArgs e) {
             var twitchClient = sender as TwitchClient;
-            if (null == twitchClient)
+            if (null == twitchClient) {
                 return;
+            }
 
             twitchClient.SendMessage(e.BeingHostedNotification.Channel, $"!so {e.BeingHostedNotification.HostedByChannel}");
         }
@@ -352,22 +402,26 @@
         /// <param name="sender">The twitch chat client.</param>
         /// <param name="e">The message information.</param>
         private void TwitchClient_OnMessageReceived(object? sender, OnMessageReceivedArgs e) {
-            if (null == sender)
+            if (null == sender) {
                 return;
+            }
 
             var twitchClient = sender as TwitchClient;
-            if (null == twitchClient)
+            if (null == twitchClient) {
                 return;
+            }
 
             var conn = this.twitchClients.GetValueOrDefault(twitchClient, null);
-            if (null == conn)
+            if (null == conn) {
                 return;
+            }
 
             if (null != conn.AdminCallbacks) {
                 foreach (var adminFilter in conn.AdminCallbacks.GetInvocationList()) {
-                    var shouldContinue = (bool)(adminFilter.DynamicInvoke(twitchClient, e) ?? true);
-                    if (!shouldContinue)
+                    var shouldContinue = (bool) (adminFilter.DynamicInvoke(twitchClient, e) ?? true);
+                    if (!shouldContinue) {
                         return;
+                    }
                 }
             }
 
@@ -381,8 +435,9 @@
         /// <param name="e">The raid information.</param>
         private void TwitchClient_OnRaidNotification(object? sender, OnRaidNotificationArgs e) {
             var twitchClient = sender as TwitchClient;
-            if (null == twitchClient)
+            if (null == twitchClient) {
                 return;
+            }
 
             twitchClient.SendMessage(e.Channel, $"!so {e.RaidNotification.DisplayName}");
         }

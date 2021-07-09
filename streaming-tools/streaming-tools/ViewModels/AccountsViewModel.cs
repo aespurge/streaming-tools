@@ -1,4 +1,5 @@
-﻿namespace streaming_tools.ViewModels {
+﻿namespace streaming_tools.ViewModels
+{
     using System;
     using System.Collections.ObjectModel;
     using System.Diagnostics;
@@ -7,18 +8,16 @@
     using System.Text;
     using System.Threading.Tasks;
     using System.Timers;
-
     using Newtonsoft.Json;
-
     using ReactiveUI;
-
     using streaming_tools.Models;
     using streaming_tools.Views;
 
     /// <summary>
     ///     Handles updating the list and credentials for twitch accounts.
     /// </summary>
-    public class AccountsViewModel : ViewModelBase {
+    public class AccountsViewModel : ViewModelBase
+    {
         /// <summary>
         ///     The singleton collection for configuring the application.
         /// </summary>
@@ -79,7 +78,7 @@
                     continue;
 
                 var viewModel = this.CreateAccountViewModel(user.Username);
-                var control = new AccountView { DataContext = viewModel };
+                var control = new AccountView {DataContext = viewModel};
                 this.Accounts.Add(control);
             }
         }
@@ -176,12 +175,12 @@
         /// <summary>
         ///     Launches the webpage to get the "code" from.
         /// </summary>
-        public void LaunchCodeWebpage() {
-            var url = this.GetCodeUrl();
+        public async void LaunchCodeWebpage() {
+            var url = await this.GetCodeUrl();
             if (null == url)
                 return;
 
-            Process.Start(new ProcessStartInfo("cmd", $"/c start {url.Replace("&", "^&")}") { CreateNoWindow = true });
+            Process.Start(new ProcessStartInfo("cmd", $"/c start {url.Replace("&", "^&")}") {CreateNoWindow = true});
             this.oauthCodeCheckTimer.Start();
         }
 
@@ -209,7 +208,7 @@
             this.config.WriteConfiguration();
 
             if (isNew)
-                this.Accounts.Add(new AccountView { DataContext = this.CreateAccountViewModel(this.Username) });
+                this.Accounts.Add(new AccountView {DataContext = this.CreateAccountViewModel(this.Username)});
 
             this.ClearForm();
         }
@@ -232,7 +231,7 @@
         /// <param name="twitchUsername">The username of the currently added twitch account.</param>
         /// <returns>A new instance of the view model.</returns>
         private AccountViewModel CreateAccountViewModel(string twitchUsername) {
-            return new AccountViewModel { Username = twitchUsername, DeleteAccount = () => this.DeleteAccount(twitchUsername), EditAccount = () => this.EditAccount(twitchUsername) };
+            return new AccountViewModel {Username = twitchUsername, DeleteAccount = () => this.DeleteAccount(twitchUsername), EditAccount = () => this.EditAccount(twitchUsername)};
         }
 
         /// <summary>
@@ -261,35 +260,25 @@
         ///     Gets the URL to launch in the browser for the user to get the "code" to generate an OAuth token.
         /// </summary>
         /// <returns>The url if successful, null otherwise.</returns>
-        private string? GetCodeUrl() {
-            var response = Task.Run(
-                () => {
-                    var setText = Constants.CLIPBOARD?.SetTextAsync("");
-                    if (null == setText)
-                        return null;
+        private async Task<string?> GetCodeUrl() {
+            if (null == Constants.CLIPBOARD)
+                return null;
 
-                    Task.WaitAll(setText);
+            await Constants.CLIPBOARD.SetTextAsync("");
+            var client = new HttpClient();
+            var nullinsideResponse = await client.GetAsync(Constants.NULLINSIDE_TWITCH_CODE);
+            if (!nullinsideResponse.IsSuccessStatusCode)
+                return null;
 
-                    var client = new HttpClient();
-                    var nullinsideResponse = client.GetAsync(Constants.NULLINSIDE_TWITCH_CODE);
-                    Task.WaitAll(nullinsideResponse);
-                    if (!nullinsideResponse.Result.IsSuccessStatusCode)
-                        return null;
+            var body = await nullinsideResponse.Content.ReadAsStringAsync();
+            if (string.IsNullOrWhiteSpace(body))
+                return null;
 
-                    var body = nullinsideResponse.Result.Content.ReadAsStringAsync();
-                    Task.WaitAll(body);
-                    if (string.IsNullOrWhiteSpace(body.Result))
-                        return null;
+            var json = JsonConvert.DeserializeObject<NullInsideTwitchCodeResponseJson>(body);
+            if (null == json)
+                return null;
 
-                    var json = JsonConvert.DeserializeObject<NullInsideTwitchCodeResponseJson>(body.Result);
-                    if (null == json)
-                        return null;
-
-                    return json.url;
-                });
-
-            Task.WaitAll(response);
-            return response.Result;
+            return json.url;
         }
 
         /// <summary>
@@ -297,18 +286,17 @@
         /// </summary>
         /// <param name="sender">The timer.</param>
         /// <param name="e">The event arguments.</param>
-        private void OauthCodeCheckTimer_Elapsed(object sender, ElapsedEventArgs e) {
-            var task = Constants.CLIPBOARD?.GetTextAsync();
-            if (null == task)
+        private async void OauthCodeCheckTimer_Elapsed(object sender, ElapsedEventArgs e) {
+            if (null == Constants.CLIPBOARD)
                 return;
 
-            Task.WaitAll(task);
-            if (string.IsNullOrWhiteSpace(task.Result)) {
+            var text = await Constants.CLIPBOARD.GetTextAsync();
+            if (string.IsNullOrWhiteSpace(text)) {
                 this.oauthCodeCheckTimer.Start();
                 return;
             }
 
-            this.Code = task.Result;
+            this.Code = text;
         }
     }
 }

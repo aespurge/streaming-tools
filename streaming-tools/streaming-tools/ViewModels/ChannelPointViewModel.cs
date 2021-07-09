@@ -101,7 +101,7 @@
                 if (null == account || null == account.Username)
                     return;
 
-                var api = TwitchChatManager.Instance.GetTwitchClientApi(account.Username);
+                var api = await TwitchChatManager.Instance.GetTwitchClientApi(account.Username);
                 if (null == api)
                     return;
 
