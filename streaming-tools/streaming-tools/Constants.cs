@@ -59,7 +59,7 @@
         /// <summary>
         ///     The hard coded location for where the keyboard hooks executable lives.
         /// </summary>
-        public const string WINDOWS_KEYBOARD_HOOK_LOCATION = @"../../../../WindowsKeyboardHook/bin/Release/net5.0/WindowsKeyboardHook.exe";
+        public const string WINDOWS_KEYBOARD_HOOK_LOCATION = @"../WindowsKeyboardHook/WindowsKeyboardHook.exe";
 #endif
     }
 }
