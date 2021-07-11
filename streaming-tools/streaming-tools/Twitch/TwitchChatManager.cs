@@ -310,6 +310,7 @@
                     twitchClient.OnRaidNotification += this.TwitchClient_OnRaidNotification;
 
                     twitchClient.Connect();
+                    twitchClient.JoinChannel(channel);
                 } catch (Exception) { }
             });
 

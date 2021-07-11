@@ -20,7 +20,14 @@
         /// <returns>True if the message should be passed on, false if it should be discarded.</returns>
         public bool Handle(TwitchChatConfiguration config, TwitchClient client, OnMessageReceivedArgs messageInfo) {
             string chatMessage = messageInfo.ChatMessage.Message;
-            if (chatMessage.Contains("Wanna become famous?", StringComparison.InvariantCultureIgnoreCase) && Regex.IsMatch(chatMessage, Constants.REGEX_URL)) {
+            if (chatMessage.Contains("Wanna become famous?", StringComparison.InvariantCultureIgnoreCase) &&
+                (
+                    Regex.IsMatch(chatMessage, Constants.REGEX_URL) ||
+                    chatMessage.Contains("Buy", StringComparison.InvariantCultureIgnoreCase) &&
+                    chatMessage.Contains("followers", StringComparison.InvariantCultureIgnoreCase) &&
+                    chatMessage.Contains("primes", StringComparison.InvariantCultureIgnoreCase) &&
+                    chatMessage.Contains("viewers", StringComparison.InvariantCultureIgnoreCase)
+                )) {
                 client.BanUser(config.TwitchChannel, messageInfo.ChatMessage.Username, "[Bot] Wanna become famous");
                 return false;
             }
