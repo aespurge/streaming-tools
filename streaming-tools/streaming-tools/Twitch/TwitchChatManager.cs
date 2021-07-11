@@ -4,6 +4,7 @@
     using System.Linq;
     using System.Net.Http;
     using System.Text;
+    using System.Threading;
     using System.Threading.Tasks;
     using System.Timers;
     using Models;
@@ -15,6 +16,7 @@
     using TwitchLib.Client.Models;
     using TwitchLib.Communication.Clients;
     using TwitchLib.Communication.Models;
+    using Timer = System.Timers.Timer;
 
     /// <summary>
     ///     Organizes and aggregates the clients connected to zero or more twitch chats. Invokes callbacks for messages
@@ -42,7 +44,7 @@
         /// <remarks>This is protected to prevent instantiation outside of our singleton.</remarks>
         protected TwitchChatManager() {
             this.reconnectTimer = new Timer(1000);
-            this.reconnectTimer.AutoReset = true;
+            this.reconnectTimer.AutoReset = false;
             this.reconnectTimer.Elapsed += this.ReconnectTimer_OnElapsed;
             this.reconnectTimer.Start();
         }
@@ -343,38 +345,56 @@
         /// <param name="sender">The timer.</param>
         /// <param name="e">The event arguments.</param>
         private async void ReconnectTimer_OnElapsed(object sender, ElapsedEventArgs e) {
-            // This is a race condition but we're going with it for now. We will grab the entire list of clients
-            // and loop through for information and connecting outside of the lock. Technically we could be removing
-            // something at the same time as we're trying to reconnect to them.
-            KeyValuePair<TwitchClient, TwitchConnection?>[] clients;
-            lock (this.twitchClients) {
-                clients = this.twitchClients.ToArray();
-            }
-
-            foreach (var client in clients) {
-                // If the connection is established, perform a reconnection.
-                if (!client.Key.IsConnected) {
-                    await Task.WhenAny(Task.Run(() => {
-                        try {
-                            client.Key.Reconnect();
-                        } catch (Exception) { }
-                    }), Task.Delay(15000));
+            try {
+                // This is a race condition but we're going with it for now. We will grab the entire list of clients
+                // and loop through for information and connecting outside of the lock. Technically we could be removing
+                // something at the same time as we're trying to reconnect to them.
+                KeyValuePair<TwitchClient, TwitchConnection?>[] clients;
+                lock (this.twitchClients) {
+                    clients = this.twitchClients.ToArray();
                 }
 
-                // If we are connected but we are not actually in the twitch chat channel like
-                // we're supposed to be, join the channel. I don't know why sometimes we lose
-                // the joined channel completely after being connected but we do.
-                if (0 == client.Key.JoinedChannels.Count) {
-                    await Task.WhenAny(Task.Run(() => {
-                        try {
-                            if (null == client.Value) {
-                                return;
-                            }
+                foreach (var client in clients) {
+                    // If the connection is established, perform a reconnection.
+                    if (!client.Key.IsConnected) {
+                        await Task.WhenAny(Task.Run(() => {
+                            try {
+                                using (var signal = new ManualResetEventSlim(false)) {
+                                    var waiting = new EventHandler<OnConnectedArgs>((o, args) => { signal.Set(); });
 
-                            client.Key.JoinChannel(client.Value.Channel);
-                        } catch (Exception) { }
-                    }), Task.Delay(15000));
+                                    client.Key.OnConnected += waiting;
+                                    client.Key.Reconnect();
+                                    signal.Wait(10000);
+                                    client.Key.OnConnected -= waiting;
+                                }
+                            } catch (Exception) { }
+                        }), Task.Delay(15000));
+                    }
+
+                    // If we are connected but we are not actually in the twitch chat channel like
+                    // we're supposed to be, join the channel. I don't know why sometimes we lose
+                    // the joined channel completely after being connected but we do.
+                    if (0 == client.Key.JoinedChannels.Count) {
+                        await Task.WhenAny(Task.Run(() => {
+                            try {
+                                if (null == client.Value) {
+                                    return;
+                                }
+
+                                using (var signal = new ManualResetEventSlim(false)) {
+                                    var waiting = new EventHandler<OnJoinedChannelArgs>((o, args) => { signal.Set(); });
+
+                                    client.Key.OnJoinedChannel += waiting;
+                                    client.Key.JoinChannel(client.Value.Channel);
+                                    signal.Wait(10000);
+                                    client.Key.OnJoinedChannel -= waiting;
+                                }
+                            } catch (Exception) { }
+                        }), Task.Delay(15000));
+                    }
                 }
+            } finally {
+                this.reconnectTimer.Start();
             }
         }
 
