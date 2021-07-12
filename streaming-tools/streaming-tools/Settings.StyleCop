@@ -6,6 +6,9 @@
       <Value>API</Value>
       <Value>auth</Value>
       <Value>twitch</Value>
+      <Value>emojis</Value>
+      <Value>Emojis</Value>
+      <Value>FrankerzFace</Value>
     </CollectionProperty>
   </GlobalSettings>
   <Analyzers>
