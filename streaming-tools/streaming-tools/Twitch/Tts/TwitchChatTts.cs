@@ -21,7 +21,7 @@
         /// <summary>
         ///     Filters for modifying an incoming message for text to speech.
         /// </summary>
-        private readonly ITtsFilter[] ttsFilters = { new LinkFilter(), new UsernameSkipFilter(), new UsernameRemoveCharactersFilter(), new PhoneticFilter(), new CommandFilter(), new EmojiDeduplication() };
+        private readonly ITtsFilter[] ttsFilters = { new LinkFilter(), new UsernameSkipFilter(), new UsernameRemoveCharactersFilter(), new PhoneticFilter(), new CommandFilter(), new EmojiDeduplicationFilter(), new WordSpamFilter() };
 
         /// <summary>
         ///     The lock for ensuring mutual exclusion on the <see cref="ttsSoundOutput" /> object.
