@@ -200,11 +200,12 @@
         /// <param name="account">The account originally subscribed with.</param>
         /// <param name="channel">The name of the channel that was joined.</param>
         /// <param name="messageCallback">The callback to remove.</param>
-        public void RemoveTwitchChannel(TwitchAccount? account, string? channel, Action<TwitchClient, OnMessageReceivedArgs>? messageCallback) {
+        public async void RemoveTwitchChannel(TwitchAccount? account, string? channel, Action<TwitchClient, OnMessageReceivedArgs>? messageCallback) {
             if (null == account || null == channel || null == messageCallback) {
                 return;
             }
 
+            TwitchClient? removeClient = null;
             lock (this.twitchClients) {
                 var allExisting = from connection in this.twitchClients
                     where connection.Value.Account == account && connection.Value.Channel?.Equals(channel, StringComparison.InvariantCultureIgnoreCase) == true
@@ -215,9 +216,13 @@
 
                     if (null == existing.Value.MessageCallbacks && null == existing.Value.AdminCallbacks) {
                         this.twitchClients.Remove(existing.Key);
-                        existing.Key.Disconnect();
+                        removeClient = existing.Key;
                     }
                 }
+            }
+
+            if (null != removeClient) {
+                await Task.Run(() => removeClient.Disconnect());
             }
         }
 
@@ -227,11 +232,12 @@
         /// <param name="account">The account originally subscribed with.</param>
         /// <param name="channel">The name of the channel that was joined.</param>
         /// <param name="adminCallback">The callback to remove.</param>
-        public void RemoveTwitchChannelAdminFilter(TwitchAccount? account, string? channel, Func<TwitchClient, OnMessageReceivedArgs, bool>? adminCallback) {
+        public async void RemoveTwitchChannelAdminFilter(TwitchAccount? account, string? channel, Func<TwitchClient, OnMessageReceivedArgs, bool>? adminCallback) {
             if (null == account || null == channel || null == adminCallback) {
                 return;
             }
 
+            TwitchClient? removeClient = null;
             lock (this.twitchClients) {
                 var allExisting = from connection in this.twitchClients
                     where connection.Value.Account == account && connection.Value.Channel?.Equals(channel, StringComparison.InvariantCultureIgnoreCase) == true
@@ -244,9 +250,13 @@
 
                     if (null == existing.Value?.MessageCallbacks && null == existing.Value?.AdminCallbacks) {
                         this.twitchClients.Remove(existing.Key);
-                        existing.Key.Disconnect();
+                        removeClient = existing.Key;
                     }
                 }
+            }
+
+            if (null != removeClient) {
+                await Task.Run(() => removeClient.Disconnect());
             }
         }
 
@@ -310,9 +320,6 @@
                     twitchClient.OnMessageReceived += this.TwitchClient_OnMessageReceived;
                     twitchClient.OnBeingHosted += this.TwitchClient_OnBeingHosted;
                     twitchClient.OnRaidNotification += this.TwitchClient_OnRaidNotification;
-
-                    twitchClient.Connect();
-                    twitchClient.JoinChannel(channel);
                 } catch (Exception) { }
             });
 
