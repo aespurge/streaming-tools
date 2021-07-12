@@ -8,10 +8,15 @@
     using TwitchLib.Client.Events;
 
     /// <summary>
-    /// Remove duplicate spammed emojis from TTS messages. Performs no admin actions on the user (such as banning or timing out), simply removes the
-    /// duplicate or excessive use of emotes from the message.
+    ///     Remove duplicate spammed emojis from TTS messages. Performs no admin actions on the user (such as banning or timing
+    ///     out), simply removes the duplicate or excessive use of emotes from the message.
     /// </summary>
     public class EmojiDeduplication : ITtsFilter {
+        /// <summary>
+        ///     The maximum number of emotes to allow.
+        /// </summary>
+        private const int MAXIMUM_EMOTES = 2;
+
         /// <summary>
         ///     The cache of Better TTV emotes for each channel.
         /// </summary>
@@ -21,11 +26,6 @@
         ///     The cache of FrankerzFace emotes for each channel.
         /// </summary>
         private readonly Dictionary<string, string[]> frankerzFaceCache = new Dictionary<string, string[]>();
-
-        /// <summary>
-        /// The maximum number of emotes to allow.
-        /// </summary>
-        private const int MAXIMUM_EMOTES = 2;
 
         /// <summary>
         ///     Removes duplicate emotes from a message.
@@ -71,7 +71,7 @@
                         encounteredEmotes.Add(part);
 
                         // If they used more than 2 emotes, remove it from the message.
-                        if (encounteredEmotes.Count > MAXIMUM_EMOTES) {
+                        if (encounteredEmotes.Count > EmojiDeduplication.MAXIMUM_EMOTES) {
                             messageParts[i] = "";
                         }
                     }
@@ -95,7 +95,7 @@
                             // If they used more than 2 emotes, remove it from the message.
                             // There is a slight problem with this. Some of the higher value emotes take up two character slots in unicode.
                             // technically this will cause us to shot change people using emotes. But this is good enough for now.
-                            if (encounteredEmotes.Count > MAXIMUM_EMOTES) {
+                            if (encounteredEmotes.Count > EmojiDeduplication.MAXIMUM_EMOTES) {
                                 charArray[x] = ' ';
                             }
                         }
