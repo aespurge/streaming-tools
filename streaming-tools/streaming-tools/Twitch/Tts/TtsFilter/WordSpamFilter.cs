@@ -1,5 +1,6 @@
 ﻿namespace streaming_tools.Twitch.Tts.TtsFilter {
     using System;
+    using System.Linq;
     using TwitchLib.Client.Events;
 
     /// <summary>
@@ -9,7 +10,7 @@
         /// <summary>
         ///     The maximum number of emotes to allow.
         /// </summary>
-        private const int MAXIMUM_LETTER_OCCURANCES = 3;
+        private const int MAXIMUM_LETTER_OCCURANCES = 2;
 
         /// <summary>
         ///     The maximum number of emotes to allow.
@@ -31,11 +32,12 @@
         public Tuple<string, string> Filter(OnMessageReceivedArgs twitchInfo, string username, string currentMessage) {
             // See if a letter is being spammed over and over again in a single word
             var parts = currentMessage.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-            foreach (var part in parts) {
+            for (int i = 0; i < parts.Length; i++) {
+                var part = parts[i].ToList();
                 var previousLetter = ' ';
                 uint consecutiveLetterCount = 1;
-                for (var i = 0; i < part.Length; i++) {
-                    var letter = part[i];
+                for (int x = part.Count - 1; x >= 0; x--) {
+                    var letter = part[x];
 
                     if (previousLetter.Equals(letter)) {
                         ++consecutiveLetterCount;
@@ -45,9 +47,11 @@
 
                     previousLetter = letter;
                     if (consecutiveLetterCount > WordSpamFilter.MAXIMUM_LETTER_OCCURANCES) {
-                        return new Tuple<string, string>(username, WordSpamFilter.SPAM_REPLACEMENT);
+                        part.RemoveAt(x);
                     }
                 }
+
+                parts[i] = string.Join("", part);
             }
 
             // Check the words in order and see if they spammed the same word more than once.
@@ -91,7 +95,7 @@
             //    }
             //}
 
-            return new Tuple<string, string>(username, currentMessage);
+            return new Tuple<string, string>(username, string.Join(" ", parts));
         }
     }
 }
