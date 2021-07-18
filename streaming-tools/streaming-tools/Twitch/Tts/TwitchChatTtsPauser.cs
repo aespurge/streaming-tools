@@ -118,7 +118,7 @@
 
             var totalDevices = NAudioUtilities.GetTotalInputDevices();
             var index = -1;
-            for (var i = -1; i < totalDevices - 1; i++) {
+            for (var i = -1; i < totalDevices; i++) {
                 if (NAudioUtilities.GetInputDevice(i).ProductGuid.ToString() == guid) {
                     index = i + 1;
                     break;
