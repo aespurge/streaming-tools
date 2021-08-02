@@ -9,8 +9,8 @@
         <viewModels:TwitchChatConfigsViewModel />
     </Design.DataContext>
 
-    <StackPanel>
-        <Grid>
+    <DockPanel LastChildFill="True">
+        <Grid DockPanel.Dock="Top">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="30" />
                 <ColumnDefinition Width="200" />
@@ -39,8 +39,8 @@
                 <Image Source="/Assets/add.png" VerticalAlignment="Center" HorizontalAlignment="Center" />
             </Button>
         </Grid>
-        <ScrollViewer MaxHeight="150" VerticalScrollBarVisibility="Auto">
+        <ScrollViewer DockPanel.Dock="Top" VerticalScrollBarVisibility="Auto">
             <ItemsControl Items="{Binding TwitchChatConfigs}" />
         </ScrollViewer>
-    </StackPanel>
+    </DockPanel>
 </UserControl>
