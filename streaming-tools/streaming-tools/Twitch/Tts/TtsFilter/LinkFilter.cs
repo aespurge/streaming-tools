@@ -1,5 +1,6 @@
 ﻿namespace streaming_tools.Twitch.Tts.TtsFilter {
     using System;
+    using System.Linq;
     using System.Text.RegularExpressions;
     using TwitchLib.Client.Events;
 
@@ -15,7 +16,15 @@
         /// <param name="currentMessage">The message from twitch chat.</param>
         /// <returns>The new TTS message and username.</returns>
         public Tuple<string, string> Filter(OnMessageReceivedArgs twitchInfo, string username, string currentMessage) {
-            return new Tuple<string, string>(username, Regex.Replace(currentMessage, Constants.REGEX_URL, string.Empty));
+            // Protect against removing ellipsis
+			var matches = Regex.Matches(currentMessage, Constants.REGEX_URL, RegexOptions.CultureInvariant);
+            foreach (Match match in matches) {
+                if (!match.Value.Contains("..")) {
+                    currentMessage = currentMessage.Replace(match.Value, "");
+                }
+            }
+
+            return new Tuple<string, string>(username, currentMessage);
         }
     }
 }
