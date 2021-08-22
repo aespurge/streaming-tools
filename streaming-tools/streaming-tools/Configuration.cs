@@ -297,6 +297,16 @@
         public bool AdminOn { get; set; }
 
         /// <summary>
+        ///     Gets or sets a value indicating whether we should automatically ban all bots.
+        /// </summary>
+        public bool BanBotsInChat { get; set; }
+
+        /// <summary>
+        ///     Gets or sets a value indicating whether we should automatically ban all hate followers.
+        /// </summary>
+        public bool BanHateFollowers { get; set; }
+
+        /// <summary>
         ///     Gets or sets the output device to send audio to.
         /// </summary>
         public string? OutputDevice { get; set; }

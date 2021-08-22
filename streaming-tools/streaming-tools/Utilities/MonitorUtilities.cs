@@ -56,7 +56,7 @@
         public static PInvokeUtilities.MonitorInfoEx GetPrimaryMonitor() {
             // Try to find the primary monitor using the primary monitor flag.
             foreach (var monitor in MonitorUtilities.GetMonitors()) {
-                if (((User32.MONITORINFO_Flags) monitor.Flags).HasFlag(User32.MONITORINFO_Flags.MONITORINFOF_PRIMARY)) {
+                if (((User32.MONITORINFO_Flags)monitor.Flags).HasFlag(User32.MONITORINFO_Flags.MONITORINFOF_PRIMARY)) {
                     return monitor;
                 }
             }

@@ -6,7 +6,7 @@
     using Newtonsoft.Json.Linq;
 
     /// <summary>
-    /// Helper methods for looking up the emotes available on a channel.
+    ///     Helper methods for looking up the emotes available on a channel.
     /// </summary>
     public static class EmoteLookup {
         /// <summary>

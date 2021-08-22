@@ -35,6 +35,10 @@
                   IsChecked="{Binding TtsOn}" />
         <CheckBox Margin="20,-6,15,0"
                   IsChecked="{Binding PauseDuringSpeech}" />
+        <CheckBox Margin="20,-6,15,0"
+                  IsChecked="{Binding BanBots}" />
+        <CheckBox Margin="40,-6,35,0"
+                  IsChecked="{Binding BanHateFollowers}" />
         <ComboBox HorizontalAlignment="Center"
                   Width="150"
                   Items="{Binding TtsVoices}"

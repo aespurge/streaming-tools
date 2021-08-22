@@ -1,6 +1,5 @@
 ﻿namespace streaming_tools.Twitch.Tts.TtsFilter {
     using System;
-    using System.Linq;
     using System.Text.RegularExpressions;
     using TwitchLib.Client.Events;
 
@@ -17,7 +16,7 @@
         /// <returns>The new TTS message and username.</returns>
         public Tuple<string, string> Filter(OnMessageReceivedArgs twitchInfo, string username, string currentMessage) {
             // Protect against removing ellipsis
-			var matches = Regex.Matches(currentMessage, Constants.REGEX_URL, RegexOptions.CultureInvariant);
+            var matches = Regex.Matches(currentMessage, Constants.REGEX_URL, RegexOptions.CultureInvariant);
             foreach (Match match in matches) {
                 if (!match.Value.Contains("..")) {
                     currentMessage = currentMessage.Replace(match.Value, "");

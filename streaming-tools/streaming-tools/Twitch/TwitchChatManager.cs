@@ -441,7 +441,7 @@
 
             if (null != conn.AdminCallbacks) {
                 foreach (var adminFilter in conn.AdminCallbacks.GetInvocationList()) {
-                    var shouldContinue = (bool) (adminFilter.DynamicInvoke(twitchClient, e) ?? true);
+                    var shouldContinue = (bool)(adminFilter.DynamicInvoke(twitchClient, e) ?? true);
                     if (!shouldContinue) {
                         return;
                     }

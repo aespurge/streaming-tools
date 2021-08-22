@@ -52,7 +52,7 @@
         /// <returns>The next hook that should be called.</returns>
         private static int KeystrokeCallback(int nCode, IntPtr wParam, IntPtr lParam) {
             var keyboardEvent = Marshal.PtrToStructure<KeyboardLowLevelHookStruct>(lParam);
-            var whatHappened = (KeyboardMessage) wParam;
+            var whatHappened = (KeyboardMessage)wParam;
 
             if (whatHappened == KeyboardMessage.KeyDown) {
                 Console.WriteLine(keyboardEvent.vkCode);

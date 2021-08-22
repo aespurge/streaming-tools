@@ -74,22 +74,22 @@
             var monitor = null == this.SelectedMonitor ? MonitorUtilities.GetPrimaryMonitor() : monitors.FirstOrDefault(m => this.SelectedMonitor.Equals(m.DeviceName, StringComparison.InvariantCultureIgnoreCase));
             var monitorWidth = monitor.WorkArea.Right - monitor.WorkArea.Left;
             var monitorHeight = monitor.WorkArea.Bottom - monitor.WorkArea.Top;
-            var width = 2 <= processes.Count ? (int) Math.Ceiling(monitorWidth / 2.0f) : monitorWidth;
-            width += (int) (LayoutsViewModel.PADDING / 2.0 * -1.0);
+            var width = 2 <= processes.Count ? (int)Math.Ceiling(monitorWidth / 2.0f) : monitorWidth;
+            width += (int)(LayoutsViewModel.PADDING / 2.0 * -1.0);
             var height = monitorHeight;
             var rows = Math.Ceiling(processes.Count / 2.0f);
-            height = (int) Math.Ceiling(height / rows);
+            height = (int)Math.Ceiling(height / rows);
 
             // Apply the layout
             for (var i = 0; i < processes.Count; i++) {
                 var process = processes[i];
-                var row = (int) Math.Floor(i / 2.0);
+                var row = (int)Math.Floor(i / 2.0);
                 var column = i % 2 == 0 ? 0 : 1;
                 var x = monitor.WorkArea.Left + column * width + (column == 1 ? LayoutsViewModel.PADDING : 0);
                 var y = monitor.WorkArea.Top + row * height;
 
                 if (!this.previousWindowSettings.ContainsKey(process.Id)) {
-                    this.previousWindowSettings[process.Id] = (User32.SetWindowLongFlags) User32.GetWindowLong(process.MainWindowHandle, User32.WindowLongIndexFlags.GWL_STYLE);
+                    this.previousWindowSettings[process.Id] = (User32.SetWindowLongFlags)User32.GetWindowLong(process.MainWindowHandle, User32.WindowLongIndexFlags.GWL_STYLE);
                 }
 
                 User32.SetWindowLong(process.MainWindowHandle, User32.WindowLongIndexFlags.GWL_STYLE, User32.SetWindowLongFlags.WS_VISIBLE);

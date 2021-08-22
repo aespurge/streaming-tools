@@ -158,7 +158,7 @@
                 // Setup the microsoft TTS object according to the settings.
                 synth.SetOutputToWaveStream(stream);
                 synth.SelectVoice(this.chatConfig.TtsVoice);
-                synth.Volume = (int) this.chatConfig.TtsVolume;
+                synth.Volume = (int)this.chatConfig.TtsVolume;
                 synth.Speak(chatMessage);
 
                 // Now that we filled the stream, seek to the beginning so we can play it.

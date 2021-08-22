@@ -6,7 +6,7 @@
         xmlns:views="clr-namespace:streaming_tools.Views"
         mc:Ignorable="d"
         d:DesignWidth="1300" d:DesignHeight="590"
-        Width="1300" Height="590"
+        Width="1400" Height="590"
 
         x:Class="streaming_tools.Views.MainWindow"
         Icon="/Assets/icon.ico"

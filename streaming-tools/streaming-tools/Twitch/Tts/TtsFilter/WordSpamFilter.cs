@@ -32,11 +32,11 @@
         public Tuple<string, string> Filter(OnMessageReceivedArgs twitchInfo, string username, string currentMessage) {
             // See if a letter is being spammed over and over again in a single word
             var parts = currentMessage.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-            for (int i = 0; i < parts.Length; i++) {
+            for (var i = 0; i < parts.Length; i++) {
                 var part = parts[i].ToList();
                 var previousLetter = ' ';
                 uint consecutiveLetterCount = 1;
-                for (int x = part.Count - 1; x >= 0; x--) {
+                for (var x = part.Count - 1; x >= 0; x--) {
                     var letter = part[x];
 
                     if (previousLetter.Equals(letter)) {

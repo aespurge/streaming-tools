@@ -32,6 +32,16 @@
         private bool adminOn;
 
         /// <summary>
+        ///     True if known bots should be banned, false otherwise.
+        /// </summary>
+        private bool banBots;
+
+        /// <summary>
+        ///     True if we should try to identify hate followers and ban them, false otherwise.
+        /// </summary>
+        private bool banHateFollowers;
+
+        /// <summary>
         ///     The twitch chat configuration object from the persistent configuration.
         /// </summary>
         private TwitchChatConfiguration? chatConfig;
@@ -140,6 +150,47 @@
                 } else {
                     this.admin?.Dispose();
                     this.admin = null;
+                }
+            }
+        }
+
+        /// <summary>
+        ///     Gets or sets a value indicating whether known bots should be banned.
+        /// </summary>
+        public bool BanBots {
+            get => this.banBots;
+            set {
+                this.RaiseAndSetIfChanged(ref this.banBots, value);
+
+                if (null == this.chatConfig) {
+                    return;
+                }
+
+                if (value) {
+                    TwitchChatBotMonitor.Instance.MonitorForBots(this.chatConfig);
+                } else {
+                    TwitchChatBotMonitor.Instance.StopMonitoringForBots(this.chatConfig);
+                }
+            }
+        }
+
+        /// <summary>
+        ///     Gets or sets a value indicating whether we should try to identify hate followers and ban them.
+        /// </summary>
+        public bool BanHateFollowers {
+            get => this.banHateFollowers;
+
+            set {
+                this.RaiseAndSetIfChanged(ref this.banHateFollowers, value);
+
+                if (null == this.chatConfig) {
+                    return;
+                }
+
+                if (value) {
+                    TwitchChatBotMonitor.Instance.MonitorForBots(this.chatConfig);
+                } else {
+                    TwitchChatBotMonitor.Instance.StopMonitoringForBots(this.chatConfig);
                 }
             }
         }
@@ -302,6 +353,8 @@
             this.PauseDuringSpeech = config.PauseDuringSpeech;
             this.TtsVolume = config.TtsVolume;
             this.TtsOn = config.TtsOn;
+            this.BanBots = config.BanBotsInChat;
+            this.BanHateFollowers = config.BanHateFollowers;
         }
 
         /// <summary>
@@ -321,6 +374,8 @@
             config.PauseDuringSpeech = this.PauseDuringSpeech;
             config.TtsOn = this.TtsOn;
             config.TtsVolume = this.TtsVolume;
+            config.BanBotsInChat = this.BanBots;
+            config.BanHateFollowers = this.BanHateFollowers;
 
             this.Config.WriteConfiguration();
         }

@@ -180,7 +180,7 @@
                 volume = 0;
             }
 
-            GlobalSoundManager.Instance.QueueSound(reward.Filename, this.OutputDevice, (int) volume);
+            GlobalSoundManager.Instance.QueueSound(reward.Filename, this.OutputDevice, (int)volume);
         }
 
         /// <summary>
@@ -297,7 +297,7 @@
                     volume = 0;
                 }
 
-                GlobalSoundManager.Instance.QueueSound(this.Filename, this.parent.OutputDevice, (int) volume);
+                GlobalSoundManager.Instance.QueueSound(this.Filename, this.parent.OutputDevice, (int)volume);
             }
 
             /// <summary>
