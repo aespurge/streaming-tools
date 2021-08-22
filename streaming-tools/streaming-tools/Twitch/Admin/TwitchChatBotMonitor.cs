@@ -5,6 +5,7 @@
     using System.Net.Http;
     using System.Text;
     using System.Threading;
+    using System.Threading.Tasks;
     using Models;
     using Newtonsoft.Json;
     using TwitchLib.Api.Helix.Models.Users.GetUserFollows;
@@ -42,7 +43,7 @@
         /// <summary>
         ///     The whitelist of bots to not ban.
         /// </summary>
-        private static readonly string[] WHITELISTED_BOTS = { "soundalerts", "nightbot", "streamlabs" };
+        private static readonly string[] WHITELISTED_BOTS = { "soundalerts", "nightbot", "streamlabs", "pokemoncommunitygame", "streamelements", "moobot" };
 
         /// <summary>
         ///     The thread responsible for constantly checking for bots.
@@ -102,7 +103,7 @@
         /// <summary>
         ///     The main thread that monitors for bots.
         /// </summary>
-        private void MonitorForBots() {
+        private async void MonitorForBots() {
             while (!this.poisonPill) {
                 try {
                     var allConfigs = this.twitchChatsToMonitor.ToArray();
@@ -112,11 +113,11 @@
                         }
 
                         if (config.BanBotsInChat) {
-                            this.FindBannableBots(config.AccountUsername, config.TwitchChannel);
+                            await this.FindBannableBots(config.AccountUsername, config.TwitchChannel);
                         }
 
                         if (config.BanHateFollowers) {
-                            this.FindHateBotFollows(config.AccountUsername, config.TwitchChannel);
+                            await this.FindHateBotFollows(config.AccountUsername, config.TwitchChannel);
                         }
                     }
 
@@ -130,24 +131,24 @@
         /// </summary>
         /// <param name="admin">The account that is a moderator in the chat.</param>
         /// <param name="channel">The channel to check for bots in chat.</param>
-        public async void FindBannableBots(string admin, string channel) {
+        public async Task<bool> FindBannableBots(string admin, string channel) {
             var api = await TwitchChatManager.Instance.GetTwitchClientApi(admin);
             if (null == api) {
-                return;
+                return false;
             }
 
             // Reach out to the api and find out what bots are online.
             var http = new HttpClient();
             var response = await http.GetAsync("https://api.twitchinsights.net/v1/bots/online");
             if (!response.IsSuccessStatusCode) {
-                return;
+                return false;
             }
 
             var content = await response.Content.ReadAsByteArrayAsync();
             var jsonString = Encoding.UTF8.GetString(content);
             var liveBotsResponse = JsonConvert.DeserializeObject<TwitchInsightsLiveBotsResponse>(jsonString);
             if (null == liveBotsResponse) {
-                return;
+                return false;
             }
 
             var liveBots = liveBotsResponse.bots.Select(s => s[0].ToString()?.ToLowerInvariant()).Except(TwitchChatBotMonitor.WHITELISTED_BOTS);
@@ -161,7 +162,7 @@
             var someoneWasBanned = true;
             var client = TwitchChatManager.Instance.GetTwitchChannelClient(channel);
             if (null == client) {
-                return;
+                return false;
             }
 
             // Ban them. The issue with banning is that twitch doesn't always take the command and so we have to try to do it over and over again until we get them all.
@@ -181,6 +182,8 @@
                     Thread.Sleep(2000);
                 }
             }
+
+            return true;
         }
 
         /// <summary>
@@ -189,10 +192,10 @@
         /// </summary>
         /// <param name="admin">The account that is a moderator in the chat.</param>
         /// <param name="channel">The channel to check for bots in their followers list.</param>
-        public async void FindHateBotFollows(string admin, string channel) {
+        public async Task<bool> FindHateBotFollows(string admin, string channel) {
             var api = await TwitchChatManager.Instance.GetTwitchClientApi(admin);
             if (null == api) {
-                return;
+                return false;
             }
 
             // Get the user from the twitch api
@@ -269,14 +272,14 @@
 
             // If there's nothing to ban, we're done.
             if (ban.Count == 0) {
-                return;
+                return false;
             }
 
             // Otherwise, grab a twitch client for typing the ban command in chat.
             var someoneWasBanned = true;
             var client = TwitchChatManager.Instance.GetTwitchChannelClient(channel);
             if (null == client) {
-                return;
+                return false;
             }
 
             // Ban them. The issue with banning is that twitch doesn't always take the command and so we have to try to do it over and over again until we get them all.
@@ -296,6 +299,8 @@
                     Thread.Sleep(2000);
                 }
             }
+
+            return true;
         }
     }
 }
