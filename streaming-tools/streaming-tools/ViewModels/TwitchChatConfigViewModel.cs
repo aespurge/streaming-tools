@@ -169,7 +169,9 @@
                 if (value) {
                     TwitchChatBotMonitor.Instance.MonitorForBots(this.chatConfig);
                 } else {
-                    TwitchChatBotMonitor.Instance.StopMonitoringForBots(this.chatConfig);
+                    if (!this.BanHateFollowers) {
+                        TwitchChatBotMonitor.Instance.StopMonitoringForBots(this.chatConfig);
+                    }
                 }
             }
         }
@@ -190,7 +192,9 @@
                 if (value) {
                     TwitchChatBotMonitor.Instance.MonitorForBots(this.chatConfig);
                 } else {
-                    TwitchChatBotMonitor.Instance.StopMonitoringForBots(this.chatConfig);
+                    if (!this.BanBots) {
+                        TwitchChatBotMonitor.Instance.StopMonitoringForBots(this.chatConfig);
+                    }
                 }
             }
         }
