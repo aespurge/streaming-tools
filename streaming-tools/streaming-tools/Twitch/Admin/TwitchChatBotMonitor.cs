@@ -43,7 +43,7 @@
         /// <summary>
         ///     The whitelist of bots to not ban.
         /// </summary>
-        private static readonly string[] WHITELISTED_BOTS = { "soundalerts", "nightbot", "streamlabs", "pokemoncommunitygame", "streamelements", "moobot" };
+        private static readonly string[] WHITELISTED_BOTS = { "soundalerts", "nightbot", "streamlabs", "pokemoncommunitygame", "streamelements", "moobot", "wizebot" };
 
         /// <summary>
         ///     The thread responsible for constantly checking for bots.
